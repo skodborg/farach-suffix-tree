@@ -13,7 +13,8 @@ def sort(aTupleList):
 
         # split aTupleList between lists
         for tup in aTupleList:
-            # print(tup)
+            # if tup[1] == '$':
+                
             tmp = int(tup[tup_idx] / placement)
             buckets[tmp % RADIX].append(tup)
             if maxLength and tmp > 0:
@@ -48,6 +49,10 @@ def test_sort():
     l = [(2, 22), (1, 33), (2, 11)]
     sort(l)
     assert l == [(1, 33), (2, 11), (2, 22)]
+
+    l = [(2, 22), (1, '$'), (1, 33), (2, 11)]
+    sort(l)
+    assert l == [(1, 33), (1, '$'), (2, 11), (2, 22)]
 
     print('Unit tests succeeded!')
 
