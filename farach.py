@@ -19,12 +19,11 @@ def construct(inputstr):
 
 
 def T_odd(inputstr):
-    # strings are 0-indexed, we +1 to pos 'i' to match the book's examples
-    odd_pos = [i + 1 for i, _ in enumerate(inputstr) if i % 2 == 0]
-
     S = inputstr
     n = len(S)
 
+    # strings are 0-indexed in python, and 1-indexed in the book's examples
+    # so we -2 and -1 from pos 'i' to let our match the book's examples
     chr_pairs = [int(S[2*i-2] + S[2*i-1]) for i in range(1, math.floor(n / 2) + 1)]
     assert chr_pairs == [12, 11, 12, 21, 22, 21]
 
