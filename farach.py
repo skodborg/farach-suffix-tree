@@ -6,9 +6,13 @@ unique_char = '$'
 A = {0: 1, 1: 2}
 # input = '121112212221'
 input = '111222122121'
+# input = 'banana'
+# input = 'mississippi'
 
 # TODO: test that it works for inputs of odd length
 # input = '1211122122211'
+
+# TODO: map arbitrary strings (ie. 'banana') to strings over an integer alphabet
 
 # assumes integer alphabets; works, as we can translate every alphabet
 # to an integer one; we suppose that the last integer in the alphabet
