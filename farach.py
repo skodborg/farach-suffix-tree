@@ -92,17 +92,20 @@ def T_odd(inputstr):
     def resolve_suffix_tree(node):
 
 
-        
+        # Takes every child in merge list, adds a new node with these children as children to the new node
         def merge():
             node = utils.Node(current_char)
             node.children = current_merg
             for n in node.children:
+                # Removes first char, that char is already accounted for on parent node
                 n.parentEdge = n.parentEdge[1:]
             children_list.append(node)
 
         current_char = ''
         current_merg = []
         children_list = []
+
+        # If node is a leaf node, update node id to represent the actually length of string after de-ranking
         if(node.is_leaf()):
             node.id = node.id*2-1
             return
