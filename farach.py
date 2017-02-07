@@ -12,7 +12,7 @@ input = '121112212221'
 # to an integer one; we suppose that the last integer in the alphabet 
 # is contained in O(n)? page 127 in book
 
-def construct(inputstr):
+def construct_suffix_tree(inputstr):
     inputstr += unique_char
     print(inputstr)
 
@@ -63,6 +63,12 @@ def T_odd(inputstr):
     Sm += unique_char
     assert Sm == '212343$'
 
+    # TODO: recursively call construct_suffix_tree(Sm) to create suffix tree for Sm
+    Tree_Sm = construct_suffix_tree(Sm)
+
+    # refine Tree_Sm to generate odd suffix tree Tree_o
+    # TODO: fake above recursive call, implement refining of Tree_Sm
+
 
     print('Not implemented yet')
 
@@ -80,7 +86,7 @@ def cleanup_overmerge(t_overmerged):
 
 
 def main():
-    construct(input)
+    construct_suffix_tree(input)
     
 
 if __name__ == '__main__':
