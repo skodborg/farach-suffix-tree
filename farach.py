@@ -38,44 +38,9 @@ def T_odd(inputstr):
         else:
             return int(char)
 
-    # strings are 0-indexed in python, and 1-indexed in the book's examples
-    # so we -2 and -1 from pos 'i' to let our match the book's examples
-    chr_pairs = [(toInt(S[2 * i - 2]), toInt(S[2 * i - 1]))
-                 for i in range(1, math.floor(n / 2) + 1)]
-    # assert chr_pairs == [(1, 2), (1, 1), (1, 2), (2, 1), (2, 2), (2, 1)]
-
-    # sort in O(k * n) using radix sort (k = 2 here, guaranteed)
-    radixsort.sort(chr_pairs)
-    # assert chr_pairs == [(1, 1), (1, 2), (1, 2), (2, 1), (2, 1), (2, 2)]
-
-    # remove duplicates, O(n)
-    unique_chr_pairs = [chr_pairs[0]]
-    for pair in chr_pairs[1:]:
-        if unique_chr_pairs[-1] != pair:
-            unique_chr_pairs.append(pair)
-    chr_pairs = unique_chr_pairs
-    # assert chr_pairs == [(1, 1), (1, 2), (2, 1), (2, 2)]
-
-    # compute S'[i] = rank of (S[2i - 1], S[2i])
-    Sm = ''
-    count = 1
-    pair2single = {}  # lookup is O(1) for pairs to single character mapping
-    single2pair = {}  # lookup is O(1) for single to pair character mapping
-    for pair in chr_pairs:
-        pair2single[pair] = count
-        single2pair[count] = pair
-        count += 1
-    for i in range(1, math.floor(n / 2) + 1):
-        pair = (toInt(S[2 * i - 2]), toInt(S[2 * i - 1]))
-        Sm += str(pair2single[pair])
-    Sm += unique_char
-    # assert Sm == '212343$'
-
-    # TODO: recursively call construct_suffix_tree(Sm) to create suffix tree for Sm
-    # tree_Sm = construct_suffix_tree(Sm)
-    tree_Sm = faked_tree()
-
     def rank_to_char(node):
+        ''' swaps ranks in trees with corresponding character pair
+            from original string '''
         new_edge = ''
         for c in node.parentEdge:
             if(c == "$"):
@@ -89,12 +54,20 @@ def T_odd(inputstr):
         for n in node.children:
             rank_to_char(n)
 
-    rank_to_char(tree_Sm)
-
     def resolve_suffix_tree(node):
-        # Takes every child in merge list, adds a new node with
-        # these children as children to the new node
+        ''' Takes suffix tree of S' (Sm in code) and massages it into suffix
+            tree of odd (T_odd in book), which is a proper compacted trie.
+            This involves checking first character of every edge of children
+            of inner nodes to see if we need to introduce a new node with this
+            common character as its parentEdge, and the two children who shared
+            this character as its children. Further handles cases of a newly
+            introduced node only having one child, and removes itself while
+            correcting the tree structure around it (modify parentEdge to
+            include its only child-nodes parentEdge and let its parent have
+            its child as child before finally removing itself) '''
         def merge():
+            # Takes every child in merge list, adds a new node with
+            # these children as children to the new node
             node = utils.Node(current_char)
             node.children = current_merg
             for n in node.children:
@@ -143,8 +116,53 @@ def T_odd(inputstr):
         for n in node.children:
             resolve_suffix_tree(n)
 
+    # strings are 0-indexed in python, and 1-indexed in the book's examples
+    # so we -2 and -1 from pos 'i' to let our match the book's examples
+    chr_pairs = [(toInt(S[2 * i - 2]), toInt(S[2 * i - 1]))
+                 for i in range(1, math.floor(n / 2) + 1)]
+    # assert chr_pairs == [(1, 2), (1, 1), (1, 2), (2, 1), (2, 2), (2, 1)]
+
+    # sort in O(k * n) using radix sort (k = 2 here, guaranteed)
+    radixsort.sort(chr_pairs)
+    # assert chr_pairs == [(1, 1), (1, 2), (1, 2), (2, 1), (2, 1), (2, 2)]
+
+    # remove duplicates, O(n)
+    unique_chr_pairs = [chr_pairs[0]]
+    for pair in chr_pairs[1:]:
+        if unique_chr_pairs[-1] != pair:
+            unique_chr_pairs.append(pair)
+    chr_pairs = unique_chr_pairs
+    # assert chr_pairs == [(1, 1), (1, 2), (2, 1), (2, 2)]
+
+    # compute S'[i] = rank of (S[2i - 1], S[2i])
+    Sm = ''
+    count = 1
+    pair2single = {}  # lookup is O(1) for pairs to single character mapping
+    single2pair = {}  # lookup is O(1) for single to pair character mapping
+    for pair in chr_pairs:
+        pair2single[pair] = count
+        single2pair[count] = pair
+        count += 1
+    for i in range(1, math.floor(n / 2) + 1):
+        pair = (toInt(S[2 * i - 2]), toInt(S[2 * i - 1]))
+        Sm += str(pair2single[pair])
+    Sm += unique_char
+    # assert Sm == '212343$'
+
+    # TODO: recursively call construct_suffix_tree(Sm) to create suffix tree for Sm
+    # tree_Sm = construct_suffix_tree(Sm)
+    tree_Sm = faked_tree()
+
+    # convert edge characters from ranks to original character pairs
+    # + convert leaf ids to corresponding original suffix ids
+    rank_to_char(tree_Sm)
+
+    # massage into proper compacted trie 
+    # (no edges of a node share first character)
     resolve_suffix_tree(tree_Sm)
+
     print(tree_Sm.fancyprint())
+    return tree_Sm
 
 
 def faked_tree():
