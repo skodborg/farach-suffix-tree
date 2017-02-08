@@ -86,7 +86,9 @@ def T_odd(inputstr):
             # Takes every child in merge list, adds a new node with
             # these children as children to the new node
             node = utils.Node(current_char)
-            node.children = current_merg
+            for cm in current_merg:
+                node.add_child(cm)
+
             for n in node.children:
                 # Removes first char, as it is already accounted for on parent node
                 n.parentEdge = n.parentEdge[1:]
@@ -125,10 +127,14 @@ def T_odd(inputstr):
         # Merging with parent
 
         if(len(children_list) == 1):
-            node.children = children_list[0].children
+            node.children = []
+            for n in children_list[0].children:
+                node.add_child(n)
             node.parentEdge += children_list[0].parentEdge
         else:
-            node.children = children_list
+            node.children = []
+            for n in children_list:
+                node.add_child(n)
 
         for n in node.children:
             resolve_suffix_tree(n)
@@ -178,8 +184,25 @@ def T_odd(inputstr):
     # (no edges of a node share first character)
     resolve_suffix_tree(tree_Sm)
 
+    #test_tree_correctness(tree_Sm)
+
     print(tree_Sm.fancyprint())
     return tree_Sm
+
+def test_tree_correctness(tree):
+
+    def helper(node):
+        children = node.children
+
+        for child in children:
+            if(child.parent == node):
+                print("Yay")
+            else:
+                print("NOO")
+            helper(child)
+
+    helper(tree)
+
 
 
 def faked_tree():
