@@ -38,7 +38,7 @@ def construct_suffix_tree(inputstr):
     # TODO: return suffix tree if inputstr is of length 1 or 2
 
     t_odd = T_odd(inputstr)
-    # t_even = T_even(t_odd)
+    t_even = T_even(t_odd, inputstr)
     # t_overmerged = overmerge(t_even, t_odd)
     # suffix_tree = cleanup_overmerge(t_overmerged)
     # return suffix_tree
@@ -178,22 +178,18 @@ def T_odd(inputstr):
     # (no edges of a node share first character)
     resolve_suffix_tree(tree_Sm)
 
-    print(tree_Sm.fancyprint())
+    # print(tree_Sm.fancyprint())
     return tree_Sm
 
 
 def faked_tree():
     rootNode = utils.Node("")
-
     rootNode.add_child(utils.Node("$", 7))
-
     rootNode.add_child(utils.Node("124233$", 1))
 
     node = utils.Node("2")
-
     node.add_child(utils.Node("33$", 4))
     node.add_child(utils.Node("4233$", 2))
-
     rootNode.add_child(node)
 
     node = utils.Node("3")
@@ -211,8 +207,138 @@ def faked_tree():
     print('Not implemented yet')
 
 
-def T_even(t_odd):
-    print('Not implemented yet')
+def T_even(t_odd, inputstr):
+    S = inputstr
+    n = len(S)
+
+    # (i)
+    # find the lexicographical ordering of the even suffixes
+    odd_suffix_ordering = [n.id for n in t_odd.leaflist()]
+
+    # even_suffixes is a list of tuples (x[2i], suffix[2i + 1]) to radix sort
+    even_suffixes = [(int(S[n-2]), n) for n in odd_suffix_ordering if n != 1]
+    
+    radixsort.sort(even_suffixes, 0)
+
+    even_suffixes = [tup[1] - 1 for tup in even_suffixes]
+    # in case S is of even length, n % 2 == 0, the even suffix at pos n
+    # is the last one in the sorted list, as it starts with character '$'
+    # which, by definition, is ranked as |alphabet| + 1, i.e. last character
+    if n % 2 == 0:
+        even_suffixes.append(S[n - 1])
+    
+    assert even_suffixes == [12, 2, 10, 6, 8, 4]
+    
+    # (ii)
+    # compute lcp for adjacent even suffixes
+    lcp = {}
+    for idx in range(0, len(even_suffixes) - 1):
+        i = even_suffixes[idx]
+        j = even_suffixes[idx + 1]
+        curr_lcp = 0
+        while i < n and j < n:
+            if S[i-1] == S[j-1]:
+                curr_lcp += 1
+                i += 1
+                j += 1
+            else:
+                break
+        lcp[(even_suffixes[idx], even_suffixes[idx + 1])] = curr_lcp
+    
+    assert lcp[(12, 2)] == 1
+    assert lcp[(2, 10)] == 1
+    assert lcp[(10, 6)] == 0
+    assert lcp[(6, 8)] == 1
+    assert lcp[(8, 4)] == 2
+
+    # (iii)
+    # construct T_even using information from (i) and (ii)
+    root = utils.Node(aId='root')
+    fst_suf = even_suffixes[0]
+    str_fst_suf = S[fst_suf - 1:]
+    node_fst_suf = utils.Node(aParentEdge=str_fst_suf, aId=fst_suf)
+    root.add_child(node_fst_suf)
+    id2node = {fst_suf: node_fst_suf}
+
+    # TODO: DESCRIBE THE THREE CASES BELOW
+    #   - lcp = 0:          new child of root node
+    #   - lcp = prev_lcp:   siblings, new node as child of prev_node's parent
+    #   - lcp > prev_lcp:   new inner node somewhere on parentEdge of prev_node
+    
+    for i in range(1, len(even_suffixes)):
+        prev_suf = even_suffixes[i - 1]
+        curr_suf = even_suffixes[i]
+
+        curr_lcp = lcp[(prev_suf, curr_suf)]
+        prev_lcp = None
+        if i > 1:
+            prevprev_suf = even_suffixes[i - 2]
+            prev_lcp = lcp[(prevprev_suf, prev_suf)]
+        
+        if curr_lcp == 0:
+            new_node = utils.Node(aParentEdge=S[curr_suf - 1:], aId=curr_suf)
+            root.add_child(new_node)
+            id2node[curr_suf] = new_node
+        else:
+            if prev_lcp:
+                if prev_lcp == curr_lcp:
+                    # siblings
+                    str_curr_remaining = S[curr_suf - 1 + curr_lcp:]
+                    new_node = utils.Node(aParentEdge=str_curr_remaining, aId=curr_suf)
+                    prev_node = id2node[prev_suf]
+                    prev_node.parent.add_child(new_node)
+                else:
+                    # We need a nifty way to determine parentEdge of the
+                    # added innernode in this case, based on parentEdge
+                    # of prev_node, length of prev_suf and length of lcp
+
+                    # See drawing on sharelatex for this particular case
+                    
+                    prev_node = id2node[prev_suf]
+
+                    str_prev_suf = S[prev_suf - 1:]
+                    prev_node_prevprev_node_lcp = len(str_prev_suf) - len(prev_node.parentEdge)
+
+                    len_innernode_parentEdge = curr_lcp - prev_node_prevprev_node_lcp
+                    start_idx = curr_suf - 1 + prev_node_prevprev_node_lcp
+                    end_idx = start_idx + len_innernode_parentEdge
+                    innernode_parentEdge = S[start_idx:end_idx]
+                    newnode_parentEdge = S[end_idx:]
+
+                    innernode = utils.Node(aParentEdge=innernode_parentEdge, aId='inner2')
+                    new_node = utils.Node(aParentEdge=newnode_parentEdge, aId=curr_suf)
+                    prev_node_parent = prev_node.parent
+                    prev_node_parent.children[-1] = innernode
+                    prev_node.parentEdge = prev_node.parentEdge[len_innernode_parentEdge:]
+                    innernode.parent = prev_node_parent
+                    innernode.add_child(prev_node)
+                    innernode.add_child(new_node)
+
+            else:
+                str_curr_lcp = S[curr_suf - 1:curr_suf - 1 + curr_lcp]
+                innernode = utils.Node(aParentEdge=str_curr_lcp, aId='inner')
+
+                str_curr_remaining = S[curr_suf - 1 + curr_lcp:]
+                new_node = utils.Node(aParentEdge=str_curr_remaining, aId=curr_suf)
+                id2node[curr_suf] = new_node
+                prev_node = id2node[prev_suf]
+
+                # update prev_node by removing lcp from its parentEdge
+                # as it has been assigned a new parent who's parentEdge
+                # is exactly lcp
+                prev_node.parentEdge = prev_node.parentEdge[len(str_curr_lcp):]
+
+                prev_node.parent.children[-1] = innernode
+                innernode.parent = prev_node.parent
+
+                # important! prev_node must be added before new_node to
+                # keep lexicographic ordering of children
+                innernode.add_child(prev_node)
+                innernode.add_child(new_node)
+
+    t_even = root
+    print(t_even.fancyprint())
+    return t_even
 
 
 def overmerge(t_even, t_odd):
