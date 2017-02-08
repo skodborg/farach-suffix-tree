@@ -12,8 +12,6 @@ input = '111222122121'
 # TODO: test that it works for inputs of odd length
 # input = '1211122122211'
 
-# TODO: map arbitrary strings (ie. 'banana') to strings over an integer alphabet
-
 # assumes integer alphabets; works, as we can translate every alphabet
 # to an integer one; we suppose that the last integer in the alphabet
 # is contained in O(n)? page 127 in book
