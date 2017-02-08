@@ -12,9 +12,6 @@ input = '111222122121'
 # TODO: test that it works for inputs of odd length
 # input = '1211122122211'
 
-# assumes integer alphabets; works, as we can translate every alphabet
-# to an integer one; we suppose that the last integer in the alphabet
-# is contained in O(n)? page 127 in book
 
 def str2int(string):
     ''' list append is O(1), string join() is O(n), totaling O(n) conversion
@@ -34,6 +31,9 @@ def str2int(string):
 def construct_suffix_tree(inputstr):
     inputstr += unique_char
     print(inputstr)
+    # converting to integer alphabet
+    inputstr = str2int(inputstr)
+    print(inputstr)
 
     # TODO: return suffix tree if inputstr is of length 1 or 2
 
@@ -49,6 +49,7 @@ def T_odd(inputstr):
     n = len(S)
 
     def toInt(char):
+        # TODO: redundant with conversion to integer alphabet?
         if char == '$':
             return len(A) + 1
         else:
