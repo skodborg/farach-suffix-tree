@@ -18,6 +18,20 @@ input = '111222122121'
 # to an integer one; we suppose that the last integer in the alphabet
 # is contained in O(n)? page 127 in book
 
+def str2int(string):
+    ''' list append is O(1), string join() is O(n), totaling O(n) conversion
+        time from string to string over int alphabet '''
+    int_alph = {}
+    new_str_list = []
+    count = 1
+    for c in string:
+        if c not in int_alph:
+            int_alph[c] = str(count)
+            count += 1
+        new_str_list.append(int_alph[c])
+    new_str = ''.join(new_str_list)
+    return new_str
+
 
 def construct_suffix_tree(inputstr):
     inputstr += unique_char
