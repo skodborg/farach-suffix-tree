@@ -16,6 +16,12 @@ input = '111222122121'
 def str2int(string):
     ''' list append is O(1), string join() is O(n), totaling O(n) conversion
         time from string to string over int alphabet '''
+
+    # TODO: only supports alphabets of size 10, characters 0-9
+    #       need to output string as list of separated integers, to enable
+    #       differentiation between char 23 and chars 2 and 3
+    #       e.g.: output [23, 2, 3] or '23 2 3' or '23,2,3'
+    #       not : '2323'
     int_alph = {}
     new_str_list = []
     count = 1
@@ -39,7 +45,7 @@ def construct_suffix_tree(inputstr):
 
     t_odd = T_odd(inputstr)
     t_even = T_even(t_odd, inputstr)
-    # t_overmerged = overmerge(t_even, t_odd)
+    t_overmerged = overmerge(t_even, t_odd)
     # suffix_tree = cleanup_overmerge(t_overmerged)
     # return suffix_tree
 
@@ -254,6 +260,7 @@ def T_even(t_odd, inputstr):
     
     # (ii)
     # compute lcp for adjacent even suffixes
+    # TODO: NOT O(n), TREE SHOULD BE PREPROCESSED ACCORDING TO [HT84]
     lcp = {}
     for idx in range(0, len(even_suffixes) - 1):
         i = even_suffixes[idx]
@@ -368,7 +375,7 @@ def overmerge(t_even, t_odd):
     print('Not implemented yet')
 
 
-def cleanup_overmerge(t_overmerged):
+def adjust_overmerge(t_overmerged):
     print('Not implemented yet')
 
 
