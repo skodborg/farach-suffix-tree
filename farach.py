@@ -4,8 +4,8 @@ import utils
 
 unique_char = '$'
 A = {0: 1, 1: 2}
-# input = '121112212221'
-input = '111222122121'
+input = '121112212221'
+#input = '111222122121'
 # input = 'banana'
 # input = 'mississippi'
 
@@ -30,15 +30,15 @@ def str2int(string):
 
 def construct_suffix_tree(inputstr):
     inputstr += unique_char
-    print(inputstr)
     # converting to integer alphabet
     inputstr = str2int(inputstr)
-    print(inputstr)
+
 
     # TODO: return suffix tree if inputstr is of length 1 or 2
 
     t_odd = T_odd(inputstr)
     t_even = T_even(t_odd, inputstr)
+    t_overmerged = overmerge(t_even, t_odd)
     # t_overmerged = overmerge(t_even, t_odd)
     # suffix_tree = cleanup_overmerge(t_overmerged)
     # return suffix_tree
@@ -47,6 +47,8 @@ def construct_suffix_tree(inputstr):
 def T_odd(inputstr):
     S = inputstr
     n = len(S)
+    print(S)
+
 
     def toInt(char):
         # TODO: redundant with conversion to integer alphabet?
@@ -55,13 +57,16 @@ def T_odd(inputstr):
         else:
             return int(char)
 
-    def rank_to_char(node):
+    def rank_to_char(node, eos_char):
         ''' swaps ranks in trees with corresponding character pair
             from original string '''
         new_edge = ''
         for c in node.parentEdge:
-            if(c == "$"):
-                new_edge += "$"
+            if(c == eos_char):
+                if(len(inputstr) % 2 == 1):
+                   new_edge += S[-1]
+                continue
+                #new_edge += "$"
             else:
                 pair = single2pair[toInt(c)]
                 new_edge += str(pair[0])
@@ -69,7 +74,7 @@ def T_odd(inputstr):
         node.parentEdge = new_edge
 
         for n in node.children:
-            rank_to_char(n)
+            rank_to_char(n, eos_char)
 
     def resolve_suffix_tree(node):
         ''' Takes suffix tree of S' (Sm in code) and massages it into suffix
@@ -85,7 +90,7 @@ def T_odd(inputstr):
         def merge():
             # Takes every child in merge list, adds a new node with
             # these children as children to the new node
-            node = utils.Node(current_char)
+            node = utils.Node(current_char, "inner")
             for cm in current_merg:
                 node.add_child(cm)
 
@@ -169,16 +174,20 @@ def T_odd(inputstr):
     for i in range(1, math.floor(n / 2) + 1):
         pair = (toInt(S[2 * i - 2]), toInt(S[2 * i - 1]))
         Sm += str(pair2single[pair])
+    # TODO: Should we append unique char?
     Sm += unique_char
     # assert Sm == '212343$'
-
+    Sm = str2int(Sm)
     # TODO: recursively call construct_suffix_tree(Sm) to create suffix tree for Sm
     # tree_Sm = construct_suffix_tree(Sm)
-    tree_Sm = faked_tree()
+   
+    tree_Sm = faked_tree_book()
 
     # convert edge characters from ranks to original character pairs
     # + convert leaf ids to corresponding original suffix ids
-    rank_to_char(tree_Sm)
+    rank_to_char(tree_Sm, Sm[-1])
+    print("Rank to char:")
+    print(tree_Sm.fancyprint())
 
     # massage into proper compacted trie 
     # (no edges of a node share first character)
@@ -186,7 +195,6 @@ def T_odd(inputstr):
 
     #test_tree_correctness(tree_Sm)
 
-    print(tree_Sm.fancyprint())
     return tree_Sm
 
 def test_tree_correctness(tree):
@@ -205,29 +213,51 @@ def test_tree_correctness(tree):
 
 
 
-def faked_tree():
-    rootNode = utils.Node("")
-    rootNode.add_child(utils.Node("$", 7))
-    rootNode.add_child(utils.Node("124233$", 1))
+def faked_tree_article():
+    rootNode = utils.Node(aId="root")
+    rootNode.add_child(utils.Node("5", 7))
+    rootNode.add_child(utils.Node("1242335", 1))
 
-    node = utils.Node("2")
-    node.add_child(utils.Node("33$", 4))
-    node.add_child(utils.Node("4233$", 2))
+    node = utils.Node("2", "inner")
+    node.add_child(utils.Node("335", 4))
+    node.add_child(utils.Node("42335", 2))
     rootNode.add_child(node)
 
-    node = utils.Node("3")
-    node.add_child(utils.Node("$", 6))
-    node.add_child(utils.Node("3$", 5))
+    node = utils.Node("3", "inner")
+    node.add_child(utils.Node("5", 6))
+    node.add_child(utils.Node("35", 5))
     rootNode.add_child(node)
 
-    rootNode.add_child(utils.Node("4233$", 3))
+    rootNode.add_child(utils.Node("42335", 3))
+
+    return rootNode
+
+def faked_tree_book():
+    rootNode = utils.Node(aId="root")
+
+    rootNode.add_child(utils.Node("123435", 2))
+
+    inner = utils.Node("2", "inner")
+    inner.add_child(utils.Node("123435", 1))
+    inner.add_child(utils.Node("3435", 3))
+
+    rootNode.add_child(inner)
+
+    inner = utils.Node("3", "inner")
+
+    inner.add_child(utils.Node("435", 4))
+    inner.add_child(utils.Node("5", 6))
+
+    rootNode.add_child(inner)
+
+    rootNode.add_child(utils.Node("435", 5))
+    rootNode.add_child(utils.Node("5", 7))
 
     return rootNode
 
     # refine Tree_Sm to generate odd suffix tree Tree_o
     # TODO: fake above recursive call, implement refining of Tree_Sm
 
-    print('Not implemented yet')
 
 
 def T_even(t_odd, inputstr):
@@ -236,6 +266,7 @@ def T_even(t_odd, inputstr):
 
     # (i)
     # find the lexicographical ordering of the even suffixes
+
     odd_suffix_ordering = [n.id for n in t_odd.leaflist()]
 
     # even_suffixes is a list of tuples (x[2i], suffix[2i + 1]) to radix sort
@@ -250,7 +281,7 @@ def T_even(t_odd, inputstr):
     if n % 2 == 0:
         even_suffixes.append(S[n - 1])
     
-    assert even_suffixes == [12, 2, 10, 6, 8, 4]
+    #assert even_suffixes == [12, 2, 10, 6, 8, 4]
     
     # (ii)
     # compute lcp for adjacent even suffixes
@@ -268,11 +299,11 @@ def T_even(t_odd, inputstr):
                 break
         lcp[(even_suffixes[idx], even_suffixes[idx + 1])] = curr_lcp
     
-    assert lcp[(12, 2)] == 1
+    '''assert lcp[(12, 2)] == 1
     assert lcp[(2, 10)] == 1
     assert lcp[(10, 6)] == 0
     assert lcp[(6, 8)] == 1
-    assert lcp[(8, 4)] == 2
+    assert lcp[(8, 4)] == 2'''
 
     # (iii)
     # construct T_even using information from (i) and (ii)
@@ -360,12 +391,90 @@ def T_even(t_odd, inputstr):
                 innernode.add_child(new_node)
 
     t_even = root
-    print(t_even.fancyprint())
+
     return t_even
 
 
 def overmerge(t_even, t_odd):
-    print('Not implemented yet')
+    
+    t_overmerged = utils.Node(aId="root")
+    print("t_even")
+    print(t_even.fancyprint())
+
+    print("t_odd")
+    print(t_odd.fancyprint())
+
+    def merger_helper(current, even, odd):
+        even_children = even.children
+        odd_children = odd.children
+
+        e = 0
+        o = 0
+
+        while (e < len(even_children) or o < len(odd_children)):
+            e_child = None 
+            e_char = None
+            o_child = None 
+            o_char = None
+
+            if(e < len(even_children)):
+                e_child = even_children[e]
+                e_char = e_child.parentEdge[0]
+
+            if(o < len(odd_children)):
+                o_child = odd_children[o]
+                o_char = o_child.parentEdge[0]
+
+
+
+            if(e_child == None):
+                o += 1
+                current.add_child(o_child)
+                continue
+
+            if(o_child == None):
+                e += 1
+                current.add_child(e_child)
+                continue
+
+
+            if(o_char != e_char):
+                if(o_char < e_char):
+                    current.add_child(utils.Node(o_child.parentEdge, o_child.id))
+                    o += 1
+                else:
+                    current.add_child(utils.Node(e_child.parentEdge, e_child.id))
+                    e += 1
+            else:
+                # Even and odd have same first char in parent edge
+                
+                e_parentEdge = e_child.parentEdge
+                o_parentEdge = o_child.parentEdge
+
+                if(len(e_parentEdge) != len(o_parentEdge)):
+                    print("-"*50)
+                    print(e_child.id)
+                    print(o_child.id)
+                    if(len(e_parentEdge) < len(o_parentEdge)):
+                        inner_node = utils.Node(e_child.parentEdge, e_child.id)
+                        current.add_child(inner_node)
+                        inner_node.add_child(utils.Node(o_child.parentEdge, o_child.id))
+                    else:
+                        inner_node = utils.Node(o_child.parentEdge, o_child.id)
+                        current.add_child(inner_node)
+                        inner_node.add_child(utils.Node(e_child.parentEdge, e_child.id))
+                else:
+                    #TODO: Hvad skal der stå på parentEdge
+                    inner = utils.Node(e_parentEdge, "inner?")
+                    current.add_child(inner)
+                    merger_helper(inner, e_child, o_child)
+
+                o += 1
+                e += 1
+
+    merger_helper(t_overmerged, t_even, t_odd)
+
+    print(t_overmerged.fancyprint())
 
 
 def cleanup_overmerge(t_overmerged):
