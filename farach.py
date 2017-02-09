@@ -63,14 +63,36 @@ def T_odd(inputstr):
         else:
             return int(char)
 
-    def rank_to_char(node, eos_char):
+    def rank2char(node, eos_char):
         ''' swaps ranks in trees with corresponding character pair
             from original string '''
         new_edge = ''
         for c in node.parentEdge:
             if(c == eos_char):
                 if(len(inputstr) % 2 == 1):
-                   new_edge += S[-1]
+                    # SPECIAL CASE:
+                    #   the eos_char ('$' in the book) is not a part of
+                    #   any of the ranks, but it must still sit at the end
+                    #   of every suffix in the final suffix tree T_odd,
+                    #   so we simply swap the last character of the string
+                    #   of ranks (the '$' added by the recursive call) and
+                    #   the last character of the inputstr (the actual '$' on
+                    #   the current alphabet on the current input)
+                    # example:
+                    #   inputstr is 121112212221
+                    #   construct_suffix_tree adds the '$', which is then 
+                    #   converted to a '3' in str2int, giving 1211122122213
+                    #   The string of rankings of character pairs are then
+                    #   created, giving us '212343'
+                    #   This string is now subject to a recursive call, which
+                    #   also appends a '$', which in this case is converted
+                    #   to '5'
+                    #   If, when ranking the original inputstr, '13' was not
+                    #   a character pair (because the string was of even length),
+                    #   then we need to insert these '3's manually. They have
+                    #   to be placed exactly where '5' occurs in the returned
+                    #   suffix tree, which is what happens here
+                    new_edge += S[-1]
                 continue
                 #new_edge += "$"
             else:
@@ -80,7 +102,7 @@ def T_odd(inputstr):
         node.parentEdge = new_edge
 
         for n in node.children:
-            rank_to_char(n, eos_char)
+            rank2char(n, eos_char)
 
     def resolve_suffix_tree(node):
         ''' Takes suffix tree of S' (Sm in code) and massages it into suffix
@@ -154,11 +176,11 @@ def T_odd(inputstr):
     # so we -2 and -1 from pos 'i' to let our match the book's examples
     chr_pairs = [(toInt(S[2 * i - 2]), toInt(S[2 * i - 1]))
                  for i in range(1, math.floor(n / 2) + 1)]
-    # assert chr_pairs == [(1, 2), (1, 1), (1, 2), (2, 1), (2, 2), (2, 1)]
+    assert chr_pairs == [(1, 2), (1, 1), (1, 2), (2, 1), (2, 2), (2, 1)]
 
     # sort in O(k * n) using radix sort (k = 2 here, guaranteed)
     radixsort.sort(chr_pairs)
-    # assert chr_pairs == [(1, 1), (1, 2), (1, 2), (2, 1), (2, 1), (2, 2)]
+    assert chr_pairs == [(1, 1), (1, 2), (1, 2), (2, 1), (2, 1), (2, 2)]
 
     # remove duplicates, O(n)
     unique_chr_pairs = [chr_pairs[0]]
@@ -166,7 +188,7 @@ def T_odd(inputstr):
         if unique_chr_pairs[-1] != pair:
             unique_chr_pairs.append(pair)
     chr_pairs = unique_chr_pairs
-    # assert chr_pairs == [(1, 1), (1, 2), (2, 1), (2, 2)]
+    assert chr_pairs == [(1, 1), (1, 2), (2, 1), (2, 2)]
 
     # compute S'[i] = rank of (S[2i - 1], S[2i])
     Sm = ''
@@ -180,18 +202,21 @@ def T_odd(inputstr):
     for i in range(1, math.floor(n / 2) + 1):
         pair = (toInt(S[2 * i - 2]), toInt(S[2 * i - 1]))
         Sm += str(pair2single[pair])
+    
     # TODO: Should we append unique char?
-    Sm += unique_char
-    # assert Sm == '212343$'
-    Sm = str2int(Sm)
+    # ANSWER: No, as when we do not fake the result of the recursive call,
+    #         construct_suffix_tree(Sm) will do exactly this!
+    #         We do, however, need to append it as long as we are faking
+    assert Sm == '212343'
+    
     # TODO: recursively call construct_suffix_tree(Sm) to create suffix tree for Sm
     # tree_Sm = construct_suffix_tree(Sm)
-   
     tree_Sm = faked_tree_book()
+    Sm += '5'
 
     # convert edge characters from ranks to original character pairs
     # + convert leaf ids to corresponding original suffix ids
-    rank_to_char(tree_Sm, Sm[-1])
+    rank2char(tree_Sm, Sm[-1])
     print("Rank to char:")
     print(tree_Sm.fancyprint())
 
