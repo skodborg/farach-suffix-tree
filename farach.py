@@ -45,10 +45,7 @@ def construct_suffix_tree(inputstr):
     t_odd = T_odd(inputstr)
     t_even = T_even(t_odd, inputstr)
     t_overmerged = overmerge(t_even, t_odd)
-<<<<<<< HEAD
-    # t_overmerged = overmerge(t_even, t_odd)
-=======
->>>>>>> 7638db1b7d6df71d1f17c3d1e3c9f7568904a242
+
     # suffix_tree = cleanup_overmerge(t_overmerged)
     # return suffix_tree
 
