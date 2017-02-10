@@ -46,13 +46,8 @@ def construct_suffix_tree(inputstr):
     t_even = T_even(t_odd, inputstr)
 
 
-    create_tree(t_odd, "t_odd")
-    create_tree(t_even, "t_even")
-
-    t_overmerged = overmerge(t_even, t_odd)
-
     
-    #create_tree(t_overmerged, "t_overmerged_result")
+    t_overmerged = overmerge(t_even, t_odd)
 
     # suffix_tree = cleanup_overmerge(t_overmerged)
     # return suffix_tree
