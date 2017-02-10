@@ -4,8 +4,8 @@ import utils
 
 unique_char = '$'
 A = {0: 1, 1: 2}
-input = '121112212221'
-#input = '111222122121'
+#input = '121112212221'
+input = '111222122121'
 # input = 'banana'
 # input = 'mississippi'
 
@@ -176,11 +176,11 @@ def T_odd(inputstr):
     # so we -2 and -1 from pos 'i' to let our match the book's examples
     chr_pairs = [(toInt(S[2 * i - 2]), toInt(S[2 * i - 1]))
                  for i in range(1, math.floor(n / 2) + 1)]
-    assert chr_pairs == [(1, 2), (1, 1), (1, 2), (2, 1), (2, 2), (2, 1)]
+    #assert chr_pairs == [(1, 2), (1, 1), (1, 2), (2, 1), (2, 2), (2, 1)]
 
     # sort in O(k * n) using radix sort (k = 2 here, guaranteed)
     radixsort.sort(chr_pairs)
-    assert chr_pairs == [(1, 1), (1, 2), (1, 2), (2, 1), (2, 1), (2, 2)]
+    #assert chr_pairs == [(1, 1), (1, 2), (1, 2), (2, 1), (2, 1), (2, 2)]
 
     # remove duplicates, O(n)
     unique_chr_pairs = [chr_pairs[0]]
@@ -188,7 +188,7 @@ def T_odd(inputstr):
         if unique_chr_pairs[-1] != pair:
             unique_chr_pairs.append(pair)
     chr_pairs = unique_chr_pairs
-    assert chr_pairs == [(1, 1), (1, 2), (2, 1), (2, 2)]
+    #assert chr_pairs == [(1, 1), (1, 2), (2, 1), (2, 2)]
 
     # compute S'[i] = rank of (S[2i - 1], S[2i])
     Sm = ''
@@ -207,18 +207,18 @@ def T_odd(inputstr):
     # ANSWER: No, as when we do not fake the result of the recursive call,
     #         construct_suffix_tree(Sm) will do exactly this!
     #         We do, however, need to append it as long as we are faking
-    assert Sm == '212343'
+    #assert Sm == '212343'
     
     # TODO: recursively call construct_suffix_tree(Sm) to create suffix tree for Sm
     # tree_Sm = construct_suffix_tree(Sm)
-    tree_Sm = faked_tree_book()
+    #tree_Sm = faked_tree_book()
+    tree_Sm = faked_tree_article()
     Sm += '5'
 
     # convert edge characters from ranks to original character pairs
     # + convert leaf ids to corresponding original suffix ids
     rank2char(tree_Sm, Sm[-1])
-    print("Rank to char:")
-    print(tree_Sm.fancyprint())
+
 
     # massage into proper compacted trie 
     # (no edges of a node share first character)
@@ -246,8 +246,8 @@ def test_tree_correctness(tree):
 
 def faked_tree_article():
     rootNode = utils.Node(aId="root")
-    rootNode.add_child(utils.Node("5", 7))
     rootNode.add_child(utils.Node("1242335", 1))
+
 
     node = utils.Node("2", "inner")
     node.add_child(utils.Node("335", 4))
@@ -255,12 +255,13 @@ def faked_tree_article():
     rootNode.add_child(node)
 
     node = utils.Node("3", "inner")
-    node.add_child(utils.Node("5", 6))
     node.add_child(utils.Node("35", 5))
+    node.add_child(utils.Node("5", 6))
     rootNode.add_child(node)
 
     rootNode.add_child(utils.Node("42335", 3))
 
+    rootNode.add_child(utils.Node("5", 7))
     return rootNode
 
 def faked_tree_book():
@@ -430,11 +431,6 @@ def T_even(t_odd, inputstr):
 def overmerge(t_even, t_odd):
     
     t_overmerged = utils.Node(aId="root")
-    print("t_even")
-    print(t_even.fancyprint())
-
-    print("t_odd")
-    print(t_odd.fancyprint())
 
     def merger_helper(current, even, odd):
         even_children = even.children
@@ -484,17 +480,36 @@ def overmerge(t_even, t_odd):
                 o_parentEdge = o_child.parentEdge
 
                 if(len(e_parentEdge) != len(o_parentEdge)):
-                    print("-"*50)
-                    print(e_child.id)
-                    print(o_child.id)
+                
+
                     if(len(e_parentEdge) < len(o_parentEdge)):
                         inner_node = utils.Node(e_child.parentEdge, e_child.id)
                         current.add_child(inner_node)
-                        inner_node.add_child(utils.Node(o_child.parentEdge, o_child.id))
+
+                        e_child_sub = utils.Node(aId="sub_" + str(e_child.id))
+
+                        o_child.parentEdge = o_child.parentEdge[len(e_child.parentEdge):]
+                        e_child_sub.add_child(o_child)
+
+         
+
+                        merger_helper(inner_node, e_child, e_child_sub)
+
                     else:
+
                         inner_node = utils.Node(o_child.parentEdge, o_child.id)
                         current.add_child(inner_node)
-                        inner_node.add_child(utils.Node(e_child.parentEdge, e_child.id))
+
+                        o_child_sub = utils.Node(aId="sub_" + str(o_child.id))
+
+                        e_child.parentEdge = e_child.parentEdge[len(o_child.parentEdge):]
+                        o_child_sub.add_child(e_child)
+
+         
+
+                        merger_helper(inner_node, o_child, o_child_sub)
+
+
                 else:
                     #TODO: Hvad skal der stå på parentEdge
                     inner = utils.Node(e_parentEdge, "inner?")
@@ -505,7 +520,7 @@ def overmerge(t_even, t_odd):
                 e += 1
 
     merger_helper(t_overmerged, t_even, t_odd)
-
+    print("Overmerged tree:")
     print(t_overmerged.fancyprint())
 
 
