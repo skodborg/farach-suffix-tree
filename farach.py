@@ -4,8 +4,8 @@ import utils
 
 unique_char = '$'
 A = {0: 1, 1: 2}
-#input = '121112212221'
-input = '111222122121'
+input = '121112212221'
+#input = '111222122121'
 # input = 'banana'
 # input = 'mississippi'
 
@@ -44,11 +44,34 @@ def construct_suffix_tree(inputstr):
 
     t_odd = T_odd(inputstr)
     t_even = T_even(t_odd, inputstr)
+
+
+    create_tree(t_odd, "t_odd")
+    create_tree(t_even, "t_even")
+
     t_overmerged = overmerge(t_even, t_odd)
+
+    
+    #create_tree(t_overmerged, "t_overmerged_result")
 
     # suffix_tree = cleanup_overmerge(t_overmerged)
     # return suffix_tree
 
+
+def create_tree(tree, root):
+
+    def helper(lvl, node):
+        for n in node.children:
+           print("inner%s = utils.Node(\"%s\", \"%s\")" % (lvl+1, n.parentEdge, n.id))
+           print("inner%s.add_child(inner%s)" % (lvl, lvl+1))
+           helper(lvl+1, n)
+
+
+    print("%s = utils.Node(\"%s\",\"%s\")" % (root, tree.parentEdge, tree.id))
+    for n in tree.children:
+        print("inner1 = utils.Node(\"%s\", \"%s\")" % (n.parentEdge, n.id))
+        print("%s.add_child(inner1)" % root)
+        helper(1, n)
 
 def T_odd(inputstr):
     S = inputstr
@@ -211,8 +234,8 @@ def T_odd(inputstr):
     
     # TODO: recursively call construct_suffix_tree(Sm) to create suffix tree for Sm
     # tree_Sm = construct_suffix_tree(Sm)
-    #tree_Sm = faked_tree_book()
-    tree_Sm = faked_tree_article()
+    tree_Sm = faked_tree_book()
+    #tree_Sm = faked_tree_article()
     Sm += '5'
 
     # convert edge characters from ranks to original character pairs
@@ -471,10 +494,10 @@ def overmerge(t_even, t_odd):
                 # If the first char of the two parentEdges doesnt match, insert the the first char (by lexicographic order),
                 # and insert. Count that up to preceed to next child in child list
                 if(o_char < e_char):
-                    current.add_child(utils.Node(o_child.parentEdge, o_child.id))
+                    current.add_child(o_child)
                     o += 1
                 else:
-                    current.add_child(utils.Node(e_child.parentEdge, e_child.id))
+                    current.add_child(e_child)
                     e += 1
             else:
                 # Even and odd have same first char in parent edge
@@ -503,6 +526,7 @@ def overmerge(t_even, t_odd):
                     long_child.parentEdge = long_child.parentEdge[len(short_child.parentEdge):]
                     short_child_sub.add_child(long_child)
 
+
                     merger_helper(inner_node, short_child, short_child_sub)
 
                 else:
@@ -510,7 +534,8 @@ def overmerge(t_even, t_odd):
                     # If two parent edge's start with the same char, and are of equal length, we will ad an internal node, 
                     # and call our merger_helper recursively with the two sub trees.
                     #TODO: Hvad skal der stå på parentEdge
-                    inner = utils.Node(e_parentEdge, "inner?")
+
+                    inner = utils.Node(e_parentEdge, "inner")
                     current.add_child(inner)
                     merger_helper(inner, e_child, o_child)
 
@@ -518,9 +543,7 @@ def overmerge(t_even, t_odd):
                 e += 1
 
     merger_helper(t_overmerged, t_even, t_odd)
-    print("Overmerged tree:")
-    print(t_overmerged.fancyprint())
-
+    return t_overmerged
 
 def adjust_overmerge(t_overmerged):
     print('Not implemented yet')
