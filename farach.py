@@ -467,6 +467,9 @@ def overmerge(t_even, t_odd):
 
 
             if(o_char != e_char):
+                # Case 1
+                # If the first char of the two parentEdges doesnt match, insert the the first char (by lexicographic order),
+                # and insert. Count that up to preceed to next child in child list
                 if(o_char < e_char):
                     current.add_child(utils.Node(o_child.parentEdge, o_child.id))
                     o += 1
@@ -480,37 +483,32 @@ def overmerge(t_even, t_odd):
                 o_parentEdge = o_child.parentEdge
 
                 if(len(e_parentEdge) != len(o_parentEdge)):
-                
+                    # Case 3
+                    # If the two parentEdge's start with the same char, and is not of equal length
+                    # We will then decide which node has the longest parent edge, insert this into our current merge tree
+                    # we will then call recursively on this edge, and on the child with the longer edge. We do this
+                    # be introducing an substitue node, which only purpose is to make the recursive call possible.
 
-                    if(len(e_parentEdge) < len(o_parentEdge)):
-                        inner_node = utils.Node(e_child.parentEdge, e_child.id)
-                        current.add_child(inner_node)
+                    short_child = e_child if len(e_parentEdge) < len(o_parentEdge) else o_child
 
-                        e_child_sub = utils.Node(aId="sub_" + str(e_child.id))
+                    long_child = o_child if len(e_parentEdge) < len(o_parentEdge) else e_child
 
-                        o_child.parentEdge = o_child.parentEdge[len(e_child.parentEdge):]
-                        e_child_sub.add_child(o_child)
 
-         
+                    inner_node = utils.Node(short_child.parentEdge, short_child.id)
 
-                        merger_helper(inner_node, e_child, e_child_sub)
+                    current.add_child(inner_node)
 
-                    else:
+                    short_child_sub = utils.Node(aId="sub_" + str(short_child.id))
 
-                        inner_node = utils.Node(o_child.parentEdge, o_child.id)
-                        current.add_child(inner_node)
+                    long_child.parentEdge = long_child.parentEdge[len(short_child.parentEdge):]
+                    short_child_sub.add_child(long_child)
 
-                        o_child_sub = utils.Node(aId="sub_" + str(o_child.id))
-
-                        e_child.parentEdge = e_child.parentEdge[len(o_child.parentEdge):]
-                        o_child_sub.add_child(e_child)
-
-         
-
-                        merger_helper(inner_node, o_child, o_child_sub)
-
+                    merger_helper(inner_node, short_child, short_child_sub)
 
                 else:
+                    # Case 2
+                    # If two parent edge's start with the same char, and are of equal length, we will ad an internal node, 
+                    # and call our merger_helper recursively with the two sub trees.
                     #TODO: Hvad skal der stå på parentEdge
                     inner = utils.Node(e_parentEdge, "inner?")
                     current.add_child(inner)
