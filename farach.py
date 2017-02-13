@@ -39,12 +39,10 @@ def construct_suffix_tree(inputstr):
     # converting to integer alphabet
     inputstr = str2int(inputstr)
 
-
     # TODO: return suffix tree if inputstr is of length 1 or 2
 
     t_odd = T_odd(inputstr)
     t_even = T_even(t_odd, inputstr)
-
 
     t_overmerged = overmerge(t_even, t_odd)
 
