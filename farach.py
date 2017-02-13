@@ -472,11 +472,13 @@ def overmerge(t_even, t_odd):
 
             if(e_child == None):
                 o += 1
+                o_child.old_parent = o_child.parent
                 current.add_child(o_child)
                 continue
 
             if(o_child == None):
                 e += 1
+                e_child.old_parent = e_child.parent
                 current.add_child(e_child)
                 continue
 
@@ -486,9 +488,11 @@ def overmerge(t_even, t_odd):
                 # If the first char of the two parentEdges doesnt match, insert the the first char (by lexicographic order),
                 # and insert. Count that up to preceed to next child in child list
                 if(o_char < e_char):
+                    o_child.old_parent = o_child.parent
                     current.add_child(o_child)
                     o += 1
                 else:
+                    e_child.old_parent = e_child.parent
                     current.add_child(e_child)
                     e += 1
             else:
@@ -508,6 +512,8 @@ def overmerge(t_even, t_odd):
 
                     long_child = o_child if len(e_parentEdge) < len(o_parentEdge) else e_child
 
+                    short_child.old_parent = short_child.parent
+                    long_child.old_parent = long_child.parent
 
                     inner_node = utils.Node(short_child.parentEdge, short_child.id)
 
@@ -538,6 +544,21 @@ def overmerge(t_even, t_odd):
     return t_overmerged
 
 def adjust_overmerge(t_overmerged):
+
+    def add_str_length(node, prev_length):
+        node.str_length = prev_length + len(node.parentEdge)
+        for n in node.children:
+            add_str_length(n, node.str_length)
+
+    add_str_length(t_overmerged, 0)
+
+
+
+    #def adjust_helper(current_node):
+    #    current_node.
+
+    #adjust_helper(t_overmerged)
+
     print('Not implemented yet')
 
 

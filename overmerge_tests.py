@@ -8,6 +8,7 @@ def start_tests():
     mix_case_3_1()
     faked_tree_article()
     faked_tree_book()
+    small_example_2()
 
 
 def sorts_correct():
@@ -296,6 +297,46 @@ def faked_tree_book():
 
     assert t_overmerged.fancyprint() == t_overmerged_result.fancyprint()
 
+def small_example():
+    t_even = utils.Node("root")
+    t_even.add_child(utils.Node("11", 2))
 
+    t_odd = utils.Node("root")
+    t_odd.add_child(utils.Node("122", 1))
+
+
+    print("even")
+    print(t_even.fancyprint())
+
+    print("odd")
+    print(t_odd.fancyprint())
+
+    t_overmerged = farach.overmerge(t_even, t_odd)
+
+    print("overmerged")
+    print(t_overmerged.fancyprint())
+
+def small_example_2():
+
+    t_even = utils.Node("root")
+    inner2 = utils.Node("21", "inner")
+    t_even.add_child(inner2)
+    inner2.add_child(utils.Node("213", 6))
+    inner2.add_child(utils.Node("3", 10))
+
+    print("even")
+    print(t_even.fancyprint())
+
+    t_odd = utils.Node("root")
+   
+    t_odd.add_child(utils.Node("2213", 9))
+
+    print("odd")
+    print(t_odd.fancyprint())
+
+    t_overmerged = farach.overmerge(t_even, t_odd)
+    print("t_overmerged")
+    print(t_overmerged.fancyprint())
+    farach.adjust_overmerge(t_overmerged)
 if __name__ == '__main__':
     start_tests()
