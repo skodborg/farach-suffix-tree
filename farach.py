@@ -1,6 +1,7 @@
 import math
 import radixsort
 import utils
+from collections import deque
 
 unique_char = '$'
 A = {0: 1, 1: 2}
@@ -45,6 +46,8 @@ def construct_suffix_tree(inputstr):
     t_even = T_even(t_odd, inputstr)
 
     t_overmerged = overmerge(t_even, t_odd)
+
+    compute_lcp_tree(t_overmerged)
 
     # suffix_tree = cleanup_overmerge(t_overmerged)
     # return suffix_tree
@@ -536,6 +539,33 @@ def overmerge(t_even, t_odd):
 
     merger_helper(t_overmerged, t_even, t_odd)
     return t_overmerged
+
+
+def compute_lcp_tree(t_overmerged):
+    leafnode_occurences = []
+
+    def append_leafnodes(node):
+        if type(node.id) is int:
+            leafnode_occurences.append(node)
+
+    t_overmerged.traverse(append_leafnodes)
+
+    print([n.id for n in leafnode_occurences])
+
+    lca_nodepairs = []
+    curr_node = leafnode_occurences[0]
+    for node in leafnode_occurences[1:]:
+        if curr_node.id % 2 == node.id % 2:
+            # we found a homogenous pair, swap curr_node for last seen
+            # node with parity (even/odd) opposite node
+            curr_node = lca_nodepairs[-1][1]
+
+        lca_nodepairs.append((curr_node, node))
+
+    print([(n.id, m.id) for n, m in lca_nodepairs])
+
+    print('Not implemented yet')
+
 
 def adjust_overmerge(t_overmerged):
     print('Not implemented yet')

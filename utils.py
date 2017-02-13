@@ -1,5 +1,6 @@
 from itertools import count
 import random as rnd
+from collections import deque
 
 
 class Tree:
@@ -106,6 +107,14 @@ class Node:
             result += ':%f' % self.parentEdge
 
         return result
+
+    def traverse(self, fn):
+        lifo = deque()
+        lifo.append(self)
+        while lifo:
+            node = lifo.pop()
+            lifo.extend(reversed(node.children))
+            fn(node)
 
     def leaflist(self):
         def rec_helper(aNode):
