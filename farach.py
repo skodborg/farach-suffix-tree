@@ -547,6 +547,18 @@ def overmerge(t_even, t_odd):
     return t_overmerged
 
 
+def naive_lca(node1, node2, tree):
+    ''' strategy:   from node1, test if node2 is in the subtree of node1
+                        - if so, report node1 as LCA
+                    if not, proceed to parent node and do:
+                        - if parent node is node2, report parent node as LCA
+                        - if parent node has node2 in its subtree, report 
+                          parent node as LCA
+                        - if neither, recurse to parent's parent
+    '''
+    print('Not implemented yet')
+
+
 def compute_lcp_tree(t_overmerged):
     leafnode_occurences = []
 
