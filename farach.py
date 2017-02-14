@@ -1,7 +1,6 @@
 import math
 import radixsort
 import utils
-from copy import deepcopy
 from collections import deque
 
 unique_char = '$'
@@ -49,6 +48,8 @@ def construct_suffix_tree(inputstr):
     t_overmerged = overmerge(t_even, t_odd)
 
     compute_lcp_tree(t_overmerged)
+
+    adjust_overmerge(t_overmerged, t_even, t_odd)
 
     # suffix_tree = cleanup_overmerge(t_overmerged)
     # return suffix_tree
@@ -465,24 +466,24 @@ def overmerge(t_even, t_odd):
             o_char = None
 
             if(e < len(even_children)):
-                e_child = deepcopy(even_children[e])
+                e_child = even_children[e]
                 e_char = e_child.parentEdge[0]
 
             if(o < len(odd_children)):
-                o_child = deepcopy(odd_children[o])
+                o_child = odd_children[o]
                 o_char = o_child.parentEdge[0]
 
 
 
             if(e_child == None):
                 o += 1
-                o_child.old_parent = deepcopy(o_child.parent)
+                o_child.old_parent = o_child.parent
                 current.add_child(o_child)
                 continue
 
             if(o_child == None):
                 e += 1
-                e_child.old_parent = deepcopy(e_child.parent)
+                e_child.old_parent = e_child.parent
                 current.add_child(e_child)
                 continue
 
@@ -658,11 +659,26 @@ def compute_lcp_tree(t_overmerged):
 def adjust_overmerge(t_overmerged, t_even, t_odd):
 
     def add_str_length(node, prev_length):
+        # TODO: consider do this as we form the overmerge tree
         node.str_length = prev_length + len(node.parentEdge)
         for n in node.children:
             add_str_length(n, node.str_length)
 
     add_str_length(t_overmerged, 0)
+
+
+    def check(curr_node):
+        if(hasattr(curr_node, "lcp_depth")):
+            print("Node: " + str(curr_node.id) + ("-")*50)
+            print("Str_length: %i" %curr_node.str_length)
+            print("lcp_depth: %i" % curr_node.lcp_depth)
+
+            if curr_node.str_length != curr_node.lcp_depth:
+                print("BLACK LINE ON TREE")
+
+
+    t_overmerged.bfs(check)
+
 
 
 
