@@ -582,9 +582,6 @@ def naive_lca(node1, node2, tree):
     return None
 
 
-    print('Not implemented yet')
-
-
 def compute_lcp_tree(t_overmerged):
     leafnode_occurences = []
 
