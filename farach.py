@@ -629,13 +629,28 @@ def compute_lcp_tree(t_overmerged):
         node2_next = id2node[node2.id + 1]
         lca_parent = naive_lca(node1_next, node2_next, t_overmerged)
         lca.suffix_link = lca_parent
-    
+
+    # ---------------------------------------
+    # ADD LCP DEPTH TO ALL NODES USING A SINGLE DFS
+    # ---------------------------------------
+    def lcp_depth(node):
+        if hasattr(node, 'suffix_link'):
+            node.lcp_depth = node.suffix_link.lcp_depth + 1
+    t_overmerged.lcp_depth = 0
+    t_overmerged.bfs(lcp_depth)
+
     # verify LCP-tree by somehow printing it
     # def print_lcp_parent(node):
+    #     if node.id == 'root':
+    #         print('root node')
+    #         print('LCP DEPTH: %i' % node.lcp_depth)
+    #         print()
     #     if hasattr(node, 'suffix_link'):
     #         print('node %s with leaflist %s has parent %s with leaflist %s' %
     #             (node, str(node.leaflist()),
     #              node.suffix_link, str(node.suffix_link.leaflist())))
+    #         print('LCP DEPTH: %i' % node.lcp_depth)
+    #         print()
     # t_overmerged.traverse(print_lcp_parent)
 
 

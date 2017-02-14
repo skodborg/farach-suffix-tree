@@ -109,6 +109,10 @@ class Node:
         return result
 
     def traverse(self, fn):
+        self.dfs(fn)
+
+    def dfs(self, fn):
+        # depth-first search
         lifo = deque()
         lifo.append(self)
         while lifo:
@@ -116,6 +120,14 @@ class Node:
             lifo.extend(reversed(node.children))
             fn(node)
 
+    def bfs(self, fn):
+        # breadth-first search
+        fifo = deque()
+        fifo.append(self)
+        while fifo:
+            node = fifo.pop()
+            fifo.extendleft(node.children)
+            fn(node)
 
     def leaflist(self):
         result = []
