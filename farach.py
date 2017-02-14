@@ -1,6 +1,7 @@
 import math
 import radixsort
 import utils
+from copy import deepcopy
 from collections import deque
 
 unique_char = '$'
@@ -464,24 +465,24 @@ def overmerge(t_even, t_odd):
             o_char = None
 
             if(e < len(even_children)):
-                e_child = even_children[e]
+                e_child = deepcopy(even_children[e])
                 e_char = e_child.parentEdge[0]
 
             if(o < len(odd_children)):
-                o_child = odd_children[o]
+                o_child = deepcopy(odd_children[o])
                 o_char = o_child.parentEdge[0]
 
 
 
             if(e_child == None):
                 o += 1
-                o_child.old_parent = o_child.parent
+                o_child.old_parent = deepcopy(o_child.parent)
                 current.add_child(o_child)
                 continue
 
             if(o_child == None):
                 e += 1
-                e_child.old_parent = e_child.parent
+                e_child.old_parent = deepcopy(e_child.parent)
                 current.add_child(e_child)
                 continue
 
@@ -604,7 +605,7 @@ def compute_lcp_tree(t_overmerged):
     print('Not implemented yet')
 
 
-def adjust_overmerge(t_overmerged):
+def adjust_overmerge(t_overmerged, t_even, t_odd):
 
     def add_str_length(node, prev_length):
         node.str_length = prev_length + len(node.parentEdge)
