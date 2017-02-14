@@ -109,11 +109,24 @@ class Node:
         return result
 
     def traverse(self, fn):
+        self.dfs(fn)
+
+    def dfs(self, fn):
+        # depth-first search
         lifo = deque()
         lifo.append(self)
         while lifo:
             node = lifo.pop()
             lifo.extend(reversed(node.children))
+            fn(node)
+
+    def bfs(self, fn):
+        # breadth-first search
+        fifo = deque()
+        fifo.append(self)
+        while fifo:
+            node = fifo.pop()
+            fifo.extendleft(node.children)
             fn(node)
 
     def leaflist(self):
@@ -147,7 +160,9 @@ class Node:
         self.children = []
 
     def __repr__(self):
-        self_id = self.id if self.id else 'no-id'
+        self_id = 'no-id'
+        if self.id:
+            self_id = 'node'+str(self.id) if 'inner' not in str(self.id) else 'inner'
         return self_id
 
 

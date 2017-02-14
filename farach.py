@@ -561,7 +561,7 @@ def naive_lca(node1, node2, tree):
 
     def node_is_descendant(node1, node2):
         descendants = []
-        node1.traverse(lambda n: descendants.append(n) 
+        node1.traverse(lambda n: descendants.append(n)
             if 'inner' not in str(n.id) else 'do nothing')
         is_descendant = True in [n.id == node2.id for n in descendants]
         return is_descendant
@@ -584,6 +584,11 @@ def naive_lca(node1, node2, tree):
 
 
 def compute_lcp_tree(t_overmerged):
+    ''' Augments every, to the algorithm relevant, node in t_overmerged with
+        an attribute, node.suffix_link, pointing to the node representing
+        the string of the current node minus first character
+        Running time: O(n)
+    '''
     leafnode_occurences = []
 
     def append_leafnodes(node):
@@ -602,7 +607,52 @@ def compute_lcp_tree(t_overmerged):
 
         lca_nodepairs.append((curr_node, node))
 
-    print('Not implemented yet')
+    # given 'i', access node representing i'th suffix in O(1)
+    # using O(n) preprocessing time
+    id2node = []
+    t_overmerged.traverse(lambda n: id2node.append((n.id, n))
+        if 'inner' not in str(n.id) else 'do nothing')
+    id2node = dict(id2node)
+
+    # ---------------------------------------
+    # CREATE LCP TREE
+    # ---------------------------------------
+    for node1, node2 in lca_nodepairs:
+        # TODO: using naive_lca to find lca to create suffix link, this
+        #       must instead be the constant time lookup as described in
+        #       the article [Ht84], otherwise we do not achieve O(n) running
+        #       time for the algorithm
+        lca = naive_lca(node1, node2, t_overmerged)
+        if lca.id == 'root':
+            # we cannot create a suffix link from root as it is undefined
+            continue
+        node1_next = id2node[node1.id + 1]
+        node2_next = id2node[node2.id + 1]
+        lca_parent = naive_lca(node1_next, node2_next, t_overmerged)
+        lca.suffix_link = lca_parent
+
+    # ---------------------------------------
+    # ADD LCP DEPTH TO ALL NODES USING A SINGLE DFS
+    # ---------------------------------------
+    def lcp_depth(node):
+        if hasattr(node, 'suffix_link'):
+            node.lcp_depth = node.suffix_link.lcp_depth + 1
+    t_overmerged.lcp_depth = 0
+    t_overmerged.bfs(lcp_depth)
+
+    # verify LCP-tree by somehow printing it
+    # def print_lcp_parent(node):
+    #     if node.id == 'root':
+    #         print('root node')
+    #         print('LCP DEPTH: %i' % node.lcp_depth)
+    #         print()
+    #     if hasattr(node, 'suffix_link'):
+    #         print('node %s with leaflist %s has parent %s with leaflist %s' %
+    #             (node, str(node.leaflist()),
+    #              node.suffix_link, str(node.suffix_link.leaflist())))
+    #         print('LCP DEPTH: %i' % node.lcp_depth)
+    #         print()
+    # t_overmerged.traverse(print_lcp_parent)
 
 
 def adjust_overmerge(t_overmerged, t_even, t_odd):
