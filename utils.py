@@ -116,6 +116,7 @@ class Node:
             lifo.extend(reversed(node.children))
             fn(node)
 
+
     def leaflist(self):
         result = []
         self.traverse(lambda n: result.append(n) if n.is_leaf() else 'do nothing')
@@ -147,7 +148,9 @@ class Node:
         self.children = []
 
     def __repr__(self):
-        self_id = self.id if self.id else 'no-id'
+        self_id = 'no-id'
+        if self.id:
+            self_id = 'node'+str(self.id) if 'inner' not in str(self.id) else 'inner'
         return self_id
 
 
