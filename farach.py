@@ -556,6 +556,35 @@ def naive_lca(node1, node2, tree):
                           parent node as LCA
                         - if neither, recurse to parent's parent
     '''
+
+
+    def node_is_descendant(node1, node2):
+        is_descendant = False
+
+        def check_descendant(curr_node):
+            nonlocal is_descendant
+            if curr_node.id == node2.id:
+                is_descendant = True
+        node1.traverse(check_descendant)
+      
+        return is_descendant
+
+    curr_node = node1
+    no_result = True
+    while no_result:
+
+        if curr_node.id == "root":
+            no_result = False
+
+        if node_is_descendant(curr_node, node2):
+            no_result = False
+            return curr_node
+        else:
+            curr_node = curr_node.parent
+
+    return None
+
+
     print('Not implemented yet')
 
 
@@ -581,6 +610,9 @@ def compute_lcp_tree(t_overmerged):
         lca_nodepairs.append((curr_node, node))
 
     print([(n.id, m.id) for n, m in lca_nodepairs])
+
+    test = naive_lca(lca_nodepairs[len(lca_nodepairs)-1][0], lca_nodepairs[len(lca_nodepairs)-1][1], t_overmerged)
+    print(test)
 
     print('Not implemented yet')
 
