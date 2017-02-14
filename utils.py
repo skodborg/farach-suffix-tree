@@ -117,23 +117,26 @@ class Node:
             fn(node)
 
     def leaflist(self):
-        def rec_helper(aNode):
-            temp = []
-            if len(aNode.children) == 0:
-                # base case
-                # aNode has no children, return itself as it is a leaf
-                return [aNode]
-            else:
-                # rec. case
-                # aNode has children, return all their leaf descendants
-                for c in aNode.children:
-                    recursive_leafnodes_list = c.leaflist()
-                    temp.append(recursive_leafnodes_list)
-                # flatten before return
-                # should not return list-of-lists, just a flat list
-                flat_leaf_list = [i for sublist in temp for i in sublist]
-                return flat_leaf_list
-        return rec_helper(self)
+        result = []
+        self.traverse(lambda n: result.append(n) if n.is_leaf() else 'do nothing')
+        return result
+        # def rec_helper(aNode):
+        #     temp = []
+        #     if len(aNode.children) == 0:
+        #         # base case
+        #         # aNode has no children, return itself as it is a leaf
+        #         return [aNode]
+        #     else:
+        #         # rec. case
+        #         # aNode has children, return all their leaf descendants
+        #         for c in aNode.children:
+        #             recursive_leafnodes_list = c.leaflist()
+        #             temp.append(recursive_leafnodes_list)
+        #         # flatten before return
+        #         # should not return list-of-lists, just a flat list
+        #         flat_leaf_list = [i for sublist in temp for i in sublist]
+        #         return flat_leaf_list
+        # return rec_helper(self)
 
     def __init__(self, aParentEdge='', aId=None, aData=None):
         self.graphid = next(self._ids)

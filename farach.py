@@ -555,7 +555,13 @@ def naive_lca(node1, node2, tree):
                         - if parent node has node2 in its subtree, report 
                           parent node as LCA
                         - if neither, recurse to parent's parent
+        running time: awful!
     '''
+    descendants = []
+    node1.traverse(lambda n: descendants.append(n) 
+        if 'inner' not in str(n.id) else 'do nothing')
+    is_descendant = True in [n.id == node2.id for n in descendants]
+
     print('Not implemented yet')
 
 
