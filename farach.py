@@ -555,22 +555,19 @@ def naive_lca(node1, node2, tree):
                         - if parent node has node2 in its subtree, report 
                           parent node as LCA
                         - if neither, recurse to parent's parent
+        running time: awful!
     '''
 
-
     def node_is_descendant(node1, node2):
-        is_descendant = False
-
-        def check_descendant(curr_node):
-            nonlocal is_descendant
-            if curr_node.id == node2.id:
-                is_descendant = True
-        node1.traverse(check_descendant)
-      
+        descendants = []
+        node1.traverse(lambda n: descendants.append(n) 
+            if 'inner' not in str(n.id) else 'do nothing')
+        is_descendant = True in [n.id == node2.id for n in descendants]
         return is_descendant
 
     curr_node = node1
     no_result = True
+    
     while no_result:
 
         if curr_node.id == "root":
@@ -597,8 +594,6 @@ def compute_lcp_tree(t_overmerged):
 
     t_overmerged.traverse(append_leafnodes)
 
-    print([n.id for n in leafnode_occurences])
-
     lca_nodepairs = []
     curr_node = leafnode_occurences[0]
     for node in leafnode_occurences[1:]:
@@ -608,11 +603,6 @@ def compute_lcp_tree(t_overmerged):
             curr_node = lca_nodepairs[-1][1]
 
         lca_nodepairs.append((curr_node, node))
-
-    print([(n.id, m.id) for n, m in lca_nodepairs])
-
-    test = naive_lca(lca_nodepairs[len(lca_nodepairs)-1][0], lca_nodepairs[len(lca_nodepairs)-1][1], t_overmerged)
-    print(test)
 
     print('Not implemented yet')
 
