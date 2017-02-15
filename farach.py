@@ -69,9 +69,15 @@ def construct_suffix_tree(inputstr):
         return root
 
     t_odd = T_odd(inputstr)
+    print('odd tree:')
+    print(t_odd.fancyprint())
     t_even = T_even(t_odd, inputstr)
+    print('even tree:')
+    print(t_even.fancyprint())
 
     t_overmerged = overmerge(t_even, t_odd)
+    print('overmerged tree:')
+    print(t_overmerged.fancyprint())
 
     compute_lcp_tree(t_overmerged)
 
@@ -743,6 +749,7 @@ def adjust_overmerge(t_overmerged, t_even, t_odd):
 
 def main():
     suffix_tree = construct_suffix_tree(input)
+    print('final tree:')
     print(suffix_tree.fancyprint())
 
 
