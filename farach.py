@@ -523,11 +523,14 @@ def overmerge(t_even, t_odd):
                     inner_node = utils.Node(short_child.parentEdge, short_child.id)
 
                     current.add_child(inner_node)
+                    current.even_subtree = even
+                    current.odd_subtree = odd
 
                     short_child_sub = utils.Node(aId="sub_" + str(short_child.id))
 
                     long_child.parentEdge = long_child.parentEdge[len(short_child.parentEdge):]
                     short_child_sub.add_child(long_child)
+
 
 
                     merger_helper(inner_node, short_child, short_child_sub)
@@ -540,6 +543,8 @@ def overmerge(t_even, t_odd):
 
                     inner = utils.Node(e_parentEdge, "inner")
                     current.add_child(inner)
+                    current.even_subtree = even
+                    current.odd_subtree = odd
                     merger_helper(inner, e_child, o_child)
 
                 o += 1
@@ -668,6 +673,7 @@ def adjust_overmerge(t_overmerged, t_even, t_odd):
 
 
     def check(curr_node):
+        # TODO: wtf name
         if(hasattr(curr_node, "lcp_depth")):
             print("Node: " + str(curr_node.id) + ("-")*50)
             print("Str_length: %i" %curr_node.str_length)
