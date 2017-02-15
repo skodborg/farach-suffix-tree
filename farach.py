@@ -46,7 +46,9 @@ def construct_suffix_tree(inputstr):
     # TODO: return suffix tree if inputstr is of length 1 or 2
     # TODO: unique char append?
     if len(inputstr) == 1:
-        return utils.Node(aId=1, aParentEdge=inputstr)
+        root = utils.Node(aId='root')
+        root.add_child(utils.Node(aId=1, aParentEdge=inputstr))
+        return root
     elif len(inputstr) == 2:
         root = utils.Node(aId='root')
         suffix1 = inputstr
