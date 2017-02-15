@@ -523,8 +523,10 @@ def overmerge(t_even, t_odd):
                     inner_node = utils.Node(short_child.parentEdge, short_child.id)
 
                     current.add_child(inner_node)
-                    current.even_subtree = even
-                    current.odd_subtree = odd
+                    inner_node.even_subtree = e_child
+                    inner_node.odd_subtree = o_child
+                    e_child.old_parentEdge = e_child.parentEdge
+                    o_child.old_parentEdge = o_child.parentEdge
 
                     short_child_sub = utils.Node(aId="sub_" + str(short_child.id))
 
@@ -543,8 +545,8 @@ def overmerge(t_even, t_odd):
 
                     inner = utils.Node(e_parentEdge, "inner")
                     current.add_child(inner)
-                    current.even_subtree = even
-                    current.odd_subtree = odd
+                    inner.even_subtree = e_child
+                    inner.odd_subtree = o_child
                     merger_helper(inner, e_child, o_child)
 
                 o += 1
@@ -672,37 +674,40 @@ def adjust_overmerge(t_overmerged, t_even, t_odd):
     add_str_length(t_overmerged, 0)
 
 
-    def check(curr_node):
-        # TODO: wtf name
+    def adjust_overmerge_helper(curr_node):
         if(hasattr(curr_node, "lcp_depth")):
-            print("Node: " + str(curr_node.id) + ("-")*50)
-            print("Str_length: %i" %curr_node.str_length)
-            print("lcp_depth: %i" % curr_node.lcp_depth)
 
             if curr_node.str_length != curr_node.lcp_depth:
                 
                 parentEdge_length = curr_node.lcp_depth - curr_node.parent.str_length
 
                 new_node_parentEdge = curr_node.parentEdge[:parentEdge_length]
-                print("new parentEdge %i" % parentEdge_length)
-                print(new_node_parentEdge)
+           
+                curr_node.children = []
 
+                curr_node.parentEdge = new_node_parentEdge
+                curr_node.id = "inner"
+                even_tree = curr_node.even_subtree
+                odd_tree  = curr_node.odd_subtree
 
-                new_node = utils.Node("", "inner") 
+                if hasattr(even_tree, "old_parentEdge"):
+                    even_tree.parentEdge = even_tree.old_parentEdge
+                                
+                if hasattr(odd_tree, "old_parentEdge"):
+                    odd_tree.parentEdge = odd_tree.old_parentEdge
 
+                even_tree.parentEdge = even_tree.parentEdge[parentEdge_length:]
+                odd_tree.parentEdge = odd_tree.parentEdge[parentEdge_length:]
 
+                if even_tree.parentEdge[0] < odd_tree.parentEdge[0]:
+                    curr_node.add_child(even_tree)
+                    curr_node.add_child(odd_tree)
+                else:
+                    curr_node.add_child(odd_tree)
+                    curr_node.add_child(even_tree)
 
-    t_overmerged.bfs(check)
-
-
-
-
-    #def adjust_helper(current_node):
-    #    current_node.
-
-    #adjust_helper(t_overmerged)
-
-    print('Not implemented yet')
+    t_overmerged.bfs(adjust_overmerge_helper)
+    print(t_overmerged.fancyprint())
 
 
 def main():
