@@ -674,7 +674,16 @@ def adjust_overmerge(t_overmerged, t_even, t_odd):
             print("lcp_depth: %i" % curr_node.lcp_depth)
 
             if curr_node.str_length != curr_node.lcp_depth:
-                print("BLACK LINE ON TREE")
+                
+                parentEdge_length = curr_node.lcp_depth - curr_node.parent.str_length
+
+                new_node_parentEdge = curr_node.parentEdge[:parentEdge_length]
+                print("new parentEdge %i" % parentEdge_length)
+                print(new_node_parentEdge)
+
+
+                new_node = utils.Node("", "inner") 
+
 
 
     t_overmerged.bfs(check)
