@@ -9,7 +9,7 @@ A = {0: 1, 1: 2}
 #input = '111222122121'
 # input = 'banana'
 # input = 'mississippi'
-input = '122'
+input = '1222'
 
 # TODO: test that it works for inputs of odd length
 # input = '1211122122211'
@@ -639,7 +639,7 @@ def compute_lcp_tree(t_overmerged):
     lca_nodepairs = []
     curr_node = leafnode_occurences[0]
     for node in leafnode_occurences[1:]:
-        if curr_node.id % 2 == node.id % 2:
+        if curr_node.id % 2 == node.id % 2 and lca_nodepairs:
             # we found a homogenous pair, swap curr_node for last seen
             # node with parity (even/odd) opposite node
             curr_node = lca_nodepairs[-1][1]
