@@ -645,10 +645,13 @@ def compute_lcp_tree(t_overmerged):
     lca_nodepairs = []
     curr_node = leafnode_occurences[0]
     for node in leafnode_occurences[1:]:
-        if curr_node.id % 2 == node.id % 2 and lca_nodepairs:
+        if curr_node.id % 2 == node.id % 2:
             # we found a homogenous pair, swap curr_node for last seen
             # node with parity (even/odd) opposite node
-            curr_node = lca_nodepairs[-1][1]
+            if lca_nodepairs:
+                curr_node = lca_nodepairs[-1][1]
+            else:
+                continue
 
         lca_nodepairs.append((curr_node, node))
 
