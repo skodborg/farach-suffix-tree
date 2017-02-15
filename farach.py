@@ -5,10 +5,11 @@ from collections import deque
 
 unique_char = '$'
 A = {0: 1, 1: 2}
-input = '121112212221'
+# input = '121112212221'
 #input = '111222122121'
 # input = 'banana'
 # input = 'mississippi'
+input = '122'
 
 # TODO: test that it works for inputs of odd length
 # input = '1211122122211'
@@ -40,7 +41,30 @@ def construct_suffix_tree(inputstr):
     # converting to integer alphabet
     inputstr = str2int(inputstr)
 
+    print('construct inputstr: %s' % inputstr)
+
     # TODO: return suffix tree if inputstr is of length 1 or 2
+    # TODO: unique char append?
+    if len(inputstr) == 1:
+        return utils.Node(aId=1, aParentEdge=inputstr)
+    elif len(inputstr) == 2:
+        root = utils.Node(aId='root')
+        suffix1 = inputstr
+        suffix2 = inputstr[1:]
+        # if suffix1[0] == suffix2[0]:
+        #     # construct tree of depth 2
+        #     inner = utils.Node(aId='inner', aParentEdge=suffix1[0])
+        #     root.add_child(inner)
+        #     fst_child = utils.Node(aId=1, aParentEdge=suffix)
+        # else:
+            # construct tree of depth 1
+        if suffix1[0] < suffix2[0]:
+            root.add_child(utils.Node(aId=1, aParentEdge=suffix1))
+            root.add_child(utils.Node(aId=2, aParentEdge=suffix2))
+        else:
+            root.add_child(utils.Node(aId=1, aParentEdge=suffix2))
+            root.add_child(utils.Node(aId=2, aParentEdge=suffix1))
+        return root
 
     t_odd = T_odd(inputstr)
     t_even = T_even(t_odd, inputstr)
@@ -52,7 +76,7 @@ def construct_suffix_tree(inputstr):
     adjust_overmerge(t_overmerged, t_even, t_odd)
 
     # suffix_tree = cleanup_overmerge(t_overmerged)
-    # return suffix_tree
+    return t_overmerged
 
 
 def create_tree(tree, root):
@@ -73,8 +97,7 @@ def create_tree(tree, root):
 def T_odd(inputstr):
     S = inputstr
     n = len(S)
-    print(S)
-
+    print('T_odd inputstr: %s' % inputstr)
 
     def toInt(char):
         # TODO: redundant with conversion to integer alphabet?
@@ -230,14 +253,20 @@ def T_odd(inputstr):
     #assert Sm == '212343'
     
     # TODO: recursively call construct_suffix_tree(Sm) to create suffix tree for Sm
-    # tree_Sm = construct_suffix_tree(Sm)
-    tree_Sm = faked_tree_book()
+    print('prior Sm: %s' % Sm)
+    tree_Sm = construct_suffix_tree(Sm)
+    # tree_Sm = faked_tree_book()
     #tree_Sm = faked_tree_article()
-    Sm += '5'
+    # Sm += '5'
 
     # convert edge characters from ranks to original character pairs
     # + convert leaf ids to corresponding original suffix ids
-    rank2char(tree_Sm, Sm[-1])
+    print('recursively constructed tree for Sm = %s:' % Sm)
+    print(tree_Sm.fancyprint())
+    # TODO: is the below true?
+    eos_char = tree_Sm.leaflist()[0].parentEdge[-1]
+    print('eos_char: %s' % eos_char)
+    rank2char(tree_Sm, eos_char)
 
 
     # massage into proper compacted trie 
@@ -711,7 +740,8 @@ def adjust_overmerge(t_overmerged, t_even, t_odd):
 
 
 def main():
-    construct_suffix_tree(input)
+    suffix_tree = construct_suffix_tree(input)
+    print(suffix_tree.fancyprint())
 
 
 if __name__ == '__main__':
