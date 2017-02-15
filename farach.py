@@ -746,7 +746,7 @@ def adjust_overmerge(t_overmerged, t_even, t_odd):
 
 def main():
     suffix_tree = construct_suffix_tree(input)
-    print('final tree:')
+    print('final tree for input %s:' % input)
     print(suffix_tree.fancyprint())
 
 
