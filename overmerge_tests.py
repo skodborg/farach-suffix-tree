@@ -8,7 +8,7 @@ def start_tests():
     mix_case_3_1()
     faked_tree_article()
     faked_tree_book()
-    small_example_2()
+    # small_example_2()  # only prints stuff, no asserts
 
 
 def sorts_correct():
@@ -337,6 +337,8 @@ def small_example_2():
     t_overmerged = farach.overmerge(t_even, t_odd)
     print("t_overmerged")
     print(t_overmerged.fancyprint())
-    farach.adjust_overmerge(t_overmerged)
+    farach.adjust_overmerge(t_overmerged, t_even, t_odd)
+
+
 if __name__ == '__main__':
     start_tests()

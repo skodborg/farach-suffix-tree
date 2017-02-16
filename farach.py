@@ -7,9 +7,9 @@ unique_char = '$'
 A = {0: 1, 1: 2}
 # input = '121112212221'
 # input = '111222122121'
-# input = 'banana'
+input = 'banana'
 # input = 'mississippi'
-input = '1222'
+# input = '1'
 
 # TODO: test that it works for inputs of odd length
 # input = '1211122122211'
@@ -43,28 +43,31 @@ def construct_suffix_tree(inputstr):
 
     # TODO: return suffix tree if inputstr is of length 1 or 2
     # TODO: unique char append?
-    if len(inputstr) == 1:
+    # TODO: test that the expected tree is returned for very small inputstr's
+    if len(inputstr) - 1 == 1:
+        # inputstr was just a single char before we appended the unique_char
         root = utils.Node(aId='root')
         root.add_child(utils.Node(aId=1, aParentEdge=inputstr))
+        root.add_child(utils.Node(aId=2, aParentEdge=inputstr[1]))
         return root
-    elif len(inputstr) == 2:
+    elif len(inputstr) - 1 == 2:
+        # inputstr was two chars before we appended the unique_char
         root = utils.Node(aId='root')
         suffix1 = inputstr
         suffix2 = inputstr[1:]
-        # if suffix1[0] == suffix2[0]:
-        #     # construct tree of depth 2
-        #     inner = utils.Node(aId='inner', aParentEdge=suffix1[0])
-        #     root.add_child(inner)
-        #     fst_child = utils.Node(aId=1, aParentEdge=suffix)
-        # else:
-            # construct tree of depth 1
-        if suffix1[0] < suffix2[0]:
+        if suffix1[0] == suffix2[0]:
+            inputstr += unique_char
+            return construct_suffix_tree(inputstr)
+        elif suffix1[0] < suffix2[0]:
             root.add_child(utils.Node(aId=1, aParentEdge=suffix1))
             root.add_child(utils.Node(aId=2, aParentEdge=suffix2))
+            root.add_child(utils.Node(aId=3, aParentEdge=suffix2[1]))
         else:
             root.add_child(utils.Node(aId=1, aParentEdge=suffix2))
             root.add_child(utils.Node(aId=2, aParentEdge=suffix1))
+            root.add_child(utils.Node(aId=3, aParentEdge=suffix2[1]))
         return root
+
 
     t_odd = T_odd(inputstr)
     # print('odd tree:')
@@ -118,7 +121,7 @@ def T_odd(inputstr):
         new_edge = ''
         for c in node.parentEdge:
             if(c == eos_char):
-                if(len(inputstr) % 2 == 1):
+                # if(len(inputstr) % 2 == 1):
                     # SPECIAL CASE:
                     #   the eos_char ('$' in the book) is not a part of
                     #   any of the ranks, but it must still sit at the end
@@ -141,7 +144,9 @@ def T_odd(inputstr):
                     #   then we need to insert these '3's manually. They have
                     #   to be placed exactly where '5' occurs in the returned
                     #   suffix tree, which is what happens here
-                    new_edge += S[-1]
+                #     new_edge += S[-1]
+                # elif len(node.parentEdge) == 1:
+                #     new_edge += S[-1]
                 continue
                 #new_edge += "$"
             else:
@@ -188,6 +193,8 @@ def T_odd(inputstr):
 
         for child in node.children:
             edge = child.parentEdge
+            if not edge:
+                continue
             if(edge[0] == current_char or current_char == ''):
                 current_merg.append(child)
                 current_char = edge[0]
@@ -257,7 +264,6 @@ def T_odd(inputstr):
     #         construct_suffix_tree(Sm) will do exactly this!
     #         We do, however, need to append it as long as we are faking
     #assert Sm == '212343'
-    
     # TODO: recursively call construct_suffix_tree(Sm) to create suffix tree for Sm
     tree_Sm = construct_suffix_tree(Sm)
     # tree_Sm = faked_tree_book()
@@ -269,7 +275,7 @@ def T_odd(inputstr):
     # TODO: is the below true?
     eos_char = tree_Sm.leaflist()[0].parentEdge[-1]
     rank2char(tree_Sm, eos_char)
-
+    
     # massage into proper compacted trie 
     # (no edges of a node share first character)
     resolve_suffix_tree(tree_Sm)
@@ -348,7 +354,6 @@ def T_even(t_odd, inputstr):
 
     # (i)
     # find the lexicographical ordering of the even suffixes
-
     odd_suffix_ordering = [n.id for n in t_odd.leaflist()]
 
     # even_suffixes is a list of tuples (x[2i], suffix[2i + 1]) to radix sort
@@ -360,8 +365,9 @@ def T_even(t_odd, inputstr):
     # in case S is of even length, n % 2 == 0, the even suffix at pos n
     # is the last one in the sorted list, as it starts with character '$'
     # which, by definition, is ranked as |alphabet| + 1, i.e. last character
-    if n % 2 == 0:
-        even_suffixes.append(S[n - 1])
+    # TODO: what is below code doing???
+    # if n % 2 == 0:
+    #     even_suffixes.append(int(S[n - 1]))
     
     #assert even_suffixes == [12, 2, 10, 6, 8, 4]
     
@@ -665,7 +671,7 @@ def compute_lcp_tree(t_overmerged):
         #       the article [Ht84], otherwise we do not achieve O(n) running
         #       time for the algorithm
         lca = naive_lca(node1, node2, t_overmerged)
-        if lca.id == 'root':
+        if lca.id == 'root' or node1.id + 1 not in id2node or node2.id + 1 not in id2node:
             # we cannot create a suffix link from root as it is undefined
             continue
         node1_next = id2node[node1.id + 1]
