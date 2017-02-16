@@ -9,7 +9,7 @@ A = {0: 1, 1: 2}
 # input = '111222122121'
 input = 'banana'
 # input = 'mississippi'
-# input = '1'
+input = '112'
 
 # TODO: test that it works for inputs of odd length
 # input = '1211122122211'
@@ -56,8 +56,11 @@ def construct_suffix_tree(inputstr):
         suffix1 = inputstr
         suffix2 = inputstr[1:]
         if suffix1[0] == suffix2[0]:
-            inputstr += unique_char
-            return construct_suffix_tree(inputstr)
+            inner = utils.Node(aId='inner', aParentEdge=suffix2[0])
+            root.add_child(inner)
+            inner.add_child(utils.Node(aId=1, aParentEdge=suffix1[1:]))
+            inner.add_child(utils.Node(aId=2, aParentEdge=suffix2[1]))
+            root.add_child(utils.Node(aId=3, aParentEdge=suffix2[1]))
         elif suffix1[0] < suffix2[0]:
             root.add_child(utils.Node(aId=1, aParentEdge=suffix1))
             root.add_child(utils.Node(aId=2, aParentEdge=suffix2))
@@ -121,6 +124,16 @@ def T_odd(inputstr):
         new_edge = ''
         for c in node.parentEdge:
             if(c == eos_char):
+                # TODO: reconsider below: we never want to replace eos_char with
+                #       anything, do we? eos_char is added specifically for
+                #       Sm, and we want to adjust the tree edges to correspond
+                #       to strings found in S and not Sm, therefore there is
+                #       no corresponding character in S to replace eos_char in
+                #       Sm with, hence we replace with nothing. This leaves a
+                #       single edge with only eos_char on it, which we manually
+                #       remove in the adjustment code, the same code that also
+                #       makes use of this rank2char-function
+
                 # if(len(inputstr) % 2 == 1):
                     # SPECIAL CASE:
                     #   the eos_char ('$' in the book) is not a part of
@@ -265,16 +278,27 @@ def T_odd(inputstr):
     #         We do, however, need to append it as long as we are faking
     #assert Sm == '212343'
     # TODO: recursively call construct_suffix_tree(Sm) to create suffix tree for Sm
+    # print('before tree_sm')
     tree_Sm = construct_suffix_tree(Sm)
+    # tree_Sm.children.pop()
     # tree_Sm = faked_tree_book()
     #tree_Sm = faked_tree_article()
     # Sm += '5'
 
+    # print('inputstr: %s' % inputstr)
+    # print('tree_Sm before rank2char')
+    # print(tree_Sm.fancyprint())
+    # print()
     # convert edge characters from ranks to original character pairs
     # + convert leaf ids to corresponding original suffix ids
     # TODO: is the below true?
     eos_char = tree_Sm.leaflist()[0].parentEdge[-1]
+    # print('eos_char: %s' % eos_char)
     rank2char(tree_Sm, eos_char)
+
+    # print('tree_Sm AFTER rank2char')
+    # print(tree_Sm.fancyprint())
+    # print('\n\n')
     
     # massage into proper compacted trie 
     # (no edges of a node share first character)
