@@ -9,7 +9,7 @@ A = {0: 1, 1: 2}
 # input = '111222122121'
 input = 'banana'
 # input = 'mississippi'
-input = '111'
+# input = '1222'
 
 # TODO: test that it works for inputs of odd length
 # input = '1211122122211'
@@ -113,6 +113,7 @@ def create_tree(tree, root):
 def T_odd(inputstr):
     S = inputstr
     n = len(S)
+    print('Todd input: %s' % inputstr)
 
     def toInt(char):
         # TODO: redundant with conversion to integer alphabet?
@@ -136,6 +137,13 @@ def T_odd(inputstr):
                 #       single edge with only eos_char on it, which we manually
                 #       remove in the adjustment code, the same code that also
                 #       makes use of this rank2char-function
+                if len(S) % 2 == 1:
+                    if node.is_leaf():
+                        # we have a leaf node! and we have an even inputstr!
+                        # we need to append '$' to the end of the parentEdge
+                        # in this case
+                        new_edge += S[-1]
+
 
                 # if(len(inputstr) % 2 == 1):
                     # SPECIAL CASE:
