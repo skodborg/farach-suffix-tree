@@ -9,7 +9,7 @@ A = {0: 1, 1: 2}
 # input = '111222122121'
 input = 'banana'
 # input = 'mississippi'
-input = '112'
+input = '111'
 
 # TODO: test that it works for inputs of odd length
 # input = '1211122122211'
@@ -71,18 +71,21 @@ def construct_suffix_tree(inputstr):
             root.add_child(utils.Node(aId=3, aParentEdge=suffix2[1]))
         return root
 
+    print('construct called with inputstr: %s' % inputstr)
 
     t_odd = T_odd(inputstr)
-    # print('odd tree:')
-    # print(t_odd.fancyprint())
+    print('odd tree:')
+    print(t_odd.fancyprint())
 
     t_even = T_even(t_odd, inputstr)
-    # print('even tree:')
-    # print(t_even.fancyprint())
+    print('even tree:')
+    print(t_even.fancyprint())
+
+    print('\n\n')
 
     t_overmerged = overmerge(t_even, t_odd)
-    # print('overmerged tree:')
-    # print(t_overmerged.fancyprint())
+    print('overmerged tree:')
+    print(t_overmerged.fancyprint())
 
     compute_lcp_tree(t_overmerged)
 
@@ -185,14 +188,14 @@ def T_odd(inputstr):
         def merge():
             # Takes every child in merge list, adds a new node with
             # these children as children to the new node
-            node = utils.Node(current_char, "inner")
+            inner = utils.Node(current_char, "inner")
             for cm in current_merg:
-                node.add_child(cm)
+                inner.add_child(cm)
 
-            for n in node.children:
+            for n in inner.children:
                 # Removes first char, as it is already accounted for on parent node
                 n.parentEdge = n.parentEdge[1:]
-            children_list.append(node)
+            children_list.append(inner)
 
         current_char = ''
         current_merg = []
@@ -228,15 +231,22 @@ def T_odd(inputstr):
         # Correcting tree if a node only has one child.
         # Merging with parent
 
-        if(len(children_list) == 1):
-            node.children = []
-            for n in children_list[0].children:
-                node.add_child(n)
-            node.parentEdge += children_list[0].parentEdge
-        else:
-            node.children = []
-            for n in children_list:
-                node.add_child(n)
+        # TODO: understand below case; is it relevant??
+        #       can we have an inner node with only one leaf node as children?
+        #       in which case, it is relevant to move the leaf node to
+        #       the parent of the inner and delete the excess inner
+        #if(len(children_list) == 1):
+        #    node.children = []
+        #    for n in children_list[0].children:
+        #        node.add_child(n)
+        #    node.parentEdge += children_list[0].parentEdge
+        #    print(node.id)
+        #    print(children_list)
+        #    print(children_list[0].children)
+        #else:
+        node.children = []
+        for n in children_list:
+            node.add_child(n)
 
         for n in node.children:
             resolve_suffix_tree(n)
@@ -296,8 +306,8 @@ def T_odd(inputstr):
     # print('eos_char: %s' % eos_char)
     rank2char(tree_Sm, eos_char)
 
-    # print('tree_Sm AFTER rank2char')
-    # print(tree_Sm.fancyprint())
+    print('tree_Sm AFTER rank2char')
+    print(tree_Sm.fancyprint())
     # print('\n\n')
     
     # massage into proper compacted trie 
@@ -389,9 +399,14 @@ def T_even(t_odd, inputstr):
     # in case S is of even length, n % 2 == 0, the even suffix at pos n
     # is the last one in the sorted list, as it starts with character '$'
     # which, by definition, is ranked as |alphabet| + 1, i.e. last character
-    # TODO: what is below code doing???
-    # if n % 2 == 0:
-    #     even_suffixes.append(int(S[n - 1]))
+    # We need to add this one specifically, as it is not found by counting
+    # all odd suffixes down by one
+    # e.g.: if the inputstr is of length 4, then odd suffixes are 1 and 3
+    #       if we only count even suffixes as odd suffixes prefixed with
+    #       a character, we will never capture 4, as 5 is not an odd suffix
+    #       hence why we need to manually add it as the last one as it is '$'
+    if n % 2 == 0:
+        even_suffixes.append(n)
     
     #assert even_suffixes == [12, 2, 10, 6, 8, 4]
     
