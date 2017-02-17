@@ -5,9 +5,9 @@ from collections import deque
 
 unique_char = '$'
 A = {0: 1, 1: 2}
-input = '121112212221'
-# input = '111222122121'
-# input = 'banana'
+# input = '121112212221'
+input = '111222122121'
+input = 'banana'
 # input = 'mississippi'
 # input = '1222'
 
@@ -35,11 +35,23 @@ def str2int(string):
     new_str = ''.join(new_str_list)
     return new_str
 
+def append_unique_char(string):
+    count = 0
+    seen_chars = {}
+    for c in string:
+        if c not in seen_chars:
+            count += 1
+            seen_chars[c] = count
+    return string + str(count + 1)
+
 
 def construct_suffix_tree(inputstr):
-    inputstr += unique_char
-    # converting to integer alphabet
-    inputstr = str2int(inputstr)
+    print('construct called with inputstr: %s' % inputstr)
+    # inputstr += unique_char
+    # # converting to integer alphabet
+    # inputstr = str2int(inputstr)
+    inputstr = append_unique_char(inputstr)
+
 
     # TODO: return suffix tree if inputstr is of length 1 or 2
     # TODO: unique char append?
@@ -71,21 +83,20 @@ def construct_suffix_tree(inputstr):
             root.add_child(utils.Node(aId=3, aParentEdge=suffix2[1]))
         return root
 
-    # print('construct called with inputstr: %s' % inputstr)
+    print('inputstr converted to: %s' % inputstr)
 
     t_odd = T_odd(inputstr)
-    # print('odd tree:')
-    # print(t_odd.fancyprint())
+    print('odd tree:')
+    print(t_odd.fancyprint())
 
     t_even = T_even(t_odd, inputstr)
-    # print('even tree:')
-    # print(t_even.fancyprint())
-
-    # print('\n\n')
+    print('even tree:')
+    print(t_even.fancyprint())
 
     t_overmerged = overmerge(t_even, t_odd)
-    # print('overmerged tree:')
-    # print(t_overmerged.fancyprint())
+    print('overmerged tree:')
+    print(t_overmerged.fancyprint())
+    print('\n\n')
 
     compute_lcp_tree(t_overmerged)
 
@@ -128,6 +139,7 @@ def T_odd(inputstr):
         ''' swaps ranks in trees with corresponding character pair
             from original string '''
         new_edge = ''
+        print(single2pair)
         for c in node.parentEdge:
             if(c == eos_char):
                 # TODO: reconsider below: we never want to replace eos_char with
@@ -284,6 +296,7 @@ def T_odd(inputstr):
     count = 1
     pair2single = {}  # lookup is O(1) for pairs to single character mapping
     single2pair = {}  # lookup is O(1) for single to pair character mapping
+
     for pair in chr_pairs:
         pair2single[pair] = count
         single2pair[count] = pair
@@ -300,6 +313,10 @@ def T_odd(inputstr):
     # TODO: recursively call construct_suffix_tree(Sm) to create suffix tree for Sm
     # print('before tree_sm')
     tree_Sm = construct_suffix_tree(Sm)
+    print(len(Sm))
+    if len(Sm) > 5:
+        print('recursive call result for Sm = %s' % Sm)
+        print(tree_Sm.fancyprint())
     # tree_Sm.children.pop()
     # tree_Sm = faked_tree_book()
     #tree_Sm = faked_tree_article()
@@ -315,7 +332,10 @@ def T_odd(inputstr):
     eos_char = tree_Sm.leaflist()[0].parentEdge[-1]
     # print('eos_char: %s' % eos_char)
     rank2char(tree_Sm, eos_char)
-
+    if len(Sm) > 5:
+        print(eos_char)
+        print('recursive call result for Sm = %s AFTER rank2char' % Sm)
+        print(tree_Sm.fancyprint())
     # print('tree_Sm AFTER rank2char')
     # print(tree_Sm.fancyprint())
     # print('\n\n')
@@ -780,6 +800,7 @@ def compute_lcp_tree(t_overmerged):
     # ---------------------------------------
     def lcp_depth(node):
         if hasattr(node, 'suffix_link'):
+            print(node.suffix_link.fancyprint())
             node.lcp_depth = node.suffix_link.lcp_depth + 1
     t_overmerged.lcp_depth = 0
     t_overmerged.bfs(lcp_depth)
@@ -862,8 +883,9 @@ def cleanup_tree(t_overmerged):
 
 
 def main():
-    suffix_tree = construct_suffix_tree(input)
-    print('final tree for input %s:' % input)
+    inputstr = str2int(input)
+    suffix_tree = construct_suffix_tree(inputstr)
+    print('final tree for input %s:' % inputstr)
     print(suffix_tree.fancyprint())
 
 
