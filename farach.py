@@ -3,13 +3,15 @@ import radixsort
 import utils
 from collections import deque
 
-unique_char = '$'
-A = {0: 1, 1: 2}
-# input = '121112212221'
+# unique_char = '$'
+
+
+input = '121112212221'
 input = '111222122121'
+input = '12121212121'
 input = 'banana'
-# input = 'mississippi'
-# input = '1222'
+input = 'mississippi'
+# input = '2221'
 
 # TODO: test that it works for inputs of odd length
 # input = '1211122122211'
@@ -46,7 +48,7 @@ def append_unique_char(string):
 
 
 def construct_suffix_tree(inputstr):
-    print('construct called with inputstr: %s' % inputstr)
+    # print('construct called with inputstr: %s' % inputstr)
     # inputstr += unique_char
     # # converting to integer alphabet
     # inputstr = str2int(inputstr)
@@ -78,8 +80,8 @@ def construct_suffix_tree(inputstr):
             root.add_child(utils.Node(aId=2, aParentEdge=suffix2))
             root.add_child(utils.Node(aId=3, aParentEdge=suffix2[1]))
         else:
-            root.add_child(utils.Node(aId=1, aParentEdge=suffix2))
-            root.add_child(utils.Node(aId=2, aParentEdge=suffix1))
+            root.add_child(utils.Node(aId=2, aParentEdge=suffix2))
+            root.add_child(utils.Node(aId=1, aParentEdge=suffix1))
             root.add_child(utils.Node(aId=3, aParentEdge=suffix2[1]))
         return root
 
@@ -139,7 +141,7 @@ def T_odd(inputstr):
         ''' swaps ranks in trees with corresponding character pair
             from original string '''
         new_edge = ''
-        print(single2pair)
+        # print(single2pair)
         for c in node.parentEdge:
             if(c == eos_char):
                 # TODO: reconsider below: we never want to replace eos_char with
@@ -313,18 +315,18 @@ def T_odd(inputstr):
     # TODO: recursively call construct_suffix_tree(Sm) to create suffix tree for Sm
     # print('before tree_sm')
     tree_Sm = construct_suffix_tree(Sm)
-    print(len(Sm))
-    if len(Sm) > 5:
-        print('recursive call result for Sm = %s' % Sm)
-        print(tree_Sm.fancyprint())
+    # print(len(Sm))
+    # if len(Sm) > 5:
+    #     print('recursive call result for Sm = %s' % Sm)
+    # print(tree_Sm.fancyprint())
     # tree_Sm.children.pop()
     # tree_Sm = faked_tree_book()
     #tree_Sm = faked_tree_article()
     # Sm += '5'
 
     # print('inputstr: %s' % inputstr)
-    # print('tree_Sm before rank2char')
-    # print(tree_Sm.fancyprint())
+    print('tree_Sm before rank2char')
+    print(tree_Sm.fancyprint())
     # print()
     # convert edge characters from ranks to original character pairs
     # + convert leaf ids to corresponding original suffix ids
@@ -332,12 +334,12 @@ def T_odd(inputstr):
     eos_char = tree_Sm.leaflist()[0].parentEdge[-1]
     # print('eos_char: %s' % eos_char)
     rank2char(tree_Sm, eos_char)
-    if len(Sm) > 5:
-        print(eos_char)
-        print('recursive call result for Sm = %s AFTER rank2char' % Sm)
-        print(tree_Sm.fancyprint())
-    # print('tree_Sm AFTER rank2char')
-    # print(tree_Sm.fancyprint())
+    # if len(Sm) > 5:
+    #     print(eos_char)
+    #     print('recursive call result for Sm = %s AFTER rank2char' % Sm)
+    #     print(tree_Sm.fancyprint())
+    print('tree_Sm AFTER rank2char')
+    print(tree_Sm.fancyprint())
     # print('\n\n')
     
     # massage into proper compacted trie 
@@ -484,7 +486,6 @@ def T_even(t_odd, inputstr):
     for i in range(1, len(even_suffixes)):
         prev_suf = even_suffixes[i - 1]
         curr_suf = even_suffixes[i]
-
         curr_lcp = lcp[(prev_suf, curr_suf)]
         prev_lcp = None
         if i > 1:
@@ -509,7 +510,7 @@ def T_even(t_odd, inputstr):
                     # of prev_node, length of prev_suf and length of lcp
 
                     # See drawing on sharelatex for this particular case
-                    
+
                     prev_node = id2node[prev_suf]
 
                     str_prev_suf = S[prev_suf - 1:]
@@ -568,8 +569,7 @@ def T_even(t_odd, inputstr):
                             innernode.add_child(child_of_insertion_node)
                             innernode.add_child(new_node)
 
-
-                        
+                            id2node[curr_suf] = new_node
 
             else:
                 str_curr_lcp = S[curr_suf - 1:curr_suf - 1 + curr_lcp]
@@ -795,13 +795,26 @@ def compute_lcp_tree(t_overmerged):
         lca.suffix_link = lca_parent
     # print(lca_nodepairs)
 
+
     # ---------------------------------------
     # ADD LCP DEPTH TO ALL NODES USING A SINGLE DFS
     # ---------------------------------------
     def lcp_depth(node):
+        if hasattr(node, 'lcp_depth'):
+            # we already computed this node as a result of computing an
+            # earlier node with a suffix link to this node, no need to
+            # repeat the computation
+            return node.lcp_depth
+
         if hasattr(node, 'suffix_link'):
-            print(node.suffix_link.fancyprint())
+            if not hasattr(node.suffix_link, 'lcp_depth'):
+                # our suffix link is to a node for which we have not yet computed
+                # the lcp depth; do so, return it to here and continue the bfs
+                # this is still within O(n) as we simply skip the node when we
+                # encounter it the second time in the initial bfs
+                node.lcp_depth = lcp_depth(node.suffix_link) + 1
             node.lcp_depth = node.suffix_link.lcp_depth + 1
+            return node.lcp_depth
     t_overmerged.lcp_depth = 0
     t_overmerged.bfs(lcp_depth)
 
@@ -830,6 +843,7 @@ def adjust_overmerge(t_overmerged, t_even, t_odd):
     add_str_length(t_overmerged, 0)
 
     def adjust_overmerge_helper(curr_node):
+        # print(curr_node.fancyprint())
         if(hasattr(curr_node, "lcp_depth")):
 
             if curr_node.str_length != curr_node.lcp_depth:
