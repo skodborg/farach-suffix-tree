@@ -1,7 +1,7 @@
 import farach
 from utils import Node
 
-def tests():
+def run_tests():
     inputstr = '1'
     constructed_tree = farach.construct_suffix_tree(inputstr)
     expected_result = Node(aId='root')
@@ -87,11 +87,11 @@ def tests():
     inner1.add_child(leaf4)
     inner2.add_child(leaf2)
     inner2.add_child(leaf3)
-    print('inputstr: %s' % inputstr)
-    print('expected:')
-    print(expected_result.fancyprint())
-    print('actual:')
-    print(constructed_tree.fancyprint())
+    # print('inputstr: %s' % inputstr)
+    # print('expected:')
+    # print(expected_result.fancyprint())
+    # print('actual:')
+    # print(constructed_tree.fancyprint())
     assert constructed_tree.fancyprint() == expected_result.fancyprint()
 
     # inputstr = '1221'
@@ -105,6 +105,8 @@ def tests():
     # expected_result = Node(aId='root')
     # expected_result.add_child(Node(aId=1, aParentEdge='12'))
     # assert constructed_tree.fancyprint() == expected_result.fancyprint()
+
+    print('tests succeeded!')
 
 def current_test():
     inputstr = '1222'
@@ -124,18 +126,18 @@ def current_test():
     inner1.add_child(leaf4)
     inner2.add_child(leaf2)
     inner2.add_child(leaf3)
-    print('-'*80)
-    print('inputstr: %s' % inputstr)
-    print('expected:')
-    print(expected_result.fancyprint())
-    print('actual:')
-    print(constructed_tree.fancyprint())
+    # print('-'*80)
+    # print('inputstr: %s' % inputstr)
+    # print('expected:')
+    # print(expected_result.fancyprint())
+    # print('actual:')
+    # print(constructed_tree.fancyprint())
     assert constructed_tree.fancyprint() == expected_result.fancyprint()
 
 def main():
-    tests()
+    # run_tests()
     current_test()
-    print('tests succeeded!')
+    
 
 if __name__ == '__main__':
     main()

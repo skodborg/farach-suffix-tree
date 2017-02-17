@@ -1,7 +1,7 @@
 import farach
 import utils
 
-def start_tests():
+def run_tests():
     sorts_correct()
     case_3_rec()
     case_2_rec()
@@ -9,6 +9,7 @@ def start_tests():
     faked_tree_article()
     faked_tree_book()
     # small_example_2()  # only prints stuff, no asserts
+    print('tests succeeded!')
 
 
 def sorts_correct():
@@ -341,4 +342,4 @@ def small_example_2():
 
 
 if __name__ == '__main__':
-    start_tests()
+    run_tests()

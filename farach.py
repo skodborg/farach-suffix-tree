@@ -5,7 +5,7 @@ from collections import deque
 
 unique_char = '$'
 A = {0: 1, 1: 2}
-# input = '121112212221'
+input = '121112212221'
 # input = '111222122121'
 input = 'banana'
 # input = 'mississippi'
@@ -493,11 +493,12 @@ def T_even(t_odd, inputstr):
                     str_prev_suf = S[prev_suf - 1:]
                     prev_node_prevprev_node_lcp = len(str_prev_suf) - len(prev_node.parentEdge)
                     # TODO: why don't we just use len(prev_lcp) instead of the above?
+                    assert prev_lcp == prev_node_prevprev_node_lcp
 
-                    if curr_lcp > prev_node_prevprev_node_lcp:
+                    if curr_lcp > prev_lcp:
                         # we need to append the new node to the prev_node's parentEdge somewhere
-                        len_innernode_parentEdge = curr_lcp - prev_node_prevprev_node_lcp
-                        start_idx = curr_suf - 1 + prev_node_prevprev_node_lcp
+                        len_innernode_parentEdge = curr_lcp - prev_lcp
+                        start_idx = curr_suf - 1 + prev_lcp
                         end_idx = start_idx + len_innernode_parentEdge
                         innernode_parentEdge = S[start_idx:end_idx]
                         newnode_parentEdge = S[end_idx:]
@@ -515,19 +516,38 @@ def T_even(t_odd, inputstr):
                         # the parent of the prev_node. This might involve following a lot of
                         # nodes' parentEdges to find the spot
                         # TODO: is it O(n)???
-                        print('INSIDE ELSE')
-                        print('prev_node: %s' % prev_node)
-                        print('curr_suf: %i' % curr_suf)
-                        print('curr_lcp: %i' % curr_lcp)
-                        print('prev_lcp: %i' % prev_lcp)
-                        print('prev_node_prevprev_node_lcp: %i' % prev_node_prevprev_node_lcp)
                         remaining_until_insertion = prev_lcp - curr_lcp
-                        print(remaining_until_insertion)
-
-                        # run up through parentEdges until remaining_until_insertion is 0
                         
+                        possible_insertion_node = prev_node.parent
+                        while remaining_until_insertion > 0:
+                            # run up through parentEdges until remaining_until_insertion is 0
+                            remaining_until_insertion -= len(possible_insertion_node.parentEdge)
+                            possible_insertion_node = possible_insertion_node.parent
+                        # possible_insertion_node is now the spot at which we should
+                        # place curr_suf
+                        # we need to pop the rightmost child of the possible_insertion_node
+                        # as we need to insert an inner node with this child and our new_node
+                        # as children in place of this rightmost child, if remaining_until_insertion
+                        # is negative and not exactly 0, in which case we can just add_child(new_node)
+                        
+                        if remaining_until_insertion == 0:
+                            print('TODO: handle insertion directly, no inner nodes necessary')
+                        else:
+                            child_of_insertion_node = possible_insertion_node.children.pop()
+                            split_idx = abs(remaining_until_insertion)
+                            inner_parentEdge = child_of_insertion_node.parentEdge[:split_idx]
+                            child_of_insertion_parentEdge = child_of_insertion_node.parentEdge[split_idx:]
+                            innernode = utils.Node(aParentEdge=inner_parentEdge, aId='inner')
+                            child_of_insertion_node.parentEdge = child_of_insertion_parentEdge
+                            new_node_parentEdge = S[curr_suf - 1 + curr_lcp:]
+                            new_node = utils.Node(aParentEdge=new_node_parentEdge, aId=curr_suf)
+
+                            possible_insertion_node.add_child(innernode)
+                            innernode.add_child(child_of_insertion_node)
+                            innernode.add_child(new_node)
 
 
+                        
 
             else:
                 str_curr_lcp = S[curr_suf - 1:curr_suf - 1 + curr_lcp]
