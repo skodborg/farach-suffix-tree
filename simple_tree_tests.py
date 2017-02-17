@@ -106,6 +106,8 @@ def run_tests():
     # expected_result.add_child(Node(aId=1, aParentEdge='12'))
     # assert constructed_tree.fancyprint() == expected_result.fancyprint()
 
+    banana_test()
+
     print('tests succeeded!')
 
 def current_test():
@@ -134,9 +136,44 @@ def current_test():
     # print(constructed_tree.fancyprint())
     assert constructed_tree.fancyprint() == expected_result.fancyprint()
 
+def banana_test():
+    # banana
+    # 123232
+    inputstr = '123232'
+
+    root = Node(aId="root")
+    root.add_child(Node("1232324","1"))
+
+    inner = Node("2", "inner")
+    root.add_child(inner)
+
+    inner2 = Node("32", "inner")
+    inner2.add_child(Node("324", 2))
+    inner2.add_child(Node("4", 4))
+
+    inner.add_child(inner2)
+
+    inner.add_child(Node("4",6))
+
+    inner = Node("32", "inner")
+
+    inner.add_child(Node("324", 3))
+    inner.add_child(Node("4", 5))
+
+    root.add_child(inner)
+
+    root.add_child(Node("4", 7))
+
+
+    constructed_tree = farach.construct_suffix_tree(inputstr)
+
+
+    assert constructed_tree.fancyprint() == root.fancyprint() 
+
+
+
 def main():
-    # run_tests()
-    current_test()
+    run_tests()
     
 
 if __name__ == '__main__':
