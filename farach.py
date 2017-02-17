@@ -7,7 +7,7 @@ unique_char = '$'
 A = {0: 1, 1: 2}
 input = '121112212221'
 # input = '111222122121'
-input = 'banana'
+# input = 'banana'
 # input = 'mississippi'
 # input = '1222'
 
@@ -71,25 +71,27 @@ def construct_suffix_tree(inputstr):
             root.add_child(utils.Node(aId=3, aParentEdge=suffix2[1]))
         return root
 
-    print('construct called with inputstr: %s' % inputstr)
+    # print('construct called with inputstr: %s' % inputstr)
 
     t_odd = T_odd(inputstr)
-    print('odd tree:')
-    print(t_odd.fancyprint())
+    # print('odd tree:')
+    # print(t_odd.fancyprint())
 
     t_even = T_even(t_odd, inputstr)
-    print('even tree:')
-    print(t_even.fancyprint())
+    # print('even tree:')
+    # print(t_even.fancyprint())
 
-    print('\n\n')
+    # print('\n\n')
 
     t_overmerged = overmerge(t_even, t_odd)
-    print('overmerged tree:')
-    print(t_overmerged.fancyprint())
+    # print('overmerged tree:')
+    # print(t_overmerged.fancyprint())
 
     compute_lcp_tree(t_overmerged)
 
     adjust_overmerge(t_overmerged, t_even, t_odd)
+
+    cleanup_tree(t_overmerged)
 
     # suffix_tree = cleanup_overmerge(t_overmerged)
     return t_overmerged
@@ -113,7 +115,7 @@ def create_tree(tree, root):
 def T_odd(inputstr):
     S = inputstr
     n = len(S)
-    print('Todd input: %s' % inputstr)
+    # print('Todd input: %s' % inputstr)
 
     def toInt(char):
         # TODO: redundant with conversion to integer alphabet?
@@ -314,8 +316,8 @@ def T_odd(inputstr):
     # print('eos_char: %s' % eos_char)
     rank2char(tree_Sm, eos_char)
 
-    print('tree_Sm AFTER rank2char')
-    print(tree_Sm.fancyprint())
+    # print('tree_Sm AFTER rank2char')
+    # print(tree_Sm.fancyprint())
     # print('\n\n')
     
     # massage into proper compacted trie 
@@ -425,7 +427,7 @@ def T_even(t_odd, inputstr):
     for idx in range(0, len(even_suffixes) - 1):
         i = even_suffixes[idx]
         j = even_suffixes[idx + 1]
-        print('i: %i  j: %i' % (i, j))
+        # print('i: %i  j: %i' % (i, j))
         curr_lcp = 0
         while i < n and j < n:
             if S[i-1] == S[j-1]:
@@ -434,10 +436,10 @@ def T_even(t_odd, inputstr):
                 j += 1
             else:
                 break
-        print('curr_lcp: %i' % curr_lcp)
+        # print('curr_lcp: %i' % curr_lcp)
         lcp[(even_suffixes[idx], even_suffixes[idx + 1])] = curr_lcp
 
-    print(lcp)
+    # print(lcp)
     
     '''assert lcp[(12, 2)] == 1
     assert lcp[(2, 10)] == 1
@@ -763,6 +765,7 @@ def compute_lcp_tree(t_overmerged):
         #       the article [Ht84], otherwise we do not achieve O(n) running
         #       time for the algorithm
         lca = naive_lca(node1, node2, t_overmerged)
+        # print(lca.id)
         if lca.id == 'root' or node1.id + 1 not in id2node or node2.id + 1 not in id2node:
             # we cannot create a suffix link from root as it is undefined
             continue
@@ -770,6 +773,7 @@ def compute_lcp_tree(t_overmerged):
         node2_next = id2node[node2.id + 1]
         lca_parent = naive_lca(node1_next, node2_next, t_overmerged)
         lca.suffix_link = lca_parent
+    # print(lca_nodepairs)
 
     # ---------------------------------------
     # ADD LCP DEPTH TO ALL NODES USING A SINGLE DFS
@@ -796,7 +800,6 @@ def compute_lcp_tree(t_overmerged):
 
 
 def adjust_overmerge(t_overmerged, t_even, t_odd):
-
     def add_str_length(node, prev_length):
         # TODO: consider do this as we form the overmerge tree
         node.str_length = prev_length + len(node.parentEdge)
@@ -804,7 +807,6 @@ def adjust_overmerge(t_overmerged, t_even, t_odd):
             add_str_length(n, node.str_length)
 
     add_str_length(t_overmerged, 0)
-
 
     def adjust_overmerge_helper(curr_node):
         if(hasattr(curr_node, "lcp_depth")):
@@ -840,6 +842,23 @@ def adjust_overmerge(t_overmerged, t_even, t_odd):
 
     t_overmerged.bfs(adjust_overmerge_helper)
     # print(t_overmerged.fancyprint())
+
+
+def cleanup_tree(t_overmerged):
+    # remove suffix links on all nodes with one
+    def helper(node):
+        if hasattr(node, 'suffix_link'):
+            delattr(node, 'suffix_link')
+        if hasattr(node, 'old_parent'):
+            delattr(node, 'old_parent')
+        if hasattr(node, 'old_parentEdge'):
+            delattr(node, 'old_parentEdge')
+        if hasattr(node, 'lcp_depth'):
+            delattr(node, 'lcp_depth')
+        if hasattr(node, 'str_length'):
+            delattr(node, 'str_length')
+
+    t_overmerged.traverse(helper)
 
 
 def main():
