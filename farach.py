@@ -425,6 +425,7 @@ def T_even(t_odd, inputstr):
     for idx in range(0, len(even_suffixes) - 1):
         i = even_suffixes[idx]
         j = even_suffixes[idx + 1]
+        print('i: %i  j: %i' % (i, j))
         curr_lcp = 0
         while i < n and j < n:
             if S[i-1] == S[j-1]:
@@ -433,7 +434,10 @@ def T_even(t_odd, inputstr):
                 j += 1
             else:
                 break
+        print('curr_lcp: %i' % curr_lcp)
         lcp[(even_suffixes[idx], even_suffixes[idx + 1])] = curr_lcp
+
+    print(lcp)
     
     '''assert lcp[(12, 2)] == 1
     assert lcp[(2, 10)] == 1
@@ -488,21 +492,42 @@ def T_even(t_odd, inputstr):
 
                     str_prev_suf = S[prev_suf - 1:]
                     prev_node_prevprev_node_lcp = len(str_prev_suf) - len(prev_node.parentEdge)
+                    # TODO: why don't we just use len(prev_lcp) instead of the above?
 
-                    len_innernode_parentEdge = curr_lcp - prev_node_prevprev_node_lcp
-                    start_idx = curr_suf - 1 + prev_node_prevprev_node_lcp
-                    end_idx = start_idx + len_innernode_parentEdge
-                    innernode_parentEdge = S[start_idx:end_idx]
-                    newnode_parentEdge = S[end_idx:]
+                    if curr_lcp > prev_node_prevprev_node_lcp:
+                        # we need to append the new node to the prev_node's parentEdge somewhere
+                        len_innernode_parentEdge = curr_lcp - prev_node_prevprev_node_lcp
+                        start_idx = curr_suf - 1 + prev_node_prevprev_node_lcp
+                        end_idx = start_idx + len_innernode_parentEdge
+                        innernode_parentEdge = S[start_idx:end_idx]
+                        newnode_parentEdge = S[end_idx:]
 
-                    innernode = utils.Node(aParentEdge=innernode_parentEdge, aId='inner2')
-                    new_node = utils.Node(aParentEdge=newnode_parentEdge, aId=curr_suf)
-                    prev_node_parent = prev_node.parent
-                    prev_node_parent.children[-1] = innernode
-                    prev_node.parentEdge = prev_node.parentEdge[len_innernode_parentEdge:]
-                    innernode.parent = prev_node_parent
-                    innernode.add_child(prev_node)
-                    innernode.add_child(new_node)
+                        innernode = utils.Node(aParentEdge=innernode_parentEdge, aId='inner2')
+                        new_node = utils.Node(aParentEdge=newnode_parentEdge, aId=curr_suf)
+                        prev_node_parent = prev_node.parent
+                        prev_node_parent.children[-1] = innernode
+                        prev_node.parentEdge = prev_node.parentEdge[len_innernode_parentEdge:]
+                        innernode.parent = prev_node_parent
+                        innernode.add_child(prev_node)
+                        innernode.add_child(new_node)
+                    else:
+                        # we need to append the new node to somewhere on the path from root to
+                        # the parent of the prev_node. This might involve following a lot of
+                        # nodes' parentEdges to find the spot
+                        # TODO: is it O(n)???
+                        print('INSIDE ELSE')
+                        print('prev_node: %s' % prev_node)
+                        print('curr_suf: %i' % curr_suf)
+                        print('curr_lcp: %i' % curr_lcp)
+                        print('prev_lcp: %i' % prev_lcp)
+                        print('prev_node_prevprev_node_lcp: %i' % prev_node_prevprev_node_lcp)
+                        remaining_until_insertion = prev_lcp - curr_lcp
+                        print(remaining_until_insertion)
+
+                        # run up through parentEdges until remaining_until_insertion is 0
+                        
+
+
 
             else:
                 str_curr_lcp = S[curr_suf - 1:curr_suf - 1 + curr_lcp]
