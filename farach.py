@@ -490,6 +490,7 @@ def T_even(t_odd, inputstr):
                     prev_node_prevprev_node_lcp = len(str_prev_suf) - len(prev_node.parentEdge)
 
                     len_innernode_parentEdge = curr_lcp - prev_node_prevprev_node_lcp
+
                     start_idx = curr_suf - 1 + prev_node_prevprev_node_lcp
                     end_idx = start_idx + len_innernode_parentEdge
                     innernode_parentEdge = S[start_idx:end_idx]
