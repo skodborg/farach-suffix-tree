@@ -123,7 +123,7 @@ def mix_case_3_1():
 
 
 def faked_tree_article():
-    t_even = utils.Node([] "root")
+    t_even = utils.Node([], "root")
     inner1 = utils.Node([1], "inner")
     t_even.add_child(inner1)
     inner2 = utils.Node([1,2,2,2,1,2,2,1,2,1,3], "2")
@@ -143,7 +143,7 @@ def faked_tree_article():
     inner3 = utils.Node([2,1,2,2,1,2,1,3], "4")
     inner2.add_child(inner3)
 
-    t_odd = utils.Node([] "root")
+    t_odd = utils.Node([], "root")
     inner1 = utils.Node([1], "inner")
     t_odd.add_child(inner1)
     inner2 = utils.Node([1,1,2,2,2,1,2,2,1,2,1,3], "1")
@@ -167,7 +167,7 @@ def faked_tree_article():
     inner1 = utils.Node([3], "13")
     t_odd.add_child(inner1)
 
-    t_overmerged_result = utils.Node([] "root")
+    t_overmerged_result = utils.Node([], "root")
     inner1 = utils.Node([1], "inner")
     t_overmerged_result.add_child(inner1)
     inner2 = utils.Node([1,2,2,2,1,2,2,1,2,1,3], "2")
@@ -212,7 +212,7 @@ def faked_tree_article():
 
 def faked_tree_book():
 
-    t_odd = utils.Node([] "root")
+    t_odd = utils.Node([], "root")
     inner1 = utils.Node([1], "inner")
     t_odd.add_child(inner1)
     inner2 = utils.Node([1,1,2,2,1,2,2,2,1,3], "3")
@@ -236,7 +236,7 @@ def faked_tree_book():
     inner1 = utils.Node([3], "13")
     t_odd.add_child(inner1)
 
-    t_even = utils.Node([] "root")
+    t_even = utils.Node([], "root")
     inner1 = utils.Node([1], "inner")
     t_even.add_child(inner1)
     inner2 = utils.Node([1,2,2,1,2,2,2,1,3], "4")
@@ -256,7 +256,7 @@ def faked_tree_book():
     inner3 = utils.Node([3], "10")
     inner2.add_child(inner3)
 
-    t_overmerged_result = utils.Node([] "root")
+    t_overmerged_result = utils.Node([], "root")
     inner1 = utils.Node([1], "inner")
     t_overmerged_result.add_child(inner1)
     inner2 = utils.Node([1,2,2,1,2,2,2,1,3], "4")
