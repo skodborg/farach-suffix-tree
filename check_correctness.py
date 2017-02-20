@@ -91,7 +91,6 @@ def check_string_length(node):
 
 
 def add_str_length(node, prev_length):
-        # TODO: consider do this as we form the overmerge tree
         node.str_length = prev_length + len(node.parentEdge)
         for n in node.children:
             add_str_length(n, node.str_length)
