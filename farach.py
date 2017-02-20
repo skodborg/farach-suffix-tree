@@ -400,8 +400,10 @@ def T_even(t_odd, inputstr):
                         # 0, in which case we can just add_child(new_node)
 
                         if remaining_until_insertion == 0:
-                            print('TODO: handle insertion directly,\
-                                  no inner nodes necessary')
+                            new_node_parentEdge = S[curr_suf - 1 + curr_lcp:]
+                            new_node = Node(new_node_parentEdge, curr_suf)
+                            id2node[curr_suf] = new_node
+                            possible_insertion_node.add_child(new_node)
                         else:
                             child_of_insertion_node = possible_insertion_node.children.pop()
                             split_idx = abs(remaining_until_insertion)
