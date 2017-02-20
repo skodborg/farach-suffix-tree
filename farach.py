@@ -370,6 +370,9 @@ def T_even(t_odd, inputstr):
 
                         innernode = Node(innernode_parentEdge, 'inner2')
                         new_node = Node(newnode_parentEdge, curr_suf)
+                        
+                        id2node[curr_suf] = new_node
+
                         prev_node_parent = prev_node.parent
                         prev_node_parent.children[-1] = innernode
                         prev_node.parentEdge = prev_node.parentEdge[len_innernode_parentEdge:]
