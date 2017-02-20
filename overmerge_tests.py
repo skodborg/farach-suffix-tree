@@ -15,18 +15,18 @@ def run_tests():
 def sorts_correct():
 
     even = utils.Node(aId="root")
-    even.add_child(utils.Node("1", 1))
-    even.add_child(utils.Node("4", 2))
+    even.add_child(utils.Node([1], 1))
+    even.add_child(utils.Node([4], 2))
 
     odd = utils.Node(aId="root")
-    odd.add_child(utils.Node("2", 3))
-    odd.add_child(utils.Node("3", 4))
+    odd.add_child(utils.Node([2], 3))
+    odd.add_child(utils.Node([3], 4))
 
     result = utils.Node(aId="root")
-    result.add_child(utils.Node("1", 1))
-    result.add_child(utils.Node("2", 3))
-    result.add_child(utils.Node("3", 4))
-    result.add_child(utils.Node("4", 2))
+    result.add_child(utils.Node([1], 1))
+    result.add_child(utils.Node([2], 3))
+    result.add_child(utils.Node([3], 4))
+    result.add_child(utils.Node([4], 2))
 
     assert farach.overmerge(even, odd).fancyprint() == result.fancyprint()
 
@@ -34,30 +34,30 @@ def sorts_correct():
 def case_3_rec():
 
     even = utils.Node(aId="root")
-    inner = utils.Node("111", "inner")
+    inner = utils.Node([1,1,1], "inner")
     even.add_child(inner)
 
-    inner.add_child(utils.Node("1", 1))
-    inner.add_child(utils.Node("4", 2))
+    inner.add_child(utils.Node([1], 1))
+    inner.add_child(utils.Node([4], 2))
 
     odd = utils.Node(aId="root")
-    inner = utils.Node("12", "inner")
+    inner = utils.Node([1,2], "inner")
     odd.add_child(inner)
-    inner.add_child(utils.Node("2", 3))
-    inner.add_child(utils.Node("3", 4))
+    inner.add_child(utils.Node([2], 3))
+    inner.add_child(utils.Node([3], 4))
 
     result = utils.Node(aId="root")
 
-    inner = utils.Node("12", "inner")
+    inner = utils.Node([1,2], "inner")
     result.add_child(inner)
-    inner2 = utils.Node("1", "inner")
-    inner2.add_child(utils.Node("1", 1))
-    inner2.add_child(utils.Node("4", 2))
+    inner2 = utils.Node([1], "inner")
+    inner2.add_child(utils.Node([1], 1))
+    inner2.add_child(utils.Node([4], 2))
 
     inner.add_child(inner2)
 
-    inner.add_child(utils.Node("2", 3))
-    inner.add_child(utils.Node("3", 4))
+    inner.add_child(utils.Node([2], 3))
+    inner.add_child(utils.Node([3], 4))
 
     overmerged = farach.overmerge(even, odd)
 
@@ -68,27 +68,27 @@ def case_2_rec():
 
     even = utils.Node(aId="root")
 
-    inner = utils.Node("11", "inner")
+    inner = utils.Node([1,1], "inner")
     even.add_child(inner)
-    inner.add_child(utils.Node("111", 1))
+    inner.add_child(utils.Node([1,1,1], 1))
 
     odd = utils.Node(aId="root")
 
-    inner = utils.Node("12", "inner")
+    inner = utils.Node([1,2], "inner")
     odd.add_child(inner)
 
-    inner.add_child(utils.Node("12", 2))
+    inner.add_child(utils.Node([1,2], 2))
 
     result = utils.Node(aId="root")
 
-    inner = utils.Node("11", "inner")
+    inner = utils.Node([1,1], "inner")
 
     result.add_child(inner)
 
-    inner2 = utils.Node("12", 2)
+    inner2 = utils.Node([1,2], 2)
     inner.add_child(inner2)
 
-    inner2.add_child(utils.Node("1", 1))
+    inner2.add_child(utils.Node([1], 1))
 
     overmerged = farach.overmerge(even, odd)
 
@@ -99,23 +99,23 @@ def mix_case_3_1():
 
     even = utils.Node(aId="root")
 
-    even.add_child(utils.Node("1", 1))
-    even.add_child(utils.Node("222", 2))
+    even.add_child(utils.Node([1], 1))
+    even.add_child(utils.Node([2, 2, 2], 2))
 
     odd = utils.Node(aId="root")
 
-    odd.add_child(utils.Node("21", 3))
-    odd.add_child(utils.Node("3", 4))
+    odd.add_child(utils.Node([2,1], 3))
+    odd.add_child(utils.Node([3], 4))
 
     result = utils.Node(aId="root")
 
-    result.add_child(utils.Node("1", 1))
-    inner = utils.Node("21", 3)
+    result.add_child(utils.Node([1], 1))
+    inner = utils.Node([2,1], 3)
 
     result.add_child(inner)
-    inner.add_child(utils.Node("2", 2))
+    inner.add_child(utils.Node([2], 2))
 
-    result.add_child(utils.Node("3", 4))
+    result.add_child(utils.Node([3], 4))
 
     overmerged = farach.overmerge(even, odd)
 
@@ -300,10 +300,10 @@ def faked_tree_book():
 
 def small_example():
     t_even = utils.Node("root")
-    t_even.add_child(utils.Node("11", 2))
+    t_even.add_child(utils.Node([1,1], 2))
 
     t_odd = utils.Node("root")
-    t_odd.add_child(utils.Node("122", 1))
+    t_odd.add_child(utils.Node([1,2,2], 1))
 
 
     print("even")
@@ -320,17 +320,17 @@ def small_example():
 def small_example_2():
 
     t_even = utils.Node("root")
-    inner2 = utils.Node("21", "inner")
+    inner2 = utils.Node([2,1], "inner")
     t_even.add_child(inner2)
-    inner2.add_child(utils.Node("213", 6))
-    inner2.add_child(utils.Node("3", 10))
+    inner2.add_child(utils.Node([2,1,3], 6))
+    inner2.add_child(utils.Node([3], 10))
 
     print("even")
     print(t_even.fancyprint())
 
     t_odd = utils.Node("root")
    
-    t_odd.add_child(utils.Node("2213", 9))
+    t_odd.add_child(utils.Node([2,2,1,3], 9))
 
     print("odd")
     print(t_odd.fancyprint())
