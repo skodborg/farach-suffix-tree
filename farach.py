@@ -256,7 +256,6 @@ def T_odd(inputstr):
         Sm.append(pair2single[pair])
 
     tree_Sm = construct_suffix_tree(Sm)
-    print(tree_Sm.fancyprint())
 
     # convert edge characters from ranks to original character pairs
     # + convert leaf ids to corresponding original suffix ids
@@ -440,7 +439,6 @@ def T_even(t_odd, inputstr):
                 innernode.add_child(prev_node)
                 innernode.add_child(new_node)
     t_even = root
-    print(t_even.fancyprint())
     return t_even
 
 
@@ -449,8 +447,6 @@ def overmerge(t_even, t_odd):
     t_overmerged = Node(aId="root")
 
     def merger_helper(current, even, odd):
-        print('current odd')
-        print(odd.fancyprint())
         even_children = even.children
         odd_children = odd.children
         e = 0
@@ -468,8 +464,6 @@ def overmerge(t_even, t_odd):
 
             if(o < len(odd_children)):
                 o_child = odd_children[o]
-                print(o_child)
-                print(o_child.parentEdge)
                 o_char = o_child.parentEdge[0]
 
             if(e_child is None):
@@ -551,8 +545,6 @@ def overmerge(t_even, t_odd):
                 o += 1
                 e += 1
     merger_helper(t_overmerged, t_even, t_odd)
-    print('overmerged')
-    print(t_overmerged.fancyprint())
     return t_overmerged
 
 
