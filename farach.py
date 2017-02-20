@@ -23,11 +23,11 @@ def str2int(string):
     count = 1
     for c in string:
         if c not in int_alph:
-            int_alph[c] = str(count)
+            int_alph[c] = count
             count += 1
         new_str_list.append(int_alph[c])
-    new_str = ''.join(new_str_list)
-    return new_str
+    # new_str = ''.join(new_str_list)
+    return new_str_list
 
 
 def append_unique_char(string):
@@ -38,7 +38,8 @@ def append_unique_char(string):
         if c not in seen_chars:
             count += 1
             seen_chars[c] = count
-    return string + str(count + 1)
+    string.append(count + 1)
+    return string
 
 
 def construct_suffix_tree(inputstr):
@@ -49,7 +50,7 @@ def construct_suffix_tree(inputstr):
         # inputstr was just a single char before we appended the unique_char
         root = Node(aId='root')
         root.add_child(Node(aId=1, aParentEdge=inputstr))
-        root.add_child(Node(aId=2, aParentEdge=inputstr[1]))
+        root.add_child(Node(aId=2, aParentEdge=[inputstr[1]]))
         return root
     elif len(inputstr) - 1 == 2:
         # inputstr was two chars before we appended the unique_char
@@ -57,19 +58,19 @@ def construct_suffix_tree(inputstr):
         suffix1 = inputstr
         suffix2 = inputstr[1:]
         if suffix1[0] == suffix2[0]:
-            inner = Node(aId='inner', aParentEdge=suffix2[0])
+            inner = Node(aId='inner', aParentEdge=[suffix2[0]])
             root.add_child(inner)
             inner.add_child(Node(aId=1, aParentEdge=suffix1[1:]))
-            inner.add_child(Node(aId=2, aParentEdge=suffix2[1]))
-            root.add_child(Node(aId=3, aParentEdge=suffix2[1]))
+            inner.add_child(Node(aId=2, aParentEdge=[suffix2[1]]))
+            root.add_child(Node(aId=3, aParentEdge=[suffix2[1]]))
         elif suffix1[0] < suffix2[0]:
             root.add_child(Node(aId=1, aParentEdge=suffix1))
             root.add_child(Node(aId=2, aParentEdge=suffix2))
-            root.add_child(Node(aId=3, aParentEdge=suffix2[1]))
+            root.add_child(Node(aId=3, aParentEdge=[suffix2[1]]))
         else:
             root.add_child(Node(aId=2, aParentEdge=suffix2))
             root.add_child(Node(aId=1, aParentEdge=suffix1))
-            root.add_child(Node(aId=3, aParentEdge=suffix2[1]))
+            root.add_child(Node(aId=3, aParentEdge=[suffix2[1]]))
         return root
 
     t_odd = T_odd(inputstr)
@@ -108,7 +109,7 @@ def T_odd(inputstr):
         #       in constant time, although there are definitely less than the
         #       original n characters to process, they occur on multiple edges
         #       and needs processing/translation multiple times
-        new_edge = ''
+        new_edge = []
         for c in node.parentEdge:
             if(c == eos_char):
                 #       we never want to replace eos_char with anything.
@@ -125,7 +126,7 @@ def T_odd(inputstr):
                         # we have a leaf node! and we have an even inputstr!
                         # we need to append '$' to the end of the parentEdge
                         # in this case
-                        new_edge += S[-1]
+                        new_edge.append(S[-1])
 
                 # if(len(inputstr) % 2 == 1):
                     # SPECIAL CASE:
@@ -153,8 +154,8 @@ def T_odd(inputstr):
                 continue
             else:
                 pair = single2pair[int(c)]
-                new_edge += str(pair[0])
-                new_edge += str(pair[1])
+                new_edge.append(pair[0])
+                new_edge.append(pair[1])
         node.parentEdge = new_edge
 
         for n in node.children:
@@ -174,7 +175,7 @@ def T_odd(inputstr):
         def merge():
             # Takes every child in merge list, adds a new node with
             # these children as children to the new node
-            inner = Node(current_char, "inner")
+            inner = Node([current_char], "inner")
             for cm in current_merg:
                 inner.add_child(cm)
 
@@ -241,7 +242,7 @@ def T_odd(inputstr):
     chr_pairs = unique_chr_pairs
 
     # compute S'[i] = rank of (S[2i - 1], S[2i])
-    Sm = ''
+    Sm = []
     count = 1
     pair2single = {}  # lookup is O(1) for pairs to single character mapping
     single2pair = {}  # lookup is O(1) for single to pair character mapping
@@ -252,9 +253,10 @@ def T_odd(inputstr):
         count += 1
     for i in range(1, math.floor(n / 2) + 1):
         pair = (int(S[2 * i - 2]), int(S[2 * i - 1]))
-        Sm += str(pair2single[pair])
+        Sm.append(pair2single[pair])
 
     tree_Sm = construct_suffix_tree(Sm)
+    print(tree_Sm.fancyprint())
 
     # convert edge characters from ranks to original character pairs
     # + convert leaf ids to corresponding original suffix ids
@@ -438,6 +440,7 @@ def T_even(t_odd, inputstr):
                 innernode.add_child(prev_node)
                 innernode.add_child(new_node)
     t_even = root
+    print(t_even.fancyprint())
     return t_even
 
 
@@ -446,6 +449,8 @@ def overmerge(t_even, t_odd):
     t_overmerged = Node(aId="root")
 
     def merger_helper(current, even, odd):
+        print('current odd')
+        print(odd.fancyprint())
         even_children = even.children
         odd_children = odd.children
         e = 0
@@ -463,6 +468,8 @@ def overmerge(t_even, t_odd):
 
             if(o < len(odd_children)):
                 o_child = odd_children[o]
+                print(o_child)
+                print(o_child.parentEdge)
                 o_char = o_child.parentEdge[0]
 
             if(e_child is None):
@@ -544,6 +551,8 @@ def overmerge(t_even, t_odd):
                 o += 1
                 e += 1
     merger_helper(t_overmerged, t_even, t_odd)
+    print('overmerged')
+    print(t_overmerged.fancyprint())
     return t_overmerged
 
 
