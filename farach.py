@@ -6,7 +6,7 @@ input = '121112212221'
 input = '111222122121'
 input = '12121212121'
 input = 'banana'
-input = 'mississippi'
+input = 'mississippiisaniceplaceithink'
 
 
 def str2int(string):
@@ -341,6 +341,7 @@ def T_even(t_odd, inputstr):
                     # siblings
                     str_curr_remaining = S[curr_suf - 1 + curr_lcp:]
                     new_node = Node(str_curr_remaining, curr_suf)
+                    id2node[curr_suf] = new_node
                     prev_node = id2node[prev_suf]
                     prev_node.parent.add_child(new_node)
                 else:
