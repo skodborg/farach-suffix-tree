@@ -337,6 +337,9 @@ def T_even(t_odd, inputstr):
             id2node[curr_suf] = new_node
         else:
             if prev_lcp:
+                # TODO: only the long case with remaining_until_insertion
+                #       is actually relevant, the two other cases can be
+                #       caught by this procedure as well if adjusted a bit
                 if prev_lcp == curr_lcp:
                     # siblings
                     str_curr_remaining = S[curr_suf - 1 + curr_lcp:]
