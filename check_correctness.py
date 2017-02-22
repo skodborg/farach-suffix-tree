@@ -103,6 +103,7 @@ def add_str_length(node, prev_length):
 def check_correctness2(inputstr):
     # TODO: find some definition of a suffix tree and refer it?
     #       below is from wikipedia with a dead reference to it, hmm..
+    #       https://en.wikipedia.org/wiki/Suffix_tree#Definition
 
     # -------------------------------------------------------------
     # The suffix tree for the string S of length n is defined as a
