@@ -6,18 +6,14 @@ input = '121112212221'
 input = '111222122121'
 input = '12121212121'
 input = 'banana'
+input = 'mississippi'
 input = 'mississippiisaniceplaceithink'
+input = 'abcdefghabcdefgi'
 
 
 def str2int(string):
     ''' list append is O(1), string join() is O(n), totaling O(n) conversion
         time from string to string over int alphabet '''
-
-    # TODO: only supports alphabets of size 10, characters 0-9
-    #       need to output string as list of separated integers, to enable
-    #       differentiation between char 23 and chars 2 and 3
-    #       e.g.: output [23, 2, 3] or '23 2 3' or '23,2,3'
-    #       not : '2323'
     int_alph = {}
     new_str_list = []
     count = 1
@@ -216,12 +212,20 @@ def T_odd(inputstr):
         else:
             children_list.extend(current_merg)
 
-        # Correcting tree if a node only has one child.
-        # Merging with parent
-
         node.children = []
         for n in children_list:
             node.add_child(n)
+        
+        # Correcting tree if a node only has one child.
+        # This happens when the parentEdges of all children started with the
+        # same character
+        # In this case we must delete it by updating parent's parentEdge
+        # and transfer all children
+        if len(children_list) == 1 and node.id is not 'root':
+            node.parentEdge += node.children[0].parentEdge
+            node.children = node.children[0].children
+            for n in node.children:
+                n.parent = node
 
         for n in node.children:
             resolve_suffix_tree(n)
@@ -256,15 +260,21 @@ def T_odd(inputstr):
         Sm.append(pair2single[pair])
 
     tree_Sm = construct_suffix_tree(Sm)
+    # print('for Sm = %s the returned tree is' % Sm)
+    # print(tree_Sm.fancyprint())
 
     # convert edge characters from ranks to original character pairs
     # + convert leaf ids to corresponding original suffix ids
     eos_char = tree_Sm.leaflist()[0].parentEdge[-1]
     rank2char(tree_Sm, eos_char)
+    # print('after rank2char:')
+    # print(tree_Sm.fancyprint())
 
     # massage into proper compacted trie
     # (no edges of a node share first character)
     resolve_suffix_tree(tree_Sm)
+    # print('after resolve:')
+    # print(tree_Sm.fancyprint())
 
     return tree_Sm
 
