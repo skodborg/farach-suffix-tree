@@ -1,6 +1,7 @@
 import farach
 from utils import Node
-
+import random
+import string
 
 def check_correctness(inputstr):
     inputstrOld = inputstr
@@ -20,6 +21,7 @@ def check_correctness(inputstr):
 
     suffix_tree.traverse(children_different_first_char)
     print("Three for input : \"%s\" is correct" % inputstrOld)
+    return suffix_tree
  
 def children_different_first_char(node):
     # For each internal node x with children c1...ck 
@@ -105,5 +107,7 @@ def run_tests():
 
 def main():
     run_tests()
+
+    check_correctness(''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(1000)))
 if __name__ == '__main__':
     main()

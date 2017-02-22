@@ -7,6 +7,8 @@ input = '111222122121'
 input = '12121212121'
 input = 'banana'
 input = 'mississippiisaniceplaceithink'
+input = '123232'
+input = 'abcdefghabcdefgi'
 
 
 def str2int(string):
@@ -265,7 +267,6 @@ def T_odd(inputstr):
     # massage into proper compacted trie
     # (no edges of a node share first character)
     resolve_suffix_tree(tree_Sm)
-
     return tree_Sm
 
 
