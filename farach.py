@@ -100,11 +100,12 @@ def T_odd(inputstr):
 
     def rank2char(node, eos_char):
         ''' swaps ranks in trees with corresponding character pair
-            from original string '''
-        # TODO: is this actually O(n) ?? processing all characters on all edges
-        #       in constant time, although there are definitely less than the
-        #       original n characters to process, they occur on multiple edges
-        #       and needs processing/translation multiple times
+            from original string
+            NOTE! This is an O(n^2) operation!! Cannot use as a premise
+                  for constructing trees and claim linear time spent,
+                  this can only be used for pretty representations during
+                  implementation
+        '''
         new_edge = []
         for c in node.parentEdge:
             if(c == eos_char):
