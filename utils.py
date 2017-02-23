@@ -83,13 +83,33 @@ class Node:
     def is_leaf(self):
         return len(self.children) == 0
 
-    def fancyprint(self, level=0):
+    def update_leaf_list(self):
+        self.leaflist = []
+
+        if self.is_leaf():
+            return [self]
+
+        for n in self.children:
+            self.leaflist.extend(n.update_leaf_list())
+
+        return self.leaflist
+
+    def fancyprint(self, S, level=0):
         self_id = str(self.id)+":" if self.id else ''
-        if self.parentEdge:
-            self_id += str(self.parentEdge)
+    
+        if self.is_leaf():
+            leaf_id = self.id
+        else:
+            leaf_descendant = self.leaflist[0]
+            leaf_id = leaf_descendant.id
+        if self.id == "root":
+            edge = ""
+        else:
+            edge = S[leaf_id - 1 + self.parent.str_length : leaf_id - 1 + self.str_length] 
+        self_id += str(edge)
         result = '\t' * level + self_id + '\n'
         for child in self.children:
-            result += child.fancyprint(level + 1)
+            result += child.fancyprint(S, level + 1)
         return result
 
     def as_newick(self):
@@ -129,7 +149,9 @@ class Node:
             fifo.extendleft(node.children)
             fn(node)
 
-    def leaflist(self):
+    def leaflist_slow(self):
+        # TODO: leaflist should be saved on the node as the tree is constructed
+        #       and not offered as a linear-time function on each node
         result = []
         self.traverse(lambda n: result.append(n) if n.is_leaf() else 'do nothing')
         return result
@@ -151,12 +173,13 @@ class Node:
         #         return flat_leaf_list
         # return rec_helper(self)
 
-    def __init__(self, aParentEdge='', aId=None, aData=None):
+    def __init__(self, aStrLength=0, aId=None, aParentEdge='', aData=None):
         self.graphid = next(self._ids)
         self.id = aId
         self.parent = None
         self.parentEdge = aParentEdge
         self.data = aData
+        self.str_length = aStrLength
         self.children = []
 
     def __repr__(self):
