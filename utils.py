@@ -130,6 +130,8 @@ class Node:
             fn(node)
 
     def leaflist(self):
+        # TODO: leaflist should be saved on the node as the tree is constructed
+        #       and not offered as a linear-time function on each node
         result = []
         self.traverse(lambda n: result.append(n) if n.is_leaf() else 'do nothing')
         return result
