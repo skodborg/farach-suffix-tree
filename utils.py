@@ -94,9 +94,22 @@ class Node:
 
         return self.leaflist
 
+    def getParentEdge(self, S):
+        if self.id == 'root':
+            return ''
+
+        if self.is_leaf():
+            leaf_id = self.id
+        else:
+            leaf_descendant = self.leaflist[0]
+            leaf_id = leaf_descendant.id
+        
+        return S[leaf_id - 1 + self.parent.str_length : leaf_id - 1 + self.str_length]
+    
     def fancyprint(self, S, level=0):
         self_id = str(self.id)+":" if self.id else ''
-    
+        
+        # TODO: utilize getParentEdge() ??
         if self.is_leaf():
             leaf_id = self.id
         else:
@@ -105,7 +118,11 @@ class Node:
         if self.id == "root":
             edge = ""
         else:
-            edge = S[leaf_id - 1 + self.parent.str_length : leaf_id - 1 + self.str_length] 
+            if S:
+                edge = S[leaf_id - 1 + self.parent.str_length : leaf_id - 1 + self.str_length]
+                
+            else:
+                edge = ''.join(map(str, self.parentEdge))
         self_id += str(edge)
         result = '\t' * level + self_id + '\n'
         for child in self.children:

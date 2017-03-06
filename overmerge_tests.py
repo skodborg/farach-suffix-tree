@@ -167,6 +167,7 @@ def faked_tree_article():
 
     t_overmerged_result = utils.Node(0,"root")
     inner1 = utils.Node(1, "inner")
+
     t_overmerged_result.add_child(inner1)
     inner2 = utils.Node(3, "inner")
     inner1.add_child(inner2)

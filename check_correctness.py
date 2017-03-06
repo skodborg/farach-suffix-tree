@@ -124,7 +124,7 @@ def check_correctness2(inputstr):
     # the construction adds a unique char to the string to ensure deterministic
     # trees; therefore, the tree will contain a single leaf from root with this
     # unique char, hence the leaves will be n + 1, one per suffix plus an extra
-    assert len(tree.leaflist()) == n + 1
+    assert len(tree.leaflist) == n + 1
 
     # -------------------------------------------------------------
     # Except for the root, every internal node has at least two
@@ -142,7 +142,7 @@ def check_correctness2(inputstr):
     # -------------------------------------------------------------
     def helper(node):
         if node.id != 'root':
-            assert len(node.parentEdge) > 0
+            assert node.str_length - node.parent.str_length > 0
     tree.traverse(helper)
 
     # -------------------------------------------------------------
@@ -153,7 +153,7 @@ def check_correctness2(inputstr):
         if not node.is_leaf():
             seen_chars = set()
             for c in node.children:
-                seen_chars.add(c.parentEdge[0])
+                seen_chars.add(c.getParentEdge(S)[0])
             assert len(seen_chars) == len(node.children)
     tree.traverse(helper)
 
@@ -167,7 +167,7 @@ def check_correctness2(inputstr):
             # check if curr_str + parentEdge equals i'th suffix
             # where i is node.id
             ith_suffix = S[node.id - 1:]
-            str_curr_node = curr_str + node.parentEdge
+            str_curr_node = curr_str + node.getParentEdge(S)
             assert ith_suffix == str_curr_node
         else:
             # call recursively to all children with parentEdge appended
@@ -179,7 +179,7 @@ def check_correctness2(inputstr):
                 # it far too much
                 new_str = []
                 new_str.extend(curr_str)
-                new_str.extend(node.parentEdge)
+                new_str.extend(node.getParentEdge(S))
             for n in node.children:
                 helper(n, new_str)
     helper(tree, [])
@@ -204,14 +204,6 @@ def check_correctness2(inputstr):
 
 
 def run_tests():
-    check_correctness("mississippi")
-    check_correctness("121112212221")
-    check_correctness("111222122121")
-    check_correctness("12121212121")
-    check_correctness("banana")
-    check_correctness("mississippiisaniceplaceithink")
-    check_correctness("12121")
-    print('\nmy new correctness test\n')
     check_correctness2("mississippi")
     check_correctness2("121112212221")
     check_correctness2("111222122121")
