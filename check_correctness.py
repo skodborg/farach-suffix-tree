@@ -1,6 +1,7 @@
 import farach
 from utils import Node
-
+import random
+import string
 
 def check_correctness(inputstr):
     # TODO: i think it fails to identify trees that are not proper
@@ -23,7 +24,10 @@ def check_correctness(inputstr):
     suffix_tree.traverse(check_descendants(inputstr))
 
     suffix_tree.traverse(children_different_first_char)
+
     print("tree for input : \"%s\" is correct" % inputstrOld)
+
+    return suffix_tree
 
 
 def children_different_first_char(node):
@@ -220,6 +224,7 @@ def run_tests():
 def main():
     run_tests()
 
+    check_correctness(''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(1000)))
 
 if __name__ == '__main__':
     main()
