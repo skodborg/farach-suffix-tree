@@ -1,14 +1,19 @@
 import math
 import radixsort
 from utils import Node
+import check_correctness
 
 input = '121112212221'
 input = '111222122121'
 input = '12121212121'
 input = 'banana'
 input = 'mississippi'
-#input = 'mississippiisaniceplaceithink'
-#input = '123232'
+input = 'mississippiisaniceplaceithink'
+# input = '123232'
+input = '12122'  # ERROR
+# input = '12121'  # ERROR
+input = '1211122122213'  # ERROR
+
 
 
 
@@ -71,19 +76,25 @@ def construct_suffix_tree(inputstr):
         return root
 
     t_odd = T_odd(inputstr)
+
+    print('odd tree for %s' % inputstr)
+    print(t_odd.fancyprint(inputstr))
+
     t_even = T_even(t_odd, inputstr)
 
-    
-
-    
+    print('even tree for %s' % inputstr)
+    print(t_even.fancyprint(inputstr))    
     
     t_overmerged = overmerge(t_even, t_odd, inputstr)
-    
+    print('overmerge tree for %s' % inputstr)
+    print(t_overmerged.fancyprint(inputstr))
 
     compute_lcp_tree(t_overmerged)
     adjust_overmerge(t_overmerged, t_even, t_odd, inputstr)
 
     cleanup_tree(t_overmerged)
+    print('adjusted tree for %s' % inputstr)
+    print(t_overmerged.fancyprint(inputstr))
     
     return t_overmerged
 
@@ -92,13 +103,13 @@ def create_tree(tree, root):
     def helper(lvl, node):
         for n in node.children:
             print("inner%s = Node(\"%s\", \"%s\")"
-                  % (lvl + 1, n.parentEdge, n.id))
+                  % (lvl + 1, n.str_length, n.id))
             print("inner%s.add_child(inner%s)" % (lvl, lvl + 1))
             helper(lvl + 1, n)
 
-    print("%s = Node(\"%s\",\"%s\")" % (root, tree.parentEdge, tree.id))
+    print("%s = Node(\"%s\",\"%s\")" % (root, tree.str_length, tree.id))
     for n in tree.children:
-        print("inner1 = Node(\"%s\", \"%s\")" % (n.parentEdge, n.id))
+        print("inner1 = Node(\"%s\", \"%s\")" % (n.str_length, n.id))
         print("%s.add_child(inner1)" % root)
         helper(1, n)
 
@@ -107,65 +118,65 @@ def T_odd(inputstr):
     S = inputstr
     n = len(S)
 
-    def rank2char(node, eos_char):
-        ''' swaps ranks in trees with corresponding character pair
-            from original string
-            NOTE! This is an O(n^2) operation!! Cannot use as a premise
-                  for constructing trees and claim linear time spent,
-                  this can only be used for pretty representations during
-                  implementation
-        '''
-        new_edge = []
-        for c in node.parentEdge:
-            if(c == eos_char):
-                #       we never want to replace eos_char with anything.
-                #       eos_char is added specifically for
-                #       Sm, and we want to adjust the tree edges to correspond
-                #       to strings found in S and not Sm, therefore there is
-                #       no corresponding character in S to replace eos_char in
-                #       Sm with, hence we replace with nothing. This leaves a
-                #       single edge with only eos_char on it, which we manually
-                #       remove in the adjustment code, the same code that also
-                #       makes use of this rank2char-function
-                if len(S) % 2 == 1:
-                    if node.is_leaf():
-                        # we have a leaf node! and we have an even inputstr!
-                        # we need to append '$' to the end of the parentEdge
-                        # in this case
-                        new_edge.append(S[-1])
+    # def rank2char(node, eos_char):
+    #     ''' swaps ranks in trees with corresponding character pair
+    #         from original string
+    #         NOTE! This is an O(n^2) operation!! Cannot use as a premise
+    #               for constructing trees and claim linear time spent,
+    #               this can only be used for pretty representations during
+    #               implementation
+    #     '''
+    #     new_edge = []
+    #     for c in node.parentEdge:
+    #         if(c == eos_char):
+    #             #       we never want to replace eos_char with anything.
+    #             #       eos_char is added specifically for
+    #             #       Sm, and we want to adjust the tree edges to correspond
+    #             #       to strings found in S and not Sm, therefore there is
+    #             #       no corresponding character in S to replace eos_char in
+    #             #       Sm with, hence we replace with nothing. This leaves a
+    #             #       single edge with only eos_char on it, which we manually
+    #             #       remove in the adjustment code, the same code that also
+    #             #       makes use of this rank2char-function
+    #             if len(S) % 2 == 1:
+    #                 if node.is_leaf():
+    #                     # we have a leaf node! and we have an even inputstr!
+    #                     # we need to append '$' to the end of the parentEdge
+    #                     # in this case
+    #                     new_edge.append(S[-1])
 
-                # if(len(inputstr) % 2 == 1):
-                    # SPECIAL CASE:
-                    #   the eos_char ('$' in the book) is not a part of
-                    #   any of the ranks, but it must still sit at the end
-                    #   of every suffix in the final suffix tree T_odd,
-                    #   so we simply swap the last character of the string
-                    #   of ranks (the '$' added by the recursive call) and
-                    #   the last character of the inputstr (the actual '$' on
-                    #   the current alphabet on the current input)
-                    # example:
-                    #   inputstr is 121112212221
-                    #   construct_suffix_tree adds the '$', which is then
-                    #   converted to a '3' in str2int, giving 1211122122213
-                    #   The string of rankings of character pairs are then
-                    #   created, giving us '212343'
-                    #   This string is now subject to a recursive call, which
-                    #   also appends a '$', which in this case is converted
-                    #   to '5'
-                    #   If, when ranking the original inputstr, '13' was not
-                    #   a character pair (because the string was of even
-                    #   length), then we need to insert these '3's manually.
-                    #   They have to be placed exactly where '5' occurs in
-                    #   the returned suffix tree, which is what happens here
-                continue
-            else:
-                pair = single2pair[int(c)]
-                new_edge.append(pair[0])
-                new_edge.append(pair[1])
-        node.parentEdge = new_edge
+    #             # if(len(inputstr) % 2 == 1):
+    #                 # SPECIAL CASE:
+    #                 #   the eos_char ('$' in the book) is not a part of
+    #                 #   any of the ranks, but it must still sit at the end
+    #                 #   of every suffix in the final suffix tree T_odd,
+    #                 #   so we simply swap the last character of the string
+    #                 #   of ranks (the '$' added by the recursive call) and
+    #                 #   the last character of the inputstr (the actual '$' on
+    #                 #   the current alphabet on the current input)
+    #                 # example:
+    #                 #   inputstr is 121112212221
+    #                 #   construct_suffix_tree adds the '$', which is then
+    #                 #   converted to a '3' in str2int, giving 1211122122213
+    #                 #   The string of rankings of character pairs are then
+    #                 #   created, giving us '212343'
+    #                 #   This string is now subject to a recursive call, which
+    #                 #   also appends a '$', which in this case is converted
+    #                 #   to '5'
+    #                 #   If, when ranking the original inputstr, '13' was not
+    #                 #   a character pair (because the string was of even
+    #                 #   length), then we need to insert these '3's manually.
+    #                 #   They have to be placed exactly where '5' occurs in
+    #                 #   the returned suffix tree, which is what happens here
+    #             continue
+    #         else:
+    #             pair = single2pair[int(c)]
+    #             new_edge.append(pair[0])
+    #             new_edge.append(pair[1])
+    #     node.parentEdge = new_edge
 
-        for n in node.children:
-            rank2char(n, eos_char)
+    #     for n in node.children:
+    #         rank2char(n, eos_char)
 
     def extend_length(node):
 
@@ -211,7 +222,6 @@ def T_odd(inputstr):
             if child.str_length == 0:
                 continue
 
-
             if child.is_leaf():
                 leaf_id = child.id
             else:
@@ -219,7 +229,6 @@ def T_odd(inputstr):
                 leaf_id = leaf_descendant.id
 
             first_edge_char = S[leaf_id + child.parent.str_length-1]
-
 
             if(first_edge_char == current_char or current_char == ''):
                 current_merg.append(child)
@@ -248,7 +257,8 @@ def T_odd(inputstr):
         # In this case we must delete it by updating parent's parentEdge
         # and transfer all children
         if len(children_list) == 1 and node.id is not 'root':
-            node.parentEdge += node.children[0].parentEdge
+            # node.parentEdge += node.children[0].parentEdge
+            node.str_length = node.children[0].str_length
             node.children = node.children[0].children
             for n in node.children:
                 n.parent = node
@@ -303,8 +313,6 @@ def T_odd(inputstr):
     # (no edges of a node share first character)
 
     tree_Sm.update_leaf_list()
-
-
     resolve_suffix_tree(tree_Sm)
     tree_Sm.update_leaf_list()
     return tree_Sm
@@ -411,12 +419,10 @@ def T_even(t_odd, inputstr):
                         # the prev_node's parentEdge somewhere
                         prev_node_parent = prev_node.parent
 
-
                         len_innernode_parentEdge = curr_lcp - prev_lcp
                         len_innernode = len_innernode_parentEdge + prev_node_parent.str_length
                         #start_idx = curr_suf - 1 + prev_lcp
                         #end_idx = start_idx + len_innernode_parentEdge
-
 
                         #innernode_parentEdge = S[start_idx:end_idx]
                         #newnode_parentEdge = S[end_idx:]
@@ -427,12 +433,11 @@ def T_even(t_odd, inputstr):
                         
                         id2node[curr_suf] = new_node
 
-                        
-
                         prev_node_parent.children[-1] = innernode
                         innernode.parent = prev_node_parent
                         innernode.add_child(prev_node)
                         innernode.add_child(new_node)
+
                     else:
                         # we need to append the new node to somewhere on the
                         # path from root to the parent of the prev_node.
@@ -530,8 +535,6 @@ def overmerge(t_even, t_odd, S):
             o_child = None
             o_char = None
 
-
-            
             if(e < len(even_children)):
                 e_child = even_children[e]
                 if e_child.is_leaf():
@@ -541,8 +544,7 @@ def overmerge(t_even, t_odd, S):
                     leaf_id = leaf_descendant.id
            
                 e_char = S[leaf_id + e_child.parent.str_length -1]
-                #e_child.parentEdge[0]
-
+                
             if(o < len(odd_children)):
                 o_child = odd_children[o]
                 if o_child.is_leaf():
@@ -552,8 +554,7 @@ def overmerge(t_even, t_odd, S):
                     leaf_id = leaf_descendant.id
 
                 o_char = S[leaf_id + o_child.parent.str_length -1]
-                #parentEdge[0]
-
+                
             if(e_child is None):
                 o += 1
                 o_child.old_parent = o_child.parent
@@ -595,7 +596,7 @@ def overmerge(t_even, t_odd, S):
                     # child with the longer edge. We do this be introducing
                     # an substitue node, which only purpose is to make the
                     # recursive call possible.
-
+                   
                     short_child = o_child
                     long_child = e_child
                     if e_parentEdge_len < o_parentEdge_len:
@@ -613,7 +614,7 @@ def overmerge(t_even, t_odd, S):
                     #e_child.old_parentEdge = e_child.parentEdge
                     #o_child.old_parentEdge = o_child.parentEdge
 
-                    short_child_sub = Node(aId="sub_" + str(short_child.id))
+                    short_child_sub = Node(short_child.str_length, aId="sub_" + str(short_child.id))
 
                     #long_child.parentEdge = long_child.parentEdge[len(short_child.parentEdge):]
                     short_child_sub.add_child(long_child)
@@ -744,6 +745,11 @@ def compute_lcp_tree(t_overmerged):
                 # continue the bfs. This is still within O(n) as we simply
                 # skip the node when we encounter it the second time in
                 # the initial bfs
+                lol = lcp_depth(node.suffix_link)
+                print('LOL')
+                print(lol)
+                print(node)
+                print(node.children)
                 node.lcp_depth = lcp_depth(node.suffix_link) + 1
             node.lcp_depth = node.suffix_link.lcp_depth + 1
             return node.lcp_depth
@@ -802,7 +808,7 @@ def adjust_overmerge(t_overmerged, t_even, t_odd, S):
                     odd_leaf_id = odd_leaf_descendant.id
 
                 odd_tree_parentEdge_char = S[odd_leaf_id - 1 + curr_node.lcp_depth]
-
+                
                 if even_tree_parentEdge_char < odd_tree_parentEdge_char:
                     curr_node.add_child(even_tree)
                     curr_node.add_child(odd_tree)
@@ -833,6 +839,7 @@ def main():
     suffix_tree = construct_suffix_tree(inputstr)
     print('final tree for input %s:' % inputstr)
     print(suffix_tree.fancyprint(inputstr))
+    check_correctness.check_correctness2(inputstr)
 
 
 if __name__ == '__main__':

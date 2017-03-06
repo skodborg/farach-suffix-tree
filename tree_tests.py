@@ -14,15 +14,15 @@ def str12121():
     constructed_tree = farach.construct_suffix_tree(string)
 
     actual_tree = Node(aId='root')
-    inner1 = Node([1], 'inner')
-    inner2 = Node([2, 1], 'inner')
-    inner3 = Node([2, 1], 'inner')
-    leaf1 = Node([2, 1, 3], 1)
-    leaf2 = Node([2, 1, 3], 2)
-    leaf3 = Node([3], 3)
-    leaf4 = Node([3], 4)
-    leaf5 = Node([3], 5)
-    leaf6 = Node([3], 6)
+    inner1 = Node(1, 'inner')
+    inner2 = Node(2, 'inner')
+    inner3 = Node(3, 'inner')
+    leaf1 = Node(6, 1)
+    leaf2 = Node(5, 2)
+    leaf3 = Node(4, 3)
+    leaf4 = Node(3, 4)
+    leaf5 = Node(2, 5)
+    leaf6 = Node(1, 6)
     actual_tree.add_child(inner1)
     actual_tree.add_child(inner2)
     actual_tree.add_child(leaf6)
@@ -33,10 +33,14 @@ def str12121():
     inner2.add_child(leaf2)
     inner2.add_child(leaf4)
 
-    # print(actual_tree.fancyprint())
-    # print(constructed_tree.fancyprint())
+    actual_tree.update_leaf_list()
 
-    assert constructed_tree.fancyprint() == actual_tree.fancyprint()
+    print(actual_tree.fancyprint(string))
+    print(constructed_tree.fancyprint(string))
+
+    check_correctness2('12121')
+
+    assert constructed_tree.fancyprint(string) == actual_tree.fancyprint(string)
 
     # check_correctness2(string[:-1])
 

@@ -157,30 +157,33 @@ def banana_test():
     inputstr = farach.str2int('123232')
 
     root = Node(aId="root")
-    root.add_child(Node([1, 2, 3, 2, 3, 2, 4], "1"))
+    root.add_child(Node(7, 1))
 
-    inner = Node([2], "inner")
+    inner = Node(1, "inner")
     root.add_child(inner)
 
-    inner2 = Node([3, 2], "inner")
-    inner2.add_child(Node([3, 2, 4], 2))
-    inner2.add_child(Node([4], 4))
+    inner2 = Node(3, "inner")
+    inner2.add_child(Node(6, 2))
+    inner2.add_child(Node(4, 4))
 
     inner.add_child(inner2)
 
-    inner.add_child(Node([4], 6))
+    inner.add_child(Node(2, 6))
 
-    inner = Node([3, 2], "inner")
+    inner = Node(2, "inner")
 
-    inner.add_child(Node([3, 2, 4], 3))
-    inner.add_child(Node([4], 5))
+    inner.add_child(Node(5, 3))
+    inner.add_child(Node(3, 5))
 
     root.add_child(inner)
 
-    root.add_child(Node([4], 7))
+    root.add_child(Node(1, 7))
 
     constructed_tree = farach.construct_suffix_tree(inputstr)
     root.update_leaf_list()
+
+    # print(constructed_tree.fancyprint(inputstr))
+    # print(root.fancyprint(inputstr))
 
     assert constructed_tree.fancyprint(inputstr) == root.fancyprint(inputstr)
 
