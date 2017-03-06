@@ -4,15 +4,15 @@ from utils import Node
 import check_correctness
 
 input = '121112212221'
-input = '111222122121'
-input = '12121212121'
-input = 'banana'
-input = 'mississippi'
-input = 'mississippiisaniceplaceithink'
+#input = '111222122121'
+#input = '12121212121'
+#input = 'banana'
+#input = 'mississippi'
+#input = 'mississippiisaniceplaceithink'
 # input = '123232'
-input = '12122'  # ERROR
+#input = '12122'  # ERROR
 # input = '12121'  # ERROR
-input = '1211122122213'  # ERROR
+#input = '121112212221'  # ERROR
 
 
 
@@ -77,24 +77,24 @@ def construct_suffix_tree(inputstr):
 
     t_odd = T_odd(inputstr)
 
-    print('odd tree for %s' % inputstr)
-    print(t_odd.fancyprint(inputstr))
+    #print('odd tree for %s' % inputstr)
+    #print(t_odd.fancyprint(inputstr))
 
     t_even = T_even(t_odd, inputstr)
 
-    print('even tree for %s' % inputstr)
-    print(t_even.fancyprint(inputstr))    
+    #print('even tree for %s' % inputstr)
+    #print(t_even.fancyprint(inputstr))    
     
     t_overmerged = overmerge(t_even, t_odd, inputstr)
-    print('overmerge tree for %s' % inputstr)
-    print(t_overmerged.fancyprint(inputstr))
+    #print('overmerge tree for %s' % inputstr)
+    #print(t_overmerged.fancyprint(inputstr))
 
     compute_lcp_tree(t_overmerged)
     adjust_overmerge(t_overmerged, t_even, t_odd, inputstr)
 
     cleanup_tree(t_overmerged)
-    print('adjusted tree for %s' % inputstr)
-    print(t_overmerged.fancyprint(inputstr))
+    #print('adjusted tree for %s' % inputstr)
+    #print(t_overmerged.fancyprint(inputstr))
     
     return t_overmerged
 
@@ -304,6 +304,7 @@ def T_odd(inputstr):
     # + convert leaf ids to corresponding original suffix ids
     #eos_char = tree_Sm.leaflist()[0].parentEdge[-1]
     #rank2char(tree_Sm, eos_char)
+
     extend_length(tree_Sm)
 
     # print('after rank2char:')
@@ -313,7 +314,14 @@ def T_odd(inputstr):
     # (no edges of a node share first character)
 
     tree_Sm.update_leaf_list()
+
+ 
     resolve_suffix_tree(tree_Sm)
+
+
+    tree_Sm.update_leaf_list()
+
+
     tree_Sm.update_leaf_list()
     return tree_Sm
 
@@ -745,11 +753,6 @@ def compute_lcp_tree(t_overmerged):
                 # continue the bfs. This is still within O(n) as we simply
                 # skip the node when we encounter it the second time in
                 # the initial bfs
-                lol = lcp_depth(node.suffix_link)
-                print('LOL')
-                print(lol)
-                print(node)
-                print(node.children)
                 node.lcp_depth = lcp_depth(node.suffix_link) + 1
             node.lcp_depth = node.suffix_link.lcp_depth + 1
             return node.lcp_depth
@@ -778,11 +781,21 @@ def adjust_overmerge(t_overmerged, t_even, t_odd, S):
                 curr_node.children = []
 
                 #curr_node.parentEdge = new_node_parentEdge
+
+
+
                 curr_node.str_length = curr_node.lcp_depth
 
                 curr_node.id = "inner"
                 even_tree = curr_node.even_subtree
                 odd_tree = curr_node.odd_subtree
+
+                for child in even_tree.children:
+                    child.parent = even_tree
+
+                for child in odd_tree.children:
+                    child.parent = odd_tree
+                
 
                 # if hasattr(even_tree, "old_parentEdge"):
                 #     even_tree.parentEdge = even_tree.old_parentEdge
@@ -816,6 +829,7 @@ def adjust_overmerge(t_overmerged, t_even, t_odd, S):
                     curr_node.add_child(odd_tree)
                     curr_node.add_child(even_tree)
 
+               
     t_overmerged.bfs(adjust_overmerge_helper)
     t_overmerged.update_leaf_list()
 

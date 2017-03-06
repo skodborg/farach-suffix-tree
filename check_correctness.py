@@ -214,9 +214,9 @@ def run_tests():
 
 
 def main():
-    run_tests()
+    #run_tests()
 
-    check_correctness(''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(1000)))
+    check_correctness(''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(100)))
 
 if __name__ == '__main__':
     main()

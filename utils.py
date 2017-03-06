@@ -119,7 +119,7 @@ class Node:
             edge = ""
         else:
             if S:
-                edge = S[leaf_id - 1 + self.parent.str_length : leaf_id - 1 + self.str_length]
+                edge =  str(S[leaf_id - 1 + self.parent.str_length : leaf_id - 1 + self.str_length]) #+ " len: " + str(self.str_length)
                 
             else:
                 edge = ''.join(map(str, self.parentEdge))
