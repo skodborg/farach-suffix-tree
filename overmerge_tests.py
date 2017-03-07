@@ -5,6 +5,7 @@ def run_tests():
     sorts_correct()
     case_3_rec()
     case_2_rec()
+    case_2_again()
     mix_case_3_1()
     faked_tree_article()
     faked_tree_book()
@@ -143,6 +144,40 @@ def mix_case_3_1():
 
     overmerged = farach.overmerge(even, odd, S)
 
+    # print(overmerged.fancyprint(S))
+    # print(result.fancyprint(S))
+
+    assert overmerged.fancyprint(S) == result.fancyprint(S)
+
+
+def case_2_again():
+    S = '12123317'
+    odd = utils.Node(0, 'root')
+    inner = utils.Node(2, 'inner')
+    odd.add_child(inner)
+    inner.add_child(utils.Node(4, 1))
+    inner.add_child(utils.Node(4, 3))
+
+    even = utils.Node(0, 'root')
+    even.add_child(utils.Node(2, 7))
+
+    result = utils.Node(0, 'root')
+    inner = utils.Node(1, 'inner')
+    result.add_child(inner)
+    inner2 = utils.Node(2, 'inner')
+    inner.add_child(inner2)
+    inner.add_child(utils.Node(2, 7))
+    inner2.add_child(utils.Node(4, 1))
+    inner2.add_child(utils.Node(4, 3))
+
+    even.update_leaf_list()
+    odd.update_leaf_list()
+    result.update_leaf_list()
+
+    overmerged = farach.overmerge(odd, even, S)
+
+    # print(odd.fancyprint(S))
+    # print(even.fancyprint(S))
     # print(overmerged.fancyprint(S))
     # print(result.fancyprint(S))
 
