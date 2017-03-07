@@ -35,8 +35,8 @@ def str12121():
 
     actual_tree.update_leaf_list()
 
-    print(actual_tree.fancyprint(string))
-    print(constructed_tree.fancyprint(string))
+    # print(actual_tree.fancyprint(string))
+    # print(constructed_tree.fancyprint(string))
 
     check_correctness2('12121')
 

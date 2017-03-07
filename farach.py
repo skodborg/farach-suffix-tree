@@ -79,22 +79,14 @@ def construct_suffix_tree(inputstr):
 
     t_odd = T_odd(inputstr)
 
-
-    if inputstr == [1, 1, 1, 2, 2, 2, 1, 2, 2, 1, 2, 1, 3]:
-        create_tree(t_odd, "t_odd")
-
     #print('odd tree for %s' % inputstr)
     #print(t_odd.fancyprint(inputstr))
 
     t_even = T_even(t_odd, inputstr)
-    if inputstr == [1, 1, 1, 2, 2, 2, 1, 2, 2, 1, 2, 1, 3]:
-        create_tree(t_even, "t_even")
     #print('even tree for %s' % inputstr)
     #print(t_even.fancyprint(inputstr))    
     
     t_overmerged = overmerge(t_even, t_odd, inputstr)
-    if inputstr == [1, 1, 1, 2, 2, 2, 1, 2, 2, 1, 2, 1, 3]:
-        create_tree(t_overmerged, "t_overmerged_result")
     #print('overmerge tree for %s' % inputstr)
     #print(t_overmerged.fancyprint(inputstr))
 

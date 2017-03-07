@@ -13,113 +13,140 @@ def run_tests():
 
 
 def sorts_correct():
+    S = '1423'
 
     even = utils.Node(aId="root")
-    even.add_child(utils.Node([1], 1))
-    even.add_child(utils.Node([4], 2))
+    even.add_child(utils.Node(1, 4))
+    even.add_child(utils.Node(3, 2))
 
     odd = utils.Node(aId="root")
-    odd.add_child(utils.Node([2], 3))
-    odd.add_child(utils.Node([3], 4))
+    odd.add_child(utils.Node(4, 1))
+    odd.add_child(utils.Node(2, 3))
 
     result = utils.Node(aId="root")
-    result.add_child(utils.Node([1], 1))
-    result.add_child(utils.Node([2], 3))
-    result.add_child(utils.Node([3], 4))
-    result.add_child(utils.Node([4], 2))
-
-    assert farach.overmerge(even, odd).fancyprint() == result.fancyprint()
+    result.add_child(utils.Node(4, 1))
+    result.add_child(utils.Node(2, 3))
+    result.add_child(utils.Node(1, 4))
+    result.add_child(utils.Node(3, 2))
+    result.update_leaf_list()
+    # print(farach.overmerge(even, odd, S).fancyprint(S))
+    # print(result.fancyprint(S))
+    assert farach.overmerge(even, odd, S).fancyprint(S) == result.fancyprint(S)
 
 
 def case_3_rec():
+    # suffixes: 1:'1211', 2:'1214', 3:'122', 4:'123'
+    S = '12111214122123'
 
     even = utils.Node(aId="root")
-    inner = utils.Node([1,1,1], "inner")
+    inner = utils.Node(3, "inner")
     even.add_child(inner)
 
-    inner.add_child(utils.Node([1], 1))
-    inner.add_child(utils.Node([4], 2))
+    inner.add_child(utils.Node(14, 1))
+    inner.add_child(utils.Node(10, 5))
 
     odd = utils.Node(aId="root")
-    inner = utils.Node([1,2], "inner")
+    inner = utils.Node(2, "inner")
     odd.add_child(inner)
-    inner.add_child(utils.Node([2], 3))
-    inner.add_child(utils.Node([3], 4))
+    inner.add_child(utils.Node(6, 9))
+    inner.add_child(utils.Node(3, 12))
 
     result = utils.Node(aId="root")
 
-    inner = utils.Node([1,2], "inner")
+    inner = utils.Node(2, "inner")
     result.add_child(inner)
-    inner2 = utils.Node([1], "inner")
-    inner2.add_child(utils.Node([1], 1))
-    inner2.add_child(utils.Node([4], 2))
+    inner2 = utils.Node(3, "inner")
+    inner2.add_child(utils.Node(14, 1))
+    inner2.add_child(utils.Node(10, 5))
 
     inner.add_child(inner2)
 
-    inner.add_child(utils.Node([2], 3))
-    inner.add_child(utils.Node([3], 4))
+    inner.add_child(utils.Node(6, 9))
+    inner.add_child(utils.Node(3, 12))
+    even.update_leaf_list()
+    odd.update_leaf_list()
+    result.update_leaf_list()
+    overmerged = farach.overmerge(even, odd, S)
 
-    overmerged = farach.overmerge(even, odd)
+    # print(overmerged.fancyprint(S))
+    # print(result.fancyprint(S))
 
-    assert overmerged.fancyprint() == result.fancyprint()
+    assert overmerged.fancyprint(S) == result.fancyprint(S)
 
 
 def case_2_rec():
+    # test is a little weird because of fancyprint
+    # suffixes: 1:'1111', 2:'1212'
+    S = '111111212'
 
     even = utils.Node(aId="root")
 
-    inner = utils.Node([1,1], "inner")
+    inner = utils.Node(2, "inner")
     even.add_child(inner)
-    inner.add_child(utils.Node([1,1,1], 1))
+    inner.add_child(utils.Node(5, 1))
 
     odd = utils.Node(aId="root")
 
-    inner = utils.Node([1,2], "inner")
+    inner = utils.Node(2, "inner")
     odd.add_child(inner)
 
-    inner.add_child(utils.Node([1,2], 2))
+    inner.add_child(utils.Node(4, 6))
 
     result = utils.Node(aId="root")
 
-    inner = utils.Node([1,1], "inner")
+    inner = utils.Node(2, "inner")
 
     result.add_child(inner)
 
-    inner2 = utils.Node([1,2], 2)
+    inner2 = utils.Node(4, 6)
     inner.add_child(inner2)
 
-    inner2.add_child(utils.Node([1], 1))
+    inner2.add_child(utils.Node(5, 1))
+    even.update_leaf_list()
+    odd.update_leaf_list()
+    result.update_leaf_list()
+    overmerged = farach.overmerge(even, odd, S)
 
-    overmerged = farach.overmerge(even, odd)
+    # print(overmerged.fancyprint(S))
+    # print(result.fancyprint(S))
 
-    assert overmerged.fancyprint() == result.fancyprint()
+    assert overmerged.fancyprint(S) == result.fancyprint(S)
 
 
 def mix_case_3_1():
+    # suffixes: 1: '1', 2: '222', 3:'21', 4:'3'
+    S = '1222213'
 
     even = utils.Node(aId="root")
 
-    even.add_child(utils.Node([1], 1))
-    even.add_child(utils.Node([2, 2, 2], 2))
+    even.add_child(utils.Node(1, 1))
+    even.add_child(utils.Node(3, 2))
 
     odd = utils.Node(aId="root")
 
-    odd.add_child(utils.Node([2,1], 3))
-    odd.add_child(utils.Node([3], 4))
+    odd.add_child(utils.Node(2, 5))
+    odd.add_child(utils.Node(1, 7))
 
     result = utils.Node(aId="root")
 
-    result.add_child(utils.Node([1], 1))
-    inner = utils.Node([2,1], 3)
+    result.add_child(utils.Node(1, 1))
+    inner = utils.Node(2, 5)
 
     result.add_child(inner)
-    inner.add_child(utils.Node([2], 2))
+    inner.add_child(utils.Node(3, 2))
 
-    result.add_child(utils.Node([3], 4))
+    result.add_child(utils.Node(1, 7))
 
-    overmerged = farach.overmerge(even, odd)
+    even.update_leaf_list()
+    odd.update_leaf_list()
+    result.update_leaf_list()
 
-    assert overmerged.fancyprint() == result.fancyprint()
+    overmerged = farach.overmerge(even, odd, S)
+
+    # print(overmerged.fancyprint(S))
+    # print(result.fancyprint(S))
+
+    assert overmerged.fancyprint(S) == result.fancyprint(S)
 
 
 def faked_tree_book():
@@ -317,11 +344,12 @@ def faked_tree_article():
 
 
 def small_example():
+    S = '11122'
     t_even = utils.Node("root")
-    t_even.add_child(utils.Node([1,1], 2))
+    t_even.add_child(utils.Node(2, 1))
 
     t_odd = utils.Node("root")
-    t_odd.add_child(utils.Node([1,2,2], 1))
+    t_odd.add_child(utils.Node(3, 3))
 
 
     print("even")
@@ -361,4 +389,5 @@ def small_example_2():
 
 if __name__ == '__main__':
     run_tests()
+
     
