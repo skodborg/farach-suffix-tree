@@ -119,6 +119,15 @@ def check_correctness2(inputstr):
     # print(tree.fancyprint(S))
 
     # -------------------------------------------------------------
+    # Check that each child has a parent pointer corresponding to
+    # its position in some node's child list
+    # -------------------------------------------------------------
+    def helper(node):
+        for child in node.children:
+            assert child.parent == node
+    tree.traverse(helper)
+
+    # -------------------------------------------------------------
     # The tree has exactly n leaves numbered from 1 to n.
     # -------------------------------------------------------------
 
@@ -147,7 +156,6 @@ def check_correctness2(inputstr):
                 print('OUCH! %s %s %i' % (node, node.parent, node.str_length - node.parent.str_length))
                 print(node.parent.fancyprint(S))
                 print(inputstr)
-                count += 1
             assert node.str_length - node.parent.str_length > 0
     tree.traverse(helper)
 

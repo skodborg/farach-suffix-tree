@@ -2,24 +2,28 @@ import math
 import radixsort
 from utils import Node
 import check_correctness
+from collections import deque
 
-input = '121112212221'
-#input = '111222122121'
-#input = '12121212121'
-#input = 'banana'
-#input = 'mississippi'
-#input = 'mississippiisaniceplaceithink'
+# input = '121112212221'
+# input = '111222122121'
+# input = '12121212121'
+# input = 'banana'
+# input = 'mississippi'
+# input = 'mississippiisaniceplaceithink'
 # input = '123232'
-#input = '12122'  # ERROR
-# input = '12121'  # ERROR
-#input = '121112212221'  # ERROR
-#input = "121112212221"
-input = "111222122121"
-
-# FAILING INPUTS
+# input = '12122'
+# input = '12121'
+# input = '121112212221'
+# input = "121112212221"
+# input = "111222122121"
 input = '126226037782486288489207273602'
 input = '0928330960'
 input = '9200662209'
+
+# FAILING INPUTS
+input = '1600637607'
+input = '6656559814'
+
 
 
 
@@ -84,16 +88,16 @@ def construct_suffix_tree(inputstr):
 
     t_odd = T_odd(inputstr)
 
-    print('odd tree for %s' % inputstr)
-    print(t_odd.fancyprint(inputstr))
+    # print('odd tree for %s' % inputstr)
+    # print(t_odd.fancyprint(inputstr))
 
     t_even = T_even(t_odd, inputstr)
-    print('even tree for %s' % inputstr)
-    print(t_even.fancyprint(inputstr))    
+    # print('even tree for %s' % inputstr)
+    # print(t_even.fancyprint(inputstr))    
     
     t_overmerged = overmerge(t_even, t_odd, inputstr)
-    print('overmerge tree for %s' % inputstr)
-    print(t_overmerged.fancyprint(inputstr))
+    # print('overmerge tree for %s' % inputstr)
+    # print(t_overmerged.fancyprint(inputstr))
 
     # print('before')
     # test_child_parent_relations(t_overmerged)
@@ -105,8 +109,8 @@ def construct_suffix_tree(inputstr):
     # print('good')
 
     cleanup_tree(t_overmerged)
-    print('adjusted tree for %s' % inputstr)
-    print(t_overmerged.fancyprint(inputstr))
+    # print('adjusted tree for %s' % inputstr)
+    # print(t_overmerged.fancyprint(inputstr))
     
     return t_overmerged
 
@@ -816,6 +820,18 @@ def adjust_overmerge(t_overmerged, t_even, t_odd, S):
 
     # add_str_length(t_overmerged, 0)
 
+    def bfs(tree, fn):
+        # breadth-first search
+        fifo = deque()
+        fifo.append(tree)
+        while fifo:
+            node = fifo.pop()
+            result = fn(node)
+            if result == 'continue':
+                # skip because we do not need to process this node's children
+                continue
+            fifo.extendleft(node.children)
+
     def adjust_overmerge_helper(curr_node):
         if(hasattr(curr_node, "lcp_depth")):
 
@@ -876,6 +892,7 @@ def adjust_overmerge(t_overmerged, t_even, t_odd, S):
                     # print('odd tree: %s' % str(odd_tree))
                     curr_node.add_child(even_tree)
                     curr_node.add_child(odd_tree)
+                    return 'continue'
                     # print('test for node IF %s' % str(curr_node.parent.leaflist))
                     # test_child_parent_relations(curr_node.parent)
                     # print('success')
@@ -885,7 +902,7 @@ def adjust_overmerge(t_overmerged, t_even, t_odd, S):
                     # print('odd tree: %s' % str(odd_tree))
                     curr_node.add_child(odd_tree)
                     curr_node.add_child(even_tree)
-
+                    return 'continue'
                     # print('test for node ELSE %s' % str(curr_node.parent))
                     # test_child_parent_relations(curr_node.parent)
                     # print('success')
@@ -910,7 +927,8 @@ def adjust_overmerge(t_overmerged, t_even, t_odd, S):
     #            t_even and t_odd directly, also remembers to pop off the
     #            children of the node, as these should no longer be visited
                
-    t_overmerged.bfs(adjust_overmerge_helper)
+    # t_overmerged.bfs(adjust_overmerge_helper)
+    bfs(t_overmerged, adjust_overmerge_helper)
     t_overmerged.update_leaf_list()
 
 
