@@ -120,6 +120,8 @@ class Node:
         else:
             if S:
                 edge =  str(S[leaf_id - 1 + self.parent.str_length : leaf_id - 1 + self.str_length]) #+ " len: " + str(self.str_length)
+                #edge += " len: " + str(self.str_length)
+                #edge += ' p_str_ln: %i' % self.parent.str_length
                 
             else:
                 edge = ''.join(map(str, self.parentEdge))

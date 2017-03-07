@@ -116,6 +116,7 @@ def check_correctness2(inputstr):
     S = farach.str2int(inputstr)
     n = len(S)
     tree = farach.construct_suffix_tree(S)
+    # print(tree.fancyprint(S))
 
     # -------------------------------------------------------------
     # The tree has exactly n leaves numbered from 1 to n.
@@ -142,6 +143,11 @@ def check_correctness2(inputstr):
     # -------------------------------------------------------------
     def helper(node):
         if node.id != 'root':
+            if not node.str_length - node.parent.str_length > 0:
+                print('OUCH! %s %s %i' % (node, node.parent, node.str_length - node.parent.str_length))
+                print(node.parent.fancyprint(S))
+                print(inputstr)
+                count += 1
             assert node.str_length - node.parent.str_length > 0
     tree.traverse(helper)
 
@@ -168,6 +174,8 @@ def check_correctness2(inputstr):
             # where i is node.id
             ith_suffix = S[node.id - 1:]
             str_curr_node = curr_str + node.getParentEdge(S)
+            if ith_suffix != str_curr_node:
+                print('OUCH! %s != %s' % (ith_suffix, str_curr_node))
             assert ith_suffix == str_curr_node
         else:
             # call recursively to all children with parentEdge appended
@@ -215,8 +223,10 @@ def run_tests():
 
 def main():
     #run_tests()
-
-    check_correctness(''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(100)))
+    while True:
+        S = ''.join(random.choice(string.digits) for _ in range(10))
+        print('attempting string: %s' % S)
+        check_correctness2(S)
 
 if __name__ == '__main__':
     main()

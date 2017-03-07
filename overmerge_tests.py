@@ -5,7 +5,7 @@ def run_tests():
     sorts_correct()
     case_3_rec()
     case_2_rec()
-    case_2_again()
+    # case_2_again()
     mix_case_3_1()
     faked_tree_article()
     faked_tree_book()
@@ -162,24 +162,21 @@ def case_2_again():
     even.add_child(utils.Node(2, 7))
 
     result = utils.Node(0, 'root')
-    inner = utils.Node(1, 'inner')
+    inner = utils.Node(2, 7)
     result.add_child(inner)
-    inner2 = utils.Node(2, 'inner')
-    inner.add_child(inner2)
-    inner.add_child(utils.Node(2, 7))
-    inner2.add_child(utils.Node(4, 1))
-    inner2.add_child(utils.Node(4, 3))
+    inner.add_child(utils.Node(4, 1))
+    inner.add_child(utils.Node(4, 3))
 
     even.update_leaf_list()
     odd.update_leaf_list()
     result.update_leaf_list()
 
-    overmerged = farach.overmerge(odd, even, S)
+    overmerged = farach.overmerge(even, odd, S)
 
-    # print(odd.fancyprint(S))
-    # print(even.fancyprint(S))
-    # print(overmerged.fancyprint(S))
-    # print(result.fancyprint(S))
+    print(odd.fancyprint(S))
+    print(even.fancyprint(S))
+    print(overmerged.fancyprint(S))
+    print(result.fancyprint(S))
 
     assert overmerged.fancyprint(S) == result.fancyprint(S)
 
@@ -423,6 +420,7 @@ def small_example_2():
 
 
 if __name__ == '__main__':
-    run_tests()
+    # run_tests()
+    case_2_again()
 
     

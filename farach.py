@@ -16,6 +16,11 @@ input = '121112212221'
 #input = "121112212221"
 input = "111222122121"
 
+# FAILING INPUTS
+input = '126226037782486288489207273602'
+input = '0928330960'
+input = '9200662209'
+
 
 
 
@@ -79,23 +84,29 @@ def construct_suffix_tree(inputstr):
 
     t_odd = T_odd(inputstr)
 
-    #print('odd tree for %s' % inputstr)
-    #print(t_odd.fancyprint(inputstr))
+    print('odd tree for %s' % inputstr)
+    print(t_odd.fancyprint(inputstr))
 
     t_even = T_even(t_odd, inputstr)
-    #print('even tree for %s' % inputstr)
-    #print(t_even.fancyprint(inputstr))    
+    print('even tree for %s' % inputstr)
+    print(t_even.fancyprint(inputstr))    
     
     t_overmerged = overmerge(t_even, t_odd, inputstr)
-    #print('overmerge tree for %s' % inputstr)
-    #print(t_overmerged.fancyprint(inputstr))
+    print('overmerge tree for %s' % inputstr)
+    print(t_overmerged.fancyprint(inputstr))
 
+    # print('before')
+    # test_child_parent_relations(t_overmerged)
     compute_lcp_tree(t_overmerged)
     adjust_overmerge(t_overmerged, t_even, t_odd, inputstr)
 
+    # print('after')
+    # test_child_parent_relations(t_overmerged)
+    # print('good')
+
     cleanup_tree(t_overmerged)
-    #print('adjusted tree for %s' % inputstr)
-    #print(t_overmerged.fancyprint(inputstr))
+    print('adjusted tree for %s' % inputstr)
+    print(t_overmerged.fancyprint(inputstr))
     
     return t_overmerged
 
@@ -573,12 +584,14 @@ def overmerge(t_even, t_odd, S):
                 o_char = S[leaf_id + o_child.parent.str_length -1]
                 
             if(e_child is None):
+                # print('e_child is none, id: %s' % o_child)
                 o += 1
                 o_child.old_parent = o_child.parent
                 current.add_child(o_child)
                 continue
 
             if(o_child is None):
+                # print('o_child is none, id: %s' % e_child)
                 e += 1
                 e_child.old_parent = e_child.parent
                 current.add_child(e_child)
@@ -644,7 +657,24 @@ def overmerge(t_even, t_odd, S):
                     # equal length, we will ad an internal node, and call our
                     # merger_helper recursively with the two sub trees.
 
-                    inner = Node(e_parentEdge_len, "inner")
+                    # SPECIAL CASE:
+                    # if one of either e_child or o_child does not have any children,
+                    # then it is a leaf node itself. This means, that we are not
+                    # creating and merging into a new inner, but rather into this
+                    # particular leaf node, creating a leaf node with a subtree
+                    # being the subtree of the other node
+                    # Note, that both e_child and o_child cannot have empty children
+                    # lists, as that would mean they were both leaf nodes. But as
+                    # we have already made sure that their string lengths are equal,
+                    # there would be two suffixes in the tree of equal length,
+                    # which is impossible
+                    inner_id = 'inner'
+                    if not e_child.children:
+                        inner_id = e_child.id
+                    if not o_child.children:
+                        inner_id = o_child.id
+
+                    inner = Node(e_parentEdge_len, inner_id)
                     current.add_child(inner)
                     inner.even_subtree = e_child
                     inner.odd_subtree = o_child
@@ -769,6 +799,14 @@ def compute_lcp_tree(t_overmerged):
     t_overmerged.bfs(lcp_depth)
 
 
+def test_child_parent_relations(tree):
+    def helper(node):
+        for child in node.children:
+            assert child.parent == node
+    tree.traverse(helper)
+
+
+
 def adjust_overmerge(t_overmerged, t_even, t_odd, S):
     # def add_str_length(node, prev_length):
     #     # TODO: consider do this as we form the overmerge tree
@@ -779,7 +817,6 @@ def adjust_overmerge(t_overmerged, t_even, t_odd, S):
     # add_str_length(t_overmerged, 0)
 
     def adjust_overmerge_helper(curr_node):
-        # print(curr_node.fancyprint())
         if(hasattr(curr_node, "lcp_depth")):
 
             if curr_node.str_length != curr_node.lcp_depth:
@@ -788,19 +825,21 @@ def adjust_overmerge(t_overmerged, t_even, t_odd, S):
                 #new_node_parentEdge = curr_node.parentEdge[:parentEdge_length]
 
                 curr_node.children = []
-
                 #curr_node.parentEdge = new_node_parentEdge
-
-
 
                 curr_node.str_length = curr_node.lcp_depth
 
                 curr_node.id = "inner"
                 even_tree = curr_node.even_subtree
+                # if even_tree.id == 'inner':
+                #     even_tree.id += 'EVEN'
                 odd_tree = curr_node.odd_subtree
+                # if odd_tree.id == 'inner':
+                #     odd_tree.id += 'ODD'
 
                 for child in even_tree.children:
                     child.parent = even_tree
+                    
 
                 for child in odd_tree.children:
                     child.parent = odd_tree
@@ -832,12 +871,44 @@ def adjust_overmerge(t_overmerged, t_even, t_odd, S):
                 odd_tree_parentEdge_char = S[odd_leaf_id - 1 + curr_node.lcp_depth]
                 
                 if even_tree_parentEdge_char < odd_tree_parentEdge_char:
+                    # print('curr node: %s' % str(curr_node))
+                    # print('even tree: %s' % str(even_tree))
+                    # print('odd tree: %s' % str(odd_tree))
                     curr_node.add_child(even_tree)
                     curr_node.add_child(odd_tree)
+                    # print('test for node IF %s' % str(curr_node.parent.leaflist))
+                    # test_child_parent_relations(curr_node.parent)
+                    # print('success')
                 else:
+                    # print('curr node: %s' % str(curr_node.leaflist))
+                    # print('even tree: %s' % str(even_tree))
+                    # print('odd tree: %s' % str(odd_tree))
                     curr_node.add_child(odd_tree)
                     curr_node.add_child(even_tree)
 
+                    # print('test for node ELSE %s' % str(curr_node.parent))
+                    # test_child_parent_relations(curr_node.parent)
+                    # print('success')
+
+                # print('curr node: %s' % str(curr_node))
+                # print('parent: %s' % str(curr_node.parent))
+                # print('odd tree: %s' % str(odd_tree))
+
+    # TODO: bfs does not work here, as in the case where we identify
+    #       that we can just insert subtrees directly as found in
+    #       t_even and t_odd, we do not need to visit children of
+    #       this node and process them again, as the subtrees just
+    #       inserted are correct. If we queue all children for a bfs
+    #       visit, and then replace the whole children list with two
+    #       subtrees as found in t_even and t_odd, we will encounter
+    #       problems when these are popped from the bfs queue while no
+    #       longer part of the tree. This may modify parent nodes of
+    #       these replaced children, which were correct, but might be
+    #       modified according to some issue found deeper down the wrong,
+    #       but already correctly modified subtree of the parent
+    #       Fix: custom bfs which, in the case of inserting subtrees from
+    #            t_even and t_odd directly, also remembers to pop off the
+    #            children of the node, as these should no longer be visited
                
     t_overmerged.bfs(adjust_overmerge_helper)
     t_overmerged.update_leaf_list()
@@ -859,9 +930,9 @@ def cleanup_tree(t_overmerged):
 
 def main():
     inputstr = str2int(input)
-    suffix_tree = construct_suffix_tree(inputstr)
-    print('final tree for input %s:' % inputstr)
-    print(suffix_tree.fancyprint(inputstr))
+    # suffix_tree = construct_suffix_tree(inputstr)
+    # print('final tree for input %s:' % inputstr)
+    # print(suffix_tree.fancyprint(inputstr))
     check_correctness.check_correctness2(inputstr)
 
 
