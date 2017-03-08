@@ -21,8 +21,12 @@ input = '0928330960'
 input = '9200662209'
 
 # FAILING INPUTS
-input = '1600637607'
-input = '6656559814'
+# input = '1600637607'
+# input = '6656559814'
+# input = '8848442145'
+input = '5515119'
+
+# input = '0101001'  # different than the ones above
 
 
 
