@@ -48,7 +48,10 @@ AssertionError
 '''
 input = '47641143403300303358'
 
-
+input = '4747744779'
+#input = '277653677653329'
+input = '984615083464848'
+input = '202040025603256'
 
 
 
@@ -112,26 +115,26 @@ def construct_suffix_tree(inputstr):
         return root
 
     t_odd = T_odd(inputstr)
-    # print('odd tree for %s' % inputstr)
+    #print('odd tree for %s' % inputstr)
     #print(t_odd.fancyprint(inputstr))
 
     t_even = T_even(t_odd, inputstr)
-    # print('even tree for %s' % inputstr)
+    #print('even tree for %s' % inputstr)
     #print(t_even.fancyprint(inputstr))   
     
     t_overmerged = overmerge(t_even, t_odd, inputstr)
-    # print('overmerge tree for %s' % inputstr)
+    #print('overmerge tree for %s' % inputstr)
     #print(t_overmerged.fancyprint(inputstr))
 
-    # print('before')
+    #print('before')
     # test_child_parent_relations(t_overmerged)
     compute_lcp_tree(t_overmerged)
     adjust_overmerge(t_overmerged, t_even, t_odd, inputstr)
 
 
-    # print('after')
+    #print('after')
     # test_child_parent_relations(t_overmerged)
-    # print('good')
+    #print('good')
 
     cleanup_tree(t_overmerged)
     # print('adjusted tree for %s' % inputstr)
@@ -779,6 +782,13 @@ def compute_lcp_tree(t_overmerged):
                             if c.id % 2 != first.id % 2:
                                 pairs2append.append((first, c))
                                 break
+                    #for c in node.parent.children:
+                    #    if type(c.id) is str:
+                    #        for c2 in c.children:
+                    #            if type(c2.id) is int and c2.id != node.id:
+                    #                if c2.id % 2 != first.id % 2:
+                    #                    pairs2append.append((first, c2))
+           
                     
 
             
@@ -808,10 +818,18 @@ def compute_lcp_tree(t_overmerged):
 
         lca_nodepairs.append((curr_node, node))'''
 
-
+    prev_node = None
     curr_node = leafnode_occurences[0]
-    for node in leafnode_occurences[1:]:
 
+    for n in range(1, len(leafnode_occurences)):
+        node = leafnode_occurences[n]
+
+        if prev_node:
+
+            if(prev_node.id % 2 != leafnode_occurences[n-1].id % 2):
+
+                pairs2append.append((prev_node, leafnode_occurences[n-1]))
+            prev_node = None
 
         if curr_node.id % 2 == node.id % 2:
             # we found a homogenous pair, swap curr_node for last seen
@@ -819,10 +837,11 @@ def compute_lcp_tree(t_overmerged):
             if lca_nodepairs:
                 curr_node = lca_nodepairs[-1][1]
             else:
+                prev_node = leafnode_occurences[0]
                 curr_node = node
                 continue
 
-
+        prev_node = leafnode_occurences[n-2]
         lca_nodepairs.append((curr_node, node))
 
 
@@ -846,6 +865,7 @@ def compute_lcp_tree(t_overmerged):
         #       the article [Ht84], otherwise we do not achieve O(n) running
         #       time for the algorithm
         lca = naive_lca(node1, node2, t_overmerged)
+
         if (lca.id == 'root' or
                 node1.id + 1 not in id2node or
                 node2.id + 1 not in id2node):
@@ -854,6 +874,7 @@ def compute_lcp_tree(t_overmerged):
         node1_next = id2node[node1.id + 1]
         node2_next = id2node[node2.id + 1]
         lca_parent = naive_lca(node1_next, node2_next, t_overmerged)
+
         lca.suffix_link = lca_parent
     # ---------------------------------------
     # ADD LCP DEPTH TO ALL NODES USING A SINGLE DFS
@@ -863,6 +884,7 @@ def compute_lcp_tree(t_overmerged):
             # we already computed this node as a result of computing an
             # earlier node with a suffix link to this node, no need to
             # repeat the computation
+
             return node.lcp_depth
 
         if hasattr(node, 'suffix_link'):
@@ -874,7 +896,9 @@ def compute_lcp_tree(t_overmerged):
                 # the initial bfs
                 node.lcp_depth = lcp_depth(node.suffix_link) + 1
             node.lcp_depth = node.suffix_link.lcp_depth + 1
+     
             return node.lcp_depth
+   
     t_overmerged.lcp_depth = 0
     t_overmerged.bfs(lcp_depth)
 
@@ -916,7 +940,7 @@ def adjust_overmerge(t_overmerged, t_even, t_odd, S):
                 parentEdge_length = curr_node.lcp_depth - curr_node.parent.str_length
 
                 #new_node_parentEdge = curr_node.parentEdge[:parentEdge_length]
-
+        
                 curr_node.children = []
                 #curr_node.parentEdge = new_node_parentEdge
 
@@ -930,12 +954,11 @@ def adjust_overmerge(t_overmerged, t_even, t_odd, S):
                 # if odd_tree.id == 'inner':
                 #     odd_tree.id += 'ODD'
 
-                for child in even_tree.children:
-                    child.parent = even_tree
-                    
-
-                for child in odd_tree.children:
-                    child.parent = odd_tree
+                def helper(node):
+                    for child in node.children:
+                        child.parent = node
+                even_tree.bfs(helper)
+                odd_tree.bfs(helper)
                 
 
                 # if hasattr(even_tree, "old_parentEdge"):

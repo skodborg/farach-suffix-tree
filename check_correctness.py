@@ -233,7 +233,7 @@ def main():
     #run_tests()
     while True:
         try:
-            S = ''.join(random.choice(string.digits) for _ in range(10))
+            S = ''.join(random.choice(string.digits) for _ in range(15))
             check_correctness2(S)
         except AssertionError:
             print('attempting string: %s' % S)
