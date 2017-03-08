@@ -200,7 +200,7 @@ def check_correctness2(inputstr):
                 helper(n, new_str)
     helper(tree, [])
 
-    print('tree for input \"%s\" is correct' % inputstr)
+    # print('tree for input \"%s\" is correct' % inputstr)
 
     # MANGELFULD:
     # det skal også være en compacted trie, så alle indre knuder skal være LCA
@@ -232,9 +232,18 @@ def run_tests():
 def main():
     #run_tests()
     while True:
-        S = ''.join(random.choice(string.digits) for _ in range(10))
-        print('attempting string: %s' % S)
-        check_correctness2(S)
+        try:
+            S = ''.join(random.choice(string.digits) for _ in range(10))
+            check_correctness2(S)
+        except AssertionError:
+            print('attempting string: %s' % S)
+            print('assertion error!')
+        except TypeError:
+            print('attempting string: %s' % S)
+            print('type error!')
+        except:
+            print('attempting string: %s' % S)
+            print('some error!')
 
 if __name__ == '__main__':
     main()

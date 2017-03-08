@@ -20,7 +20,6 @@ input = '126226037782486288489207273602'
 input = '0928330960'
 input = '9200662209'
 
-# FAILING INPUTS
 # input = '1600637607'
 # input = '6656559814'
 # input = '8848442145'
@@ -30,6 +29,25 @@ input = '7955656566'
 input = '9444479944'
 
 #input = '0101001'  # different than the ones above
+
+# FAILING INPUTS
+'''
+File "/Users/marc/Documents/AU/Git/farach-suffix-tree/farach.py", line 857, in lcp_depth
+    node.lcp_depth = lcp_depth(node.suffix_link) + 1
+TypeError: unsupported operand type(s) for +: 'NoneType' and 'int'
+'''
+input = '87698273030366133030'
+input = '52896827282892453034'
+
+'''
+File "/Users/marc/Documents/AU/Git/farach-suffix-tree/utils.py", line 160, in dfs
+    fn(node)
+  File "check_correctness.py", line 127, in helper
+    assert child.parent == node
+AssertionError
+'''
+input = '47641143403300303358'
+
 
 
 
