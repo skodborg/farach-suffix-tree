@@ -26,7 +26,7 @@ input = '9200662209'
 # input = '8848442145'
 input = '5515119'
 
-# input = '0101001'  # different than the ones above
+input = '0101001'  # different than the ones above
 
 
 
@@ -91,13 +91,19 @@ def construct_suffix_tree(inputstr):
         return root
 
     t_odd = T_odd(inputstr)
-
+    if len(inputstr) == 8:
+        print("odd")
+        print(t_odd.fancyprint(inputstr)) 
     # print('odd tree for %s' % inputstr)
     # print(t_odd.fancyprint(inputstr))
 
     t_even = T_even(t_odd, inputstr)
     # print('even tree for %s' % inputstr)
-    # print(t_even.fancyprint(inputstr))    
+    # print(t_even.fancyprint(inputstr))   
+    if len(inputstr) == 8:
+        print("even")
+        print(t_even.fancyprint(inputstr)) 
+        print("-"*25)
     
     t_overmerged = overmerge(t_even, t_odd, inputstr)
     # print('overmerge tree for %s' % inputstr)
@@ -106,8 +112,14 @@ def construct_suffix_tree(inputstr):
     # print('before')
     # test_child_parent_relations(t_overmerged)
     compute_lcp_tree(t_overmerged)
+    if len(inputstr) == 8:
+        print(inputstr)
+        print(t_overmerged.fancyprint(inputstr))
     adjust_overmerge(t_overmerged, t_even, t_odd, inputstr)
 
+
+    if len(inputstr) == 8:
+        print(t_overmerged.fancyprint(inputstr))
     # print('after')
     # test_child_parent_relations(t_overmerged)
     # print('good')
@@ -681,6 +693,7 @@ def overmerge(t_even, t_odd, S):
                         inner_id = e_child.id
                     if not o_child.children:
                         inner_id = o_child.id
+                        e_parentEdge_len = o_child.str_length
 
                     inner = Node(e_parentEdge_len, inner_id)
                     current.add_child(inner)
@@ -837,9 +850,11 @@ def adjust_overmerge(t_overmerged, t_even, t_odd, S):
             fifo.extendleft(node.children)
 
     def adjust_overmerge_helper(curr_node):
+        
         if(hasattr(curr_node, "lcp_depth")):
 
             if curr_node.str_length != curr_node.lcp_depth:
+
                 parentEdge_length = curr_node.lcp_depth - curr_node.parent.str_length
 
                 #new_node_parentEdge = curr_node.parentEdge[:parentEdge_length]
