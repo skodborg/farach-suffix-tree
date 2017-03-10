@@ -2,6 +2,7 @@ import farach
 from utils import Node
 import random
 import string
+import traceback
 
 def check_correctness(inputstr):
     # TODO: i think it fails to identify trees that are not proper
@@ -114,8 +115,10 @@ def check_correctness2(inputstr):
     # tree such that:
     # -------------------------------------------------------------
     S = farach.str2int(inputstr)
+    # S = farach.append_unique_char(S)
     n = len(S)
     tree = farach.construct_suffix_tree(S)
+    # print('check_correctness 2 final tree on inputstr = %s:' % S)
     # print(tree.fancyprint(S))
 
     # -------------------------------------------------------------
@@ -233,17 +236,21 @@ def main():
     #run_tests()
     while True:
         try:
-            S = ''.join(random.choice(string.digits) for _ in range(15))
+            S = ''.join(random.choice(string.digits) for _ in range(250))
             check_correctness2(S)
+            # print('%s\nworked\n' % S)
         except AssertionError:
             print('attempting string: %s' % S)
             print('assertion error!')
+            traceback.print_exc()
         except TypeError:
             print('attempting string: %s' % S)
             print('type error!')
+            traceback.print_exc()
         except:
             print('attempting string: %s' % S)
             print('some error!')
+            traceback.print_exc()
 
 if __name__ == '__main__':
     main()
