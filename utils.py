@@ -119,12 +119,25 @@ class Node:
             edge = ""
         else:
             if S:
-                edge =  str(S[leaf_id - 1 + self.parent.str_length : leaf_id - 1 + self.str_length]) #+ " len: " + str(self.str_length)
+                # edge =  str(S[leaf_id - 1 + self.parent.str_length : leaf_id - 1 + self.str_length]) #+ " len: " + str(self.str_length)
+                edge = " len: " + str(self.str_length)
                 #edge += " len: " + str(self.str_length)
                 #edge += ' p_str_ln: %i' % self.parent.str_length
                 
             else:
                 edge = ''.join(map(str, self.parentEdge))
+
+        # printing odd/even nodes for which this node is the LCA
+        if hasattr(self, 'lca_odd') or hasattr(self, 'lca_even'):
+            edge += ' ['
+            if hasattr(self, 'lca_odd'):
+                edge += 'o: %s' % self.lca_odd
+                if hasattr(self, 'lca_even'):
+                    edge += ', '
+            if hasattr(self, 'lca_even'):
+                edge += 'e: %s' % self.lca_even
+            edge += ']'
+
         self_id += str(edge)
         result = '\t' * level + self_id + '\n'
         for child in self.children:
@@ -218,3 +231,35 @@ def generate_random_tree(n, forced_leaf_id=None):
         if not i == forced_leaf_id:
             nodes_list.append(newNode)
     return tree
+
+'''
+python3
+from utils import get_lca_nodepairs
+
+'''
+def get_lca_nodepairs(nodelist):
+    lca_nodepairs = []
+    prev_node = None
+    pairings = []
+    for n in range(len(nodelist)):
+        node = nodelist[n]
+        if not prev_node and n > 0 and node % 2 != nodelist[n - 1] % 2:
+            for pairingnode in pairings[:-1]:
+                lca_nodepairs.append((pairingnode, node))
+            prev_node = nodelist[n - 1]
+            pairings = []
+        if prev_node and node % 2 == prev_node % 2:
+            for pairingnode in pairings:
+                lca_nodepairs.append((prev_node, pairingnode))
+            for pairingnode in pairings:
+                lca_nodepairs.append((pairingnode, node))
+            prev_node = node
+            pairings = []
+            continue
+        pairings.append(node)
+        # print(pairings)
+        
+        
+    return lca_nodepairs
+
+# get_lca_nodepairs([1,3,2,4,5])

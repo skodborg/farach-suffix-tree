@@ -4,7 +4,7 @@ from utils import Node
 import check_correctness
 from collections import deque
 
-# input = '121112212221'
+input = '121112212221'
 # input = '111222122121'
 # input = '12121212121'
 # input = 'banana'
@@ -16,42 +16,33 @@ from collections import deque
 # input = '121112212221'
 # input = "121112212221"
 # input = "111222122121"
-input = '126226037782486288489207273602'
-input = '0928330960'
-input = '9200662209'
+# input = '126226037782486288489207273602'
+# input = '0928330960'
+# input = '9200662209'
 
 # input = '1600637607'
 # input = '6656559814'
 # input = '8848442145'
-input = '5515119'
-input = '1708753703'
-input = '7955656566'
-input = '9444479944'
+# input = '5515119'
+# input = '1708753703'
+# input = '7955656566'
+# input = '9444479944'
 
-#input = '0101001'  # different than the ones above
+# input = '0101001'  # different than the ones above
 
 # FAILING INPUTS
-'''
-File "/Users/marc/Documents/AU/Git/farach-suffix-tree/farach.py", line 857, in lcp_depth
-    node.lcp_depth = lcp_depth(node.suffix_link) + 1
-TypeError: unsupported operand type(s) for +: 'NoneType' and 'int'
-'''
-input = '87698273030366133030'
-input = '52896827282892453034'
+# input = '47641143403300303358'
 
-'''
-File "/Users/marc/Documents/AU/Git/farach-suffix-tree/utils.py", line 160, in dfs
-    fn(node)
-  File "check_correctness.py", line 127, in helper
-    assert child.parent == node
-AssertionError
-'''
-input = '47641143403300303358'
+# input = '4747744779'
+# input = '277653677653329'
+# input = '984615083464848'
+# input = '202040025603256'
 
-input = '4747744779'
-#input = '277653677653329'
-input = '984615083464848'
-input = '202040025603256'
+# input = '246919686846819'
+
+# input = '05999'
+# input = '0727279295'
+# input = '4462002852916712528896186210216114803635460468672254689891567755196614186539689399314081854222959575'
 
 
 
@@ -123,8 +114,8 @@ def construct_suffix_tree(inputstr):
     #print(t_even.fancyprint(inputstr))   
     
     t_overmerged = overmerge(t_even, t_odd, inputstr)
-    #print('overmerge tree for %s' % inputstr)
-    #print(t_overmerged.fancyprint(inputstr))
+    print('overmerge tree for %s' % inputstr)
+    print(t_overmerged.fancyprint(inputstr))
 
     #print('before')
     # test_child_parent_relations(t_overmerged)
@@ -620,6 +611,10 @@ def overmerge(t_even, t_odd, S):
                 o += 1
                 o_child.old_parent = o_child.parent
                 current.add_child(o_child)
+                # prepare the LCA nodepair thingy during the overmerge
+                if not hasattr(current, 'lca_odd') or hasattr(current, 'overwrite_lca'):
+                    current.lca_odd = o_child
+                    # print('case 1 added %s' % o_child)
                 continue
 
             if(o_child is None):
@@ -627,6 +622,10 @@ def overmerge(t_even, t_odd, S):
                 e += 1
                 e_child.old_parent = e_child.parent
                 current.add_child(e_child)
+                # prepare the LCA nodepair thingy during the overmerge
+                if not hasattr(current, 'lca_even') or hasattr(current, 'overwrite_lca'):
+                    current.lca_even = e_child
+                    # print('case 2 added %s' % e_child)
                 continue
 
             if(o_char != e_char):
@@ -638,10 +637,20 @@ def overmerge(t_even, t_odd, S):
                     o_child.old_parent = o_child.parent
                     current.add_child(o_child)
                     o += 1
+                    # prepare the LCA nodepair thingy during the overmerge
+                    if o_child.is_leaf():
+                        if not hasattr(current, 'lca_odd') or hasattr(current, 'overwrite_lca'):
+                            current.lca_odd = o_child
+                            # print('case 3 added %s' % o_child)
                 else:
                     e_child.old_parent = e_child.parent
                     current.add_child(e_child)
                     e += 1
+                    # prepare the LCA nodepair thingy during the overmerge
+                    if e_child.is_leaf():
+                        if not hasattr(current, 'lca_even') or hasattr(current, 'overwrite_lca'):
+                            current.lca_even = e_child
+                            # print('case 4 added %s' % e_child)
             else:
                 # Even and odd have same first char in parent edge
                 e_parentEdge_len = e_child.str_length - current.str_length
@@ -661,7 +670,9 @@ def overmerge(t_even, t_odd, S):
                    
                     short_child = o_child
                     long_child = e_child
+                    swapped = False
                     if e_parentEdge_len < o_parentEdge_len:
+                        swapped = True
                         short_child = e_child
                         long_child = o_child
 
@@ -669,19 +680,58 @@ def overmerge(t_even, t_odd, S):
                     long_child.old_parent = long_child.parent
 
                     inner_node = Node(short_child.str_length, short_child.id)
-
                     current.add_child(inner_node)
+                    
+                    # subtrees added for reference in adjust_overmerge
                     inner_node.even_subtree = e_child
                     inner_node.odd_subtree = o_child
+
                     #e_child.old_parentEdge = e_child.parentEdge
                     #o_child.old_parentEdge = o_child.parentEdge
-
                     short_child_sub = Node(short_child.str_length, aId="sub_" + str(short_child.id))
 
                     #long_child.parentEdge = long_child.parentEdge[len(short_child.parentEdge):]
                     short_child_sub.add_child(long_child)
 
-                    merger_helper(inner_node, short_child, short_child_sub)
+                    if not short_child.children:
+                        # prepare the LCA nodepair thingy in case short_child
+                        # is a leaf node itself and is overmerged to have some
+                        # subtree containing another heterogenous leaf node
+                        if swapped:
+                            inner_node.lca_even = short_child
+                        else:
+                            inner_node.lca_odd = short_child
+
+
+                    if swapped:
+                        # short_child originates in even_tree
+                        merger_helper(inner_node, short_child, short_child_sub)
+                    else:
+                        # short_child originates in odd_tree
+                        merger_helper(inner_node, short_child_sub, short_child)
+
+                    # TODO: double overwrite might happen
+                    had_lca_even_too = False
+                    overwrote = False
+                    if not hasattr(current, 'lca_even') or hasattr(current, 'overwrite_lca'):
+                        if hasattr(inner_node, 'lca_even'):
+                            current.lca_even = inner_node.lca_even
+                            had_lca_even_too = True
+                            if hasattr(current, 'overwrite_lca'):
+                                overwrote = True
+                            # print('case 5 added %s to %s' % (inner_node.lca_even, current))
+                    if not hasattr(current, 'lca_odd') or hasattr(current, 'overwrite_lca') and not overwrote:
+                        if hasattr(inner_node, 'lca_odd'):
+                            current.lca_odd = inner_node.lca_odd
+                            # print('case 6 added %s to %s' % (inner_node.lca_odd, current))
+                            if had_lca_even_too:
+                                # we cached both lca_even and lca_odd from same
+                                # child, mark this so one can be overwritten by
+                                # whatever leafnode we may see next in another
+                                # subtree
+                                current.overwrite_lca = True
+                                # print('overwrite added to %s with both %s and %s' % (current, inner_node.lca_odd, inner_node.lca_even))
+
 
                 else:
                     # Case 2
@@ -700,17 +750,27 @@ def overmerge(t_even, t_odd, S):
                     # we have already made sure that their string lengths are equal,
                     # there would be two suffixes in the tree of equal length,
                     # which is impossible
+
+                    # W.r.t. LCA nodepairs, this current node should never be LCA
+                    # of any odd/even nodepair as a result of this merge, as every
+                    # odd/even node in the merge will be child of 'inner', which is
+                    # current's child, so the nodepairs should instead have 'inner'
+                    # as LCA. It may still be LCA of some nodepair, but this is a
+                    # result of one of the other overmerge cases
+                    inner = Node(e_parentEdge_len)
                     inner_id = 'inner'
                     if not e_child.children:
                         inner_id = e_child.id
+                        inner.lca_even = e_child
+                        # print('case ?!?! added %s' % e_child)
                     if not o_child.children:
                         inner_id = o_child.id
-
+                        inner.lca_odd = o_child
+                        # print('case ?? added %s' % o_child)
+                    inner.id = inner_id
 
                     e_parentEdge_len = o_child.str_length
 
-
-                    inner = Node(e_parentEdge_len, inner_id)
                     current.add_child(inner)
                     inner.even_subtree = e_child
                     inner.odd_subtree = o_child
@@ -768,20 +828,19 @@ def compute_lcp_tree(t_overmerged):
 
 
     leafnode_occurences = []
-    pairs2append = []
+    # pairs2append = []
     def append_leafnodes(node):
-
         if type(node.id) is int:
             leafnode_occurences.append(node)
-            if node.children:
+            # if node.children:
 
-                first = node.children[0]
-                if type(first.id) is int:
-                    for c in node.parent.children:
-                        if type(c.id) is int and c.id != node.id:
-                            if c.id % 2 != first.id % 2:
-                                pairs2append.append((first, c))
-                                break
+            #     first = node.children[0]
+            #     if type(first.id) is int:
+            #         for c in node.parent.children:
+            #             if type(c.id) is int and c.id != node.id:
+            #                 if c.id % 2 != first.id % 2:
+            #                     pairs2append.append((first, c))
+            #                     break
                     #for c in node.parent.children:
                     #    if type(c.id) is str:
                     #        for c2 in c.children:
@@ -800,11 +859,43 @@ def compute_lcp_tree(t_overmerged):
     #print(pairs2append)
 
     lca_nodepairs = []
+    prev_node = None
+    pairings = []
+    for n in range(len(leafnode_occurences)):
+        node = leafnode_occurences[n]
+        # print(node.id)
+        if not prev_node and n > 0 and node.id % 2 != leafnode_occurences[n - 1].id % 2:
+            for pairingnode in pairings[:-1]:
+                if pairingnode.id %2 != node.id % 2:
+                    lca_nodepairs.append((pairingnode, node))
+            prev_node = leafnode_occurences[n - 1]
+            pairings = []
+        if prev_node and node.id % 2 == prev_node.id % 2:
+            for pairingnode in pairings:
+                if pairingnode.id %2 != prev_node.id % 2:
+                    lca_nodepairs.append((prev_node, pairingnode))
+            for pairingnode in pairings:
+                if pairingnode.id %2 != node.id % 2:
+                    lca_nodepairs.append((pairingnode, node))
+            prev_node = node
+            pairings = []
+            continue
+        pairings.append(node)
+        # print(pairings)
+    if pairings:
+        for pairingnode in pairings:
+            if pairingnode.id %2 != prev_node.id % 2:
+                lca_nodepairs.append((prev_node, pairingnode))
 
 
-
-
+    # CHEAT
+    lca_nodepairs = []
+    for n1 in leafnode_occurences:
+        for n2 in leafnode_occurences:
+            if n1.id % 2 != n2.id % 2:
+                lca_nodepairs.append((n1, n2))
     
+    # print(lca_nodepairs)
     '''curr_node = leafnode_occurences[0]
     for node in leafnode_occurences[1:]:
         if curr_node.id % 2 == node.id % 2:
@@ -818,38 +909,41 @@ def compute_lcp_tree(t_overmerged):
 
         lca_nodepairs.append((curr_node, node))'''
 
-    prev_node = None
-    curr_node = leafnode_occurences[0]
+    # prev_node = None
+    # curr_node = leafnode_occurences[0]
+    
 
-    for n in range(1, len(leafnode_occurences)):
-        node = leafnode_occurences[n]
+    # for n in range(1, len(leafnode_occurences)):
+    #     node = leafnode_occurences[n]
 
-        if prev_node:
+    #     # if prev_node:
 
-            if(prev_node.id % 2 != leafnode_occurences[n-1].id % 2):
+    #         # if(prev_node.id % 2 != leafnode_occurences[n-1].id % 2):
 
-                pairs2append.append((prev_node, leafnode_occurences[n-1]))
-            prev_node = None
+    #             # pairs2append.append((prev_node, leafnode_occurences[n-1]))
+    #         # prev_node = None
 
-        if curr_node.id % 2 == node.id % 2:
-            # we found a homogenous pair, swap curr_node for last seen
-            # node with parity (even/odd) opposite node
-            if lca_nodepairs:
-                curr_node = lca_nodepairs[-1][1]
-            else:
-                prev_node = leafnode_occurences[0]
-                curr_node = node
-                continue
+    #     if curr_node.id % 2 == node.id % 2:
+    #         # we found a homogenous pair, swap curr_node for last seen
+    #         # node with parity (even/odd) opposite node
+    #         if lca_nodepairs:
+    #             curr_node = lca_nodepairs[-1][1]
+    #         else:
+    #             # prev_node = leafnode_occurences[0]
+    #             curr_node = node
+    #             continue
 
-        prev_node = leafnode_occurences[n-2]
-        lca_nodepairs.append((curr_node, node))
+    #     # prev_node = leafnode_occurences[n-2]
+    #     lca_nodepairs.append((curr_node, node))
 
 
 
     # given 'i', access node representing i'th suffix in O(1)
     # using O(n) preprocessing time - assumed in algorithm
-    if pairs2append:
-        lca_nodepairs.extend(pairs2append)
+    # if pairs2append:
+    #     lca_nodepairs.extend(pairs2append)
+
+    # print(lca_nodepairs)
     
     id2node = []
     t_overmerged.traverse(lambda n: id2node.append((n.id, n))
@@ -898,6 +992,7 @@ def compute_lcp_tree(t_overmerged):
             node.lcp_depth = node.suffix_link.lcp_depth + 1
      
             return node.lcp_depth
+        # print(node.children)
    
     t_overmerged.lcp_depth = 0
     t_overmerged.bfs(lcp_depth)
@@ -948,11 +1043,7 @@ def adjust_overmerge(t_overmerged, t_even, t_odd, S):
 
                 curr_node.id = "inner"
                 even_tree = curr_node.even_subtree
-                # if even_tree.id == 'inner':
-                #     even_tree.id += 'EVEN'
                 odd_tree = curr_node.odd_subtree
-                # if odd_tree.id == 'inner':
-                #     odd_tree.id += 'ODD'
 
                 def helper(node):
                     for child in node.children:
@@ -987,30 +1078,13 @@ def adjust_overmerge(t_overmerged, t_even, t_odd, S):
                 odd_tree_parentEdge_char = S[odd_leaf_id - 1 + curr_node.lcp_depth]
                 
                 if even_tree_parentEdge_char < odd_tree_parentEdge_char:
-                    # print('curr node: %s' % str(curr_node))
-                    # print('even tree: %s' % str(even_tree))
-                    # print('odd tree: %s' % str(odd_tree))
                     curr_node.add_child(even_tree)
                     curr_node.add_child(odd_tree)
-                    return 'continue'
-                    # print('test for node IF %s' % str(curr_node.parent.leaflist))
-                    # test_child_parent_relations(curr_node.parent)
-                    # print('success')
                 else:
-                    # print('curr node: %s' % str(curr_node.leaflist))
-                    # print('even tree: %s' % str(even_tree))
-                    # print('odd tree: %s' % str(odd_tree))
                     curr_node.add_child(odd_tree)
                     curr_node.add_child(even_tree)
-                    return 'continue'
-                    # print('test for node ELSE %s' % str(curr_node.parent))
-                    # test_child_parent_relations(curr_node.parent)
-                    # print('success')
-
-                # print('curr node: %s' % str(curr_node))
-                # print('parent: %s' % str(curr_node.parent))
-                # print('odd tree: %s' % str(odd_tree))
-
+                return 'continue'
+                
     # TODO: bfs does not work here, as in the case where we identify
     #       that we can just insert subtrees directly as found in
     #       t_even and t_odd, we do not need to visit children of
@@ -1048,9 +1122,9 @@ def cleanup_tree(t_overmerged):
 
 def main():
     inputstr = str2int(input)
-    # suffix_tree = construct_suffix_tree(inputstr)
-    # print('final tree for input %s:' % inputstr)
-    # print(suffix_tree.fancyprint(inputstr))
+    suffix_tree = construct_suffix_tree(inputstr)
+    print('final tree for input %s:' % inputstr)
+    print(suffix_tree.fancyprint(inputstr))
     check_correctness.check_correctness2(inputstr)
 
 
