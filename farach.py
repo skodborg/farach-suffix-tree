@@ -31,7 +31,7 @@ input = '121112212221'
 # input = '0101001'  # different than the ones above
 
 # FAILING INPUTS
-# input = '47641143403300303358'
+input = '47641143403300303358'
 
 # input = '4747744779'
 # input = '277653677653329'
@@ -1117,6 +1117,10 @@ def cleanup_tree(t_overmerged):
             delattr(node, 'old_parentEdge')
         if hasattr(node, 'lcp_depth'):
             delattr(node, 'lcp_depth')
+        if hasattr(node, 'lca_even'):
+            delattr(node, 'lca_even')
+        if hasattr(node, 'lca_odd'):
+            delattr(node, 'lca_odd')
     t_overmerged.traverse(helper)
 
 
