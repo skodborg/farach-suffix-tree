@@ -119,24 +119,25 @@ class Node:
             edge = ""
         else:
             if S:
-                # edge =  str(S[leaf_id - 1 + self.parent.str_length : leaf_id - 1 + self.str_length]) #+ " len: " + str(self.str_length)
-                edge = " len: " + str(self.str_length)
-                #edge += " len: " + str(self.str_length)
+                edge =  str(S[leaf_id - 1 + self.parent.str_length : leaf_id - 1 + self.str_length])
+                edge += " len: " + str(self.str_length)
                 #edge += ' p_str_ln: %i' % self.parent.str_length
+                
+                # edge = " len: " + str(self.str_length)
                 
             else:
                 edge = ''.join(map(str, self.parentEdge))
 
         # printing odd/even nodes for which this node is the LCA
-        if hasattr(self, 'lca_odd') or hasattr(self, 'lca_even'):
-            edge += ' ['
-            if hasattr(self, 'lca_odd'):
-                edge += 'o: %s' % self.lca_odd
-                if hasattr(self, 'lca_even'):
-                    edge += ', '
-            if hasattr(self, 'lca_even'):
-                edge += 'e: %s' % self.lca_even
-            edge += ']'
+        # if hasattr(self, 'lca_odd') or hasattr(self, 'lca_even'):
+        #     edge += ' ['
+        #     if hasattr(self, 'lca_odd'):
+        #         edge += 'o: %s' % self.lca_odd
+        #         if hasattr(self, 'lca_even'):
+        #             edge += ', '
+        #     if hasattr(self, 'lca_even'):
+        #         edge += 'e: %s' % self.lca_even
+        #     edge += ']'
 
         self_id += str(edge)
         result = '\t' * level + self_id + '\n'
