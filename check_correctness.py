@@ -234,23 +234,23 @@ def run_tests():
 
 def main():
     #run_tests()
-    while True:
-        try:
-            S = ''.join(random.choice(string.digits) for _ in range(250))
-            check_correctness2(S)
-            # print('%s\nworked\n' % S)
-        except AssertionError:
-            print('attempting string: %s' % S)
-            print('assertion error!')
-            traceback.print_exc()
-        except TypeError:
-            print('attempting string: %s' % S)
-            print('type error!')
-            traceback.print_exc()
-        except:
-            print('attempting string: %s' % S)
-            print('some error!')
-            traceback.print_exc()
+    #while True:
+    try:
+        S = ''.join(random.choice(string.digits) for _ in range(250000))
+        check_correctness2(S)
+        #print('%s\nworked\n' % S)
+    except AssertionError:
+        print('attempting string: %s' % S)
+        print('assertion error!')
+        traceback.print_exc()
+    except TypeError:
+        print('attempting string: %s' % S)
+        print('type error!')
+        traceback.print_exc()
+    except:
+        print('attempting string: %s' % S)
+        print('some error!')
+        traceback.print_exc()
 
 if __name__ == '__main__':
     main()

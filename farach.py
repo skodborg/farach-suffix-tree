@@ -57,6 +57,8 @@ input = '296842296705529'
 input = '773683253687536'
 input = '633648376335563'
 input = '7770653892593881164670670'
+input = 'banana'
+input = '11112122'
 
 
 
@@ -347,17 +349,19 @@ def T_odd(inputstr):
     Sm = []
     count = 1
     pair2single = {}  # lookup is O(1) for pairs to single character mapping
-    single2pair = {}  # lookup is O(1) for single to pair character mapping
+    #single2pair = {}  # lookup is O(1) for single to pair character mapping
 
     for pair in chr_pairs:
         pair2single[pair] = count
-        single2pair[count] = pair
+        #single2pair[count] = pair
         count += 1
     for i in range(1, math.floor(n / 2) + 1):
         pair = (int(S[2 * i - 2]), int(S[2 * i - 1]))
         Sm.append(pair2single[pair])
 
+
     tree_Sm = construct_suffix_tree(Sm)
+    tree_Sm.update_leaf_list()
 
     # print('for Sm = %s the returned tree is' % Sm)
     # print(tree_Sm.fancyprint())
@@ -380,8 +384,6 @@ def T_odd(inputstr):
  
     resolve_suffix_tree(tree_Sm)
 
-
-    tree_Sm.update_leaf_list()
 
 
     tree_Sm.update_leaf_list()
@@ -458,106 +460,69 @@ def T_even(t_odd, inputstr):
             id2node[curr_suf] = new_node
         else:
             if prev_lcp:
-                # TODO: only the long case with remaining_until_insertion
-                #       is actually relevant, the two other cases can be
-                #       caught by this procedure as well if adjusted a bit
-                if prev_lcp == curr_lcp:
-                    # siblings
-                    curr_suf_len = n - curr_suf + 1
-                    #str_curr_remaining = S[curr_suf - 1 + curr_lcp:]
-                    new_node = Node(curr_suf_len, curr_suf)
+
+                prev_node = id2node[prev_suf]
+
+                # str_prev_suf = S[prev_suf - 1:]
+                # prev_node_prevprev_node_lcp =
+                #   len(str_prev_suf) - len(prev_node.parentEdge)
+                # TODO: why not use len(prev_lcp) instead of the above?
+                # assert prev_lcp == prev_node_prevprev_node_lcp
+
+            
+                # we need to append the new node to somewhere on the
+                # path from root to the parent of the prev_node.
+                # This might involve following a lot of nodes'
+                # parentEdges to find the spot
+                # TODO: is it O(n)???
+                remaining_until_insertion = prev_lcp - curr_lcp
+
+                possible_insertion_node = prev_node.parent
+                while remaining_until_insertion > 0:
+                    # run up through parentEdges until
+                    # remaining_until_insertion is 0
+                    len_of_edge = possible_insertion_node.str_length - possible_insertion_node.parent.str_length
+
+                    remaining_until_insertion -= len_of_edge
+                    possible_insertion_node = possible_insertion_node.parent
+
+                # possible_insertion_node is now the spot at which we
+                # should place curr_suf
+                # we need to pop the rightmost child of the
+                # possible_insertion_node as we need to insert an inner
+                # node with this child and our new_node as children in
+                # place of this rightmost child, if
+                # remaining_until_insertion is negative and not exactly
+                # 0, in which case we can just add_child(new_node)
+
+                if remaining_until_insertion == 0:
+                    # new_node_parentEdge = S[curr_suf - 1 + curr_lcp:]
+                    len_newnode = n - curr_suf + 1
+                    # new_node = Node(new_node_parentEdge, curr_suf)
+                    new_node = Node(len_newnode, curr_suf)
                     id2node[curr_suf] = new_node
-                    prev_node = id2node[prev_suf]
-                    prev_node.parent.add_child(new_node)
+                    possible_insertion_node.add_child(new_node)
                 else:
-                    # We need a nifty way to determine parentEdge of the
-                    # added innernode in this case, based on parentEdge
-                    # of prev_node, length of prev_suf and length of lcp
+                    
+                    child_of_insertion_node = possible_insertion_node.children.pop()
+                    split_idx = abs(remaining_until_insertion)
+                    #inner_parentEdge = child_of_insertion_node.parentEdge[:split_idx]
+                    inner_parentEdge_len = child_of_insertion_node.parent.str_length + split_idx 
+                    #child_of_insertion_parentEdge = child_of_insertion_node.parentEdge[split_idx:]
+                    innernode = Node(inner_parentEdge_len, 'inner')
+                    # child_of_insertion_node.parentEdge = child_of_insertion_parentEdge
+                    # new_node_parentEdge = S[curr_suf - 1 + curr_lcp:]
+                    len_newnode = n - curr_suf + 1
+                    # new_node = Node(new_node_parentEdge, curr_suf)
+                    new_node = Node(len_newnode, curr_suf)
 
-                    # See drawing on sharelatex for this particular case
+        
+                    possible_insertion_node.add_child(innernode)
 
-                    prev_node = id2node[prev_suf]
+                    innernode.add_child(child_of_insertion_node)
+                    innernode.add_child(new_node)
 
-                    # str_prev_suf = S[prev_suf - 1:]
-                    # prev_node_prevprev_node_lcp =
-                    #   len(str_prev_suf) - len(prev_node.parentEdge)
-                    # TODO: why not use len(prev_lcp) instead of the above?
-                    # assert prev_lcp == prev_node_prevprev_node_lcp
-
-                    if curr_lcp > prev_lcp:
-                        # we need to append the new node to
-                        # the prev_node's parentEdge somewhere
-                        prev_node_parent = prev_node.parent
-
-                        len_innernode_parentEdge = curr_lcp - prev_lcp
-                        len_innernode = len_innernode_parentEdge + prev_node_parent.str_length
-                        #start_idx = curr_suf - 1 + prev_lcp
-                        #end_idx = start_idx + len_innernode_parentEdge
-
-                        #innernode_parentEdge = S[start_idx:end_idx]
-                        #newnode_parentEdge = S[end_idx:]
-                        len_newnode = n - curr_suf + 1
-
-                        innernode = Node(len_innernode, 'inner2')
-                        new_node = Node(len_newnode, curr_suf)
-                        
-                        id2node[curr_suf] = new_node
-
-                        prev_node_parent.children[-1] = innernode
-                        innernode.parent = prev_node_parent
-                        innernode.add_child(prev_node)
-                        innernode.add_child(new_node)
-
-                    else:
-                        # we need to append the new node to somewhere on the
-                        # path from root to the parent of the prev_node.
-                        # This might involve following a lot of nodes'
-                        # parentEdges to find the spot
-                        # TODO: is it O(n)???
-                        remaining_until_insertion = prev_lcp - curr_lcp
-
-                        possible_insertion_node = prev_node.parent
-                        while remaining_until_insertion > 0:
-                            # run up through parentEdges until
-                            # remaining_until_insertion is 0
-                            len_of_edge = possible_insertion_node.str_length - possible_insertion_node.parent.str_length
-
-                            remaining_until_insertion -= len_of_edge
-                            possible_insertion_node = possible_insertion_node.parent
-                        # possible_insertion_node is now the spot at which we
-                        # should place curr_suf
-                        # we need to pop the rightmost child of the
-                        # possible_insertion_node as we need to insert an inner
-                        # node with this child and our new_node as children in
-                        # place of this rightmost child, if
-                        # remaining_until_insertion is negative and not exactly
-                        # 0, in which case we can just add_child(new_node)
-
-                        if remaining_until_insertion == 0:
-                            # new_node_parentEdge = S[curr_suf - 1 + curr_lcp:]
-                            len_newnode = n - curr_suf + 1
-                            # new_node = Node(new_node_parentEdge, curr_suf)
-                            new_node = Node(len_newnode, curr_suf)
-                            id2node[curr_suf] = new_node
-                            possible_insertion_node.add_child(new_node)
-                        else:
-                            child_of_insertion_node = possible_insertion_node.children.pop()
-                            split_idx = abs(remaining_until_insertion)
-                            #inner_parentEdge = child_of_insertion_node.parentEdge[:split_idx]
-                            inner_parentEdge_len = child_of_insertion_node.parent.str_length + split_idx 
-                            #child_of_insertion_parentEdge = child_of_insertion_node.parentEdge[split_idx:]
-                            innernode = Node(inner_parentEdge_len, 'inner')
-                            # child_of_insertion_node.parentEdge = child_of_insertion_parentEdge
-                            # new_node_parentEdge = S[curr_suf - 1 + curr_lcp:]
-                            len_newnode = n - curr_suf + 1
-                            # new_node = Node(new_node_parentEdge, curr_suf)
-                            new_node = Node(len_newnode, curr_suf)
-
-                            possible_insertion_node.add_child(innernode)
-                            innernode.add_child(child_of_insertion_node)
-                            innernode.add_child(new_node)
-
-                            id2node[curr_suf] = new_node
+                    id2node[curr_suf] = new_node
 
             else:
 
@@ -1214,7 +1179,7 @@ def main():
     print('final tree for input %s:' % inputstr)
     print(suffix_tree.fancyprint(inputstr))
 
-    # check_correctness.check_correctness2(inputstr_copy)
+    check_correctness.check_correctness2(inputstr_copy)
 
 
 if __name__ == '__main__':
