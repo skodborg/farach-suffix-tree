@@ -23,7 +23,7 @@ def test_even_tree_for_string_1():
 
 	inner.add_child(utils.Node(7, 2))
 
-	inner2 = utils.Node(2, "inner2")
+	inner2 = utils.Node(2, "inner")
 	inner.add_child(inner2)
 
 	inner2.add_child(utils.Node(5, 4))
