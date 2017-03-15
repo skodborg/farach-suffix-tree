@@ -106,7 +106,7 @@ class Node:
         
         return S[leaf_id - 1 + self.parent.str_length : leaf_id - 1 + self.str_length]
     
-    def fancyprint(self, S, level=0):
+    def fancyprint(self, S, level=0, onlylengths=False):
         self_id = str(self.id)+":" if self.id else ''
         
         # TODO: utilize getParentEdge() ??
@@ -119,11 +119,12 @@ class Node:
             edge = ""
         else:
             if S:
-                edge =  str(S[leaf_id - 1 + self.parent.str_length : leaf_id - 1 + self.str_length])
-                edge += " len: " + str(self.str_length)
+                if not onlylengths:
+                    edge =  str(S[leaf_id - 1 + self.parent.str_length : leaf_id - 1 + self.str_length])
+                    edge += " len: " + str(self.str_length)
                 #edge += ' p_str_ln: %i' % self.parent.str_length
-                
-                # edge = " len: " + str(self.str_length)
+                else:
+                    edge = " len: " + str(self.str_length)
                 
             else:
                 edge = ''.join(map(str, self.parentEdge))
@@ -142,7 +143,7 @@ class Node:
         self_id += str(edge)
         result = '\t' * level + self_id + '\n'
         for child in self.children:
-            result += child.fancyprint(S, level + 1)
+            result += child.fancyprint(S, level + 1, onlylengths)
         return result
 
     def as_newick(self):
