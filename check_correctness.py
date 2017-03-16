@@ -3,6 +3,7 @@ from utils import Node
 import random
 import string
 import traceback
+import time
 
 def check_correctness(inputstr):
     # TODO: i think it fails to identify trees that are not proper
@@ -203,6 +204,8 @@ def check_correctness2(inputstr):
                 helper(n, new_str)
     helper(tree, [])
 
+    return tree
+
     # print('tree for input \"%s\" is correct' % inputstr)
 
     # MANGELFULD:
@@ -234,25 +237,20 @@ def run_tests():
 
 def main():
     #run_tests()
-    #while True:
+    # while True:
     try:
-        
-        S = [random.choice([n for n in range(0, 2000)]) for _ in range(2500)]
-        #S = ''.join(random.choice(string.digits) for _ in range(250000))
-        check_correctness2(S)
+        outputfilename = 'outputtree.txt'
+        S = ''.join(random.choice(string.digits) for _ in range(250000))
+        start = time.time()
+        correct_tree = check_correctness2(S)
+        end = time.time()
         print('%s\nworked\n' % S)
-    except AssertionError:
-        print('attempting string: %s' % S)
-        print('assertion error!')
-        traceback.print_exc()
-    except TypeError:
-        print('attempting string: %s' % S)
-        print('type error!')
-        traceback.print_exc()
-    except:
-        print('attempting string: %s' % S)
-        print('some error!')
-        traceback.print_exc()
+        print('took %f' % (end - start))
+        outputfile = open(outputfilename, 'w')
+        outputfile.write(correct_tree.fancyprint(S, onlylengths=True))
+        outputfile.close()
+        print('stored in %s' % outputfilename)
+
 
 if __name__ == '__main__':
     main()
