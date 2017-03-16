@@ -236,9 +236,11 @@ def main():
     #run_tests()
     #while True:
     try:
-        S = ''.join(random.choice(string.digits) for _ in range(250000))
+        
+        S = [random.choice([n for n in range(0, 2000)]) for _ in range(2500)]
+        #S = ''.join(random.choice(string.digits) for _ in range(250000))
         check_correctness2(S)
-        #print('%s\nworked\n' % S)
+        print('%s\nworked\n' % S)
     except AssertionError:
         print('attempting string: %s' % S)
         print('assertion error!')
