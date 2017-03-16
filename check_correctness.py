@@ -237,19 +237,31 @@ def run_tests():
 
 def main():
     #run_tests()
-    # while True:
-    try:
-        outputfilename = 'outputtree.txt'
-        S = ''.join(random.choice(string.digits) for _ in range(250000))
-        start = time.time()
-        correct_tree = check_correctness2(S)
-        end = time.time()
-        print('%s\nworked\n' % S)
-        print('took %f' % (end - start))
-        outputfile = open(outputfilename, 'w')
-        outputfile.write(correct_tree.fancyprint(S, onlylengths=True))
-        outputfile.close()
-        print('stored in %s' % outputfilename)
+    while True:
+        try:
+            # outputfilename = 'outputtree.txt'
+            S = ''.join(random.choice(string.digits) for _ in range(2500))
+            start = time.time()
+            correct_tree = check_correctness2(S)
+            end = time.time()
+            print('worked')
+            print('took %f' % (end - start))
+            # outputfile = open(outputfilename, 'w')
+            # outputfile.write(correct_tree.fancyprint(S, onlylengths=True))
+            # outputfile.close()
+            # print('stored in %s' % outputfilename)
+        except AssertionError:
+            print('attempting string: %s' % S)
+            print('assertion error!')
+            traceback.print_exc()
+        except TypeError:
+            print('attempting string: %s' % S)
+            print('type error!')
+            traceback.print_exc()
+        except:
+            print('attempting string: %s' % S)
+            print('some error!')
+            traceback.print_exc()
 
 
 if __name__ == '__main__':
