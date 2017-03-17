@@ -50,26 +50,6 @@ def construct_suffix_tree(inputstr, printstuff=False):
         root.add_child(Node(aId=1, aStrLength=2))
         root.add_child(Node(aId=2, aStrLength=1))
         return root
-    elif len(inputstr) - 1 == 2:
-        # inputstr was two chars before we appended the unique_char
-        root = Node(aId='root')
-        suffix1 = inputstr
-        suffix2 = inputstr[1:]
-        if suffix1[0] == suffix2[0]:
-            inner = Node(aId='inner', aStrLength=1)
-            root.add_child(inner)
-            inner.add_child(Node(aId=1, aStrLength=2))
-            inner.add_child(Node(aId=2, aStrLength=1))
-            root.add_child(Node(aId=3, aStrLength=1))
-        elif suffix1[0] < suffix2[0]:
-            root.add_child(Node(aId=1, aStrLength=3))
-            root.add_child(Node(aId=2, aStrLength=2))
-            root.add_child(Node(aId=3, aStrLength=1))
-        else:
-            root.add_child(Node(aId=2, aStrLength=2))
-            root.add_child(Node(aId=1, aStrLength=3))
-            root.add_child(Node(aId=3, aStrLength=1))
-        return root
 
     t_odd = T_odd(inputstr)
     printif('odd tree for %s' % inputstr)
