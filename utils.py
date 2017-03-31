@@ -106,15 +106,89 @@ class Node:
         
         return S[leaf_id - 1 + self.parent.str_length : leaf_id - 1 + self.str_length]
     
+
+
+    
+
+    def printLCPTree(self):
+
+        def helper(node):
+
+            if hasattr(node, "suffix_link"):
+                if hasattr(node.suffix_link, "suffix_link_children"):
+
+                    node.suffix_link.suffix_link_children.append(node)
+                else:
+                    node.suffix_link.suffix_link_children = [node]
+        self.bfs(helper)
+
+        def helper(node):
+            if hasattr(node, "lcp_depth"):
+                print ("%s%s" % ((" " * node.lcp_depth * 2, str(node.id))))
+            if hasattr(node, "suffix_link_children"):
+                for child in node.suffix_link_children:
+                    helper(child)
+
+        helper(self)
+
+                
+    def fancyprintBinaryTree(self, level=0):
+        self_id = "node : "
+
+    
+        self_id += str(self.numbering)
+
+        result = '\t' * level + self_id + '\n'
+        for child in self.children:
+            result += child.fancyprintBinaryTree(level + 1)
+        return result
+
+    def fancyprintLCA(self, level=0):
+        def ffs(x):
+            """Returns the index, counting from 0, of the
+            least significant set bit in `x`.
+            """
+            return (x&-x).bit_length()-1
+
+        self_id = str(self.PREORDER)+":" if self.id else ''
+
+        # TODO: utilize getParentEdge() ??
+        if self.is_leaf():
+            leaf_id = self.PREORDER
+
+        edge = ""
+        if(hasattr(self, "bitList")):
+            edge = " " + str(bin(self.bitList)[3:])
+
+        # printing odd/even nodes for which this node is the LCA
+        # if hasattr(self, 'lca_odd') or hasattr(self, 'lca_even'):
+        #     edge += ' ['
+        #     if hasattr(self, 'lca_odd'):
+        #         edge += 'o: %s' % self.lca_odd
+        #         if hasattr(self, 'lca_even'):
+        #             edge += ', '
+        #     if hasattr(self, 'lca_even'):
+        #         edge += 'e: %s' % self.lca_even
+        #     edge += ']'
+
+        self_id += str(edge)
+        result = '\t' * level + self_id + '\n'
+        for child in self.children:
+            result += child.fancyprintLCA(level + 1)
+        return result
+
     def fancyprint(self, S, level=0, onlylengths=False):
+
+
         self_id = str(self.id)+":" if self.id else ''
-        
+
         # TODO: utilize getParentEdge() ??
         if self.is_leaf():
             leaf_id = self.id
         else:
-            leaf_descendant = self.leaflist[0]
-            leaf_id = leaf_descendant.id
+            if not onlylengths:
+                leaf_descendant = self.leaflist[0]
+                leaf_id = leaf_descendant.id
         if self.id == "root":
             edge = ""
         else:
