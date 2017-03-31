@@ -813,7 +813,7 @@ def adjust_overmerge(t_overmerged, t_even, t_odd, S):
         if(hasattr(curr_node, "lcp_depth")):
 
             if curr_node.str_length != curr_node.lcp_depth:
-                parentEdge_length = curr_node.lcp_depth - curr_node.parent.str_length
+                # parentEdge_length = curr_node.lcp_depth - curr_node.parent.str_length
 
                 curr_node.children = []
 
