@@ -136,7 +136,7 @@ class Node:
         self_id = "node : "
 
     
-        self_id += str(self.numbering)
+        self_id += str(self.numbering) + " dfs: " + str(self.dfsNumbering) + " bheight: " + str(self.bheight)
 
         result = '\t' * level + self_id + '\n'
         for child in self.children:
@@ -158,7 +158,7 @@ class Node:
 
         edge = ""
         if(hasattr(self, "bitList")):
-            edge = " " + str(bin(self.bitList)[3:])
+            edge = " bitList=" + str(bin(self.bitList)[2:])
 
         # printing odd/even nodes for which this node is the LCA
         # if hasattr(self, 'lca_odd') or hasattr(self, 'lca_even'):
@@ -180,7 +180,7 @@ class Node:
     def fancyprint(self, S, level=0, onlylengths=False):
 
 
-        self_id = str(self.id)+":" if self.id else ''
+        self_id = str(self.id)+ ":" if self.id else ''
 
         # TODO: utilize getParentEdge() ??
         if self.is_leaf():
