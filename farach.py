@@ -7,9 +7,9 @@ from collections import deque
 input = '121112212221'
 # input = '111222122121'
 # input = '12121212121'
-# input = 'mississippi'
+input = 'mississippi'
 
-input = '1222112221212'
+#input = '1222112221212'
 _printstuff = False
 
 def str2int(string):
@@ -64,10 +64,6 @@ def construct_suffix_tree(inputstr, printstuff=False):
 
 
     compute_lcp_tree(t_overmerged)
-
-    if len(inputstr) == 13:
-        print("LCP TREE")
-        print(t_overmerged.printLCPTree())
 
     adjust_overmerge(t_overmerged, t_even, t_odd, inputstr)
 
@@ -228,9 +224,7 @@ def T_odd(inputstr):
 
     tree_Sm = construct_suffix_tree(Sm, _printstuff)
     tree_Sm.update_leaf_list()
-    if len(S) == 8:
-        print("tree_Sm")
-        print(tree_Sm.fancyprint(Sm))
+
 
     extend_length(tree_Sm)
 
@@ -239,14 +233,11 @@ def T_odd(inputstr):
     # (no edges of a node share first character)
 
     tree_Sm.update_leaf_list()
-    if len(S) == 8:
-        print(tree_Sm.fancyprint(S))
+
 
     resolve_suffix_tree(tree_Sm)
 
     tree_Sm.update_leaf_list()
-    if len(S) == 8:
-        print(tree_Sm.fancyprint(S))
     return tree_Sm
 
 
@@ -522,15 +513,6 @@ def overmerge(t_even, t_odd, S):
                     short_child = o_child
                     long_child = e_child
 
-                    
-
-
-                    # t_overmerged.update_leaf_list()
-                
-                    # print(t_overmerged.fancyprint(S))
-                    # print("-"*50)
-                    # print("-"*50)
-
                     swapped = False
                     if e_parentEdge_len < o_parentEdge_len:
                         swapped = True
@@ -617,22 +599,11 @@ def overmerge(t_even, t_odd, S):
                     # current's child, so the nodepairs should instead have 'inner'
                     # as LCA. It may still be LCA of some nodepair, but this is a
                     # result of one of the other overmerge cases
-                    t_overmerged.update_leaf_list()
-                    print("-"*50)
-                    print("-"*50)
-                    print(t_overmerged.fancyprint(S))
-                    short_child.update_leaf_list()
-                    long_child.update_leaf_list()
-                    print("EVEN/ODD")
-                    print(e_child.fancyprint(S))
-                    print(o_child.fancyprint(S))
 
 
                     e_parentEdge_len = o_child.str_length
                     inner_id = 'inner'
                     inner = Node(e_parentEdge_len, inner_id)
-                    # print('processing node %s with subtrees %s and %s' % (current, e_child, o_child))
-
                     if not e_child.children:
                         inner.id = e_child.id
                         inner.lca_even = e_child
@@ -647,9 +618,7 @@ def overmerge(t_even, t_odd, S):
                     inner.odd_subtree = o_child
                     merger_helper(inner, e_child, o_child)
 
-                    print("AFTER:")
                     t_overmerged.update_leaf_list()
-                    print(t_overmerged.fancyprint(S))
 
                     had_lca_even_too = False
                     overwrote = False
