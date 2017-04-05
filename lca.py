@@ -156,13 +156,50 @@ def leastSignificantBit(x):
     """
 	return (x&-x).bit_length()-1
 
+
+
+
 def query(x, y):
 
 	i_x = L[x.INLABEL]
 	i_y = L[y.INLABEL]
-	b_ancestor = findAncestorInBinaryTree(L[x.INLABEL].binaryNode,L[y.INLABEL].binaryNode)
+	#b_ancestor = findAncestorInBinaryTree(L[x.INLABEL].binaryNode,L[y.INLABEL].binaryNode)
 
-	j = b_ancestor.bheight
+	#j = b_ancestor.bheight
+	# TODO: done preprocess a binary tree that you dont use, moron
+
+
+	if i_x.INLABEL ^ i_y.INLABEL > 0:
+		j_2 = math.floor(math.log(i_x.INLABEL ^ i_y.INLABEL, 2))
+	else: 
+		j_2 = 0
+	
+	j_3 = leastSignificantBit(i_x.INLABEL)
+
+	j_4 = leastSignificantBit(i_y.INLABEL)
+	j_2 = max(j_2, j_3)
+	j_2 = max (j_2, j_4)
+	j = j_2
+	if j != j_2:
+
+		print("%i, %i" % (j, j_2))
+
+		# print(bin(i_x.INLABEL))
+		# print(bin(i_y.INLABEL))
+		i = L[x.INLABEL].binaryNode
+		j2 = L[y.INLABEL].binaryNode
+		if i.dfsNumbering <= j2.dfsNumbering and j2.dfsNumbering < (i.dfsNumbering + i.ancestors):
+			#print ("is child of")
+			pass
+
+		elif j2.dfsNumbering <= i.dfsNumbering and i.dfsNumbering < (j2.dfsNumbering + j2.ancestors):
+			#print("is child of")
+			pass
+		else:
+			print("ERRROR!!!")
+
+
+
 
 	x_temp_bitList = (x.bitList >> j) << j
 	y_temp_bitList = (y.bitList >> j) << j

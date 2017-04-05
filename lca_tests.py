@@ -194,9 +194,9 @@ def automaticTests():
 
 
 def main():
-    #runTests()
+    runTests()
     #automaticTests()
-    check_speed()
+    #check_speed()
 
 if __name__ == '__main__':
     main()
