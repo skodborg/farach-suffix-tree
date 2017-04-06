@@ -51,25 +51,31 @@ def createTreeTwo():
 
 def test_tree_one():
     tree, nodes = createTreeOne()
-    lca.preprocess(tree)
-    assert lca.query(nodes[0], nodes[1]).id == "inner1"
-    assert lca.query(nodes[2], nodes[3]).id == "inner2"
-    assert lca.query(nodes[0], nodes[3]).id == "root"
-    assert lca.query(nodes[3], nodes[0]).id == "root"
-    assert lca.query(nodes[4], nodes[5]).id == "root"
+
+
+    lca_al = lca.LCA()
+    lca_al.preprocess(tree)
+    assert lca_al.query(nodes[0], nodes[1]).id == "inner1"
+    assert lca_al.query(nodes[2], nodes[3]).id == "inner2"
+    assert lca_al.query(nodes[0], nodes[3]).id == "root"
+    assert lca_al.query(nodes[3], nodes[0]).id == "root"
+    assert lca_al.query(nodes[4], nodes[5]).id == "root"
 
 
 
 def test_tree_two():
     tree, nodes = createTreeTwo()
-    lca.preprocess(tree)
-    assert lca.query(nodes[7], nodes[8]).PREORDER == 5
-    assert lca.query(nodes[0], nodes[1]).PREORDER == 2
-    assert lca.query(nodes[1], nodes[3]).PREORDER == 1
-    assert lca.query(nodes[1], nodes[4]).PREORDER == 1
-    assert lca.query(nodes[1], nodes[5]).PREORDER == 1
-    assert lca.query(nodes[0], nodes[5]).PREORDER == 1
-    assert lca.query(nodes[4], nodes[5]).PREORDER == 8
+    lca_al = lca.LCA()
+    lca_al.preprocess(tree)
+    assert lca_al.query(nodes[7], nodes[8]).PREORDER == 5
+    assert lca_al.query(nodes[0], nodes[1]).PREORDER == 2
+    assert lca_al.query(nodes[1], nodes[3]).PREORDER == 1
+    assert lca_al.query(nodes[1], nodes[4]).PREORDER == 1
+    assert lca_al.query(nodes[1], nodes[5]).PREORDER == 1
+    assert lca_al.query(nodes[0], nodes[5]).PREORDER == 1
+    assert lca_al.query(nodes[4], nodes[5]).PREORDER == 8
+
+
 
 def test_tree_three():
     string = '12121'
@@ -77,13 +83,14 @@ def test_tree_three():
     constructed_tree = farach.construct_suffix_tree(string)
     constructed_tree.update_leaf_list
     leaflist = constructed_tree.leaflist
-    lca.preprocess(constructed_tree)
+    lca_al = lca.LCA()
+    lca_al.preprocess(constructed_tree)
     
-    assert str(lca.query(leaflist[0], leaflist[1]).leaflist) == "[node1, node3]"
-    assert str(lca.query(leaflist[2], leaflist[3]).leaflist) == "[node1, node3, node5, node2, node4, node6]"
-    assert str(lca.query(leaflist[0], leaflist[2]).leaflist) == "[node1, node3, node5]"
-    assert str(lca.query(leaflist[3], leaflist[4]).leaflist) == "[node2, node4]"
-    assert str(lca.query(leaflist[0], leaflist[5]).leaflist) == "[node1, node3, node5, node2, node4, node6]"
+    assert str(lca_al.query(leaflist[0], leaflist[1]).leaflist) == "[node1, node3]"
+    assert str(lca_al.query(leaflist[2], leaflist[3]).leaflist) == "[node1, node3, node5, node2, node4, node6]"
+    assert str(lca_al.query(leaflist[0], leaflist[2]).leaflist) == "[node1, node3, node5]"
+    assert str(lca_al.query(leaflist[3], leaflist[4]).leaflist) == "[node2, node4]"
+    assert str(lca_al.query(leaflist[0], leaflist[5]).leaflist) == "[node1, node3, node5, node2, node4, node6]"
 
 def test_tree_four():
     string = 'mississippi'
@@ -91,13 +98,15 @@ def test_tree_four():
     constructed_tree = farach.construct_suffix_tree(string)
     constructed_tree.update_leaf_list
     leaflist = constructed_tree.leaflist
-    lca.preprocess(constructed_tree)
 
-    assert str(lca.query(leaflist[1], leaflist[2]).leaflist) == "[node2, node5]"
+ 
+    lca_al = lca.LCA()
+    lca_al.preprocess(constructed_tree)
 
-    assert str(lca.query(leaflist[0], leaflist[2]).leaflist) == "[node1, node2, node5, node8, node11, node4, node7, node3, node6, node10, node9, node12]"
-    assert str(lca.query(leaflist[6], leaflist[8]).leaflist) == "[node4, node7, node3, node6]"
-    assert str(lca.query(leaflist[9], leaflist[10]).leaflist) == "[node10, node9]"
+    assert str(lca_al.query(leaflist[1], leaflist[2]).leaflist) == "[node2, node5]"
+    assert str(lca_al.query(leaflist[0], leaflist[2]).leaflist) == "[node1, node2, node5, node8, node11, node4, node7, node3, node6, node10, node9, node12]"
+    assert str(lca_al.query(leaflist[6], leaflist[8]).leaflist) == "[node4, node7, node3, node6]"
+    assert str(lca_al.query(leaflist[9], leaflist[10]).leaflist) == "[node10, node9]"
 
 
 
@@ -115,11 +124,12 @@ def check_correctness(string):
     id2node = dict(id2node)
     constructed_tree.update_leaf_list
     leaflist = constructed_tree.leaflist
-    lca.preprocess(constructed_tree)
+    lca_al = lca.LCA()
+    lca_al.preprocess(constructed_tree)
 
     for i in leaflist:
         for j in leaflist:
-            assert farach.naive_lca(i,j, constructed_tree, id2node) == lca.query(i,j)
+            assert farach.naive_lca(i,j, constructed_tree, id2node) == lca_al.query(i,j)
 
 def preprocess_and_one_query(tree, leaflist):
     lca.preprocess(tree)
@@ -147,7 +157,7 @@ def check_speed():
         end = time.time()
         print('%i,%f' % ((i*50),(end - start)))
 
-def runTests():
+def run_tests():
     test_tree_two()
     test_tree_one()
     test_tree_three()
@@ -194,7 +204,7 @@ def automaticTests():
 
 
 def main():
-    runTests()
+    run_tests()
     #automaticTests()
     #check_speed()
 
