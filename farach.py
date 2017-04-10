@@ -3,13 +3,16 @@ import radixsort
 from utils import Node
 import check_correctness
 from collections import deque
+import lca as fast_lca
 
-# input = '121112212221'
+input = '121112212221'
 # input = '111222122121'
 # input = '12121212121'
 input = 'mississippi'
 # input = 'banana'
 input = 'ababcacac'
+# input = '1222112221212'
+
 _printstuff = False
 
 def str2int(string):
@@ -66,6 +69,7 @@ def construct_suffix_tree(inputstr, printstuff=False):
 
 
     compute_lcp_tree(t_overmerged)
+
     adjust_overmerge(t_overmerged, t_even, t_odd, inputstr)
 
 
@@ -197,6 +201,7 @@ def T_odd(inputstr):
     # so we -2 and -1 from pos 'i' to let our match the book's examples
     chr_pairs = [(int(S[2 * i - 2]), int(S[2 * i - 1]))
                  for i in range(1, math.floor(n / 2) + 1)]
+    
 
     # sort in O(k * n) using radix sort (k = 2 here, guaranteed)
     radixsort.sort(chr_pairs)
@@ -206,7 +211,8 @@ def T_odd(inputstr):
     for pair in chr_pairs[1:]:
         if unique_chr_pairs[-1] != pair:
             unique_chr_pairs.append(pair)
-    chr_pairs = unique_chr_pairs
+    chr_pairs = unique_chr_pairs   
+
 
     # compute S'[i] = rank of (S[2i - 1], S[2i])
     Sm = []
@@ -219,16 +225,20 @@ def T_odd(inputstr):
     for i in range(1, math.floor(n / 2) + 1):
         pair = (int(S[2 * i - 2]), int(S[2 * i - 1]))
         Sm.append(pair2single[pair])
+    
 
     tree_Sm = construct_suffix_tree(Sm, _printstuff)
     tree_Sm.update_leaf_list()
 
+
     extend_length(tree_Sm)
+
 
     # massage into proper compacted trie
     # (no edges of a node share first character)
 
     tree_Sm.update_leaf_list()
+
 
     resolve_suffix_tree(tree_Sm)
 
@@ -279,6 +289,7 @@ def T_even(t_odd, inputstr):
             else:
                 break
         lcp[(even_suffixes[idx], even_suffixes[idx + 1])] = curr_lcp
+
 
     # (iii)
     # construct T_even using information from (i) and (ii)
@@ -354,6 +365,8 @@ def T_even(t_odd, inputstr):
                     innernode.add_child(new_node)
 
                     id2node[curr_suf] = new_node
+                root.update_leaf_list()
+
 
             else:
                 innernode_len = curr_lcp
@@ -457,8 +470,11 @@ def overmerge(t_even, t_odd, S):
                 # the the first char (by lexicographic order), and insert.
                 # Count that up to preceed to next child in child list
                 if(o_char < e_char):
+                    t_overmerged.update_leaf_list()
+
                     o_child.old_parent = o_child.parent
                     current.add_child(o_child)
+
                     o += 1
                     # prepare the LCA nodepair thingy during the overmerge
                     if not hasattr(current, 'lca_odd') or hasattr(current, 'overwrite_lca'):
@@ -502,6 +518,7 @@ def overmerge(t_even, t_odd, S):
                    
                     short_child = o_child
                     long_child = e_child
+
                     swapped = False
                     if e_parentEdge_len < o_parentEdge_len:
                         swapped = True
@@ -532,12 +549,15 @@ def overmerge(t_even, t_odd, S):
                             inner_node.lca_odd = short_child
 
 
+
                     if swapped:
                         # short_child originates in even_tree
                         merger_helper(inner_node, short_child, short_child_sub)
                     else:
                         # short_child originates in odd_tree
                         merger_helper(inner_node, short_child_sub, short_child)
+
+                
 
                     had_lca_even_too = False
                     overwrote = False
@@ -585,11 +605,11 @@ def overmerge(t_even, t_odd, S):
                     # current's child, so the nodepairs should instead have 'inner'
                     # as LCA. It may still be LCA of some nodepair, but this is a
                     # result of one of the other overmerge cases
+
+
                     e_parentEdge_len = o_child.str_length
                     inner_id = 'inner'
                     inner = Node(e_parentEdge_len, inner_id)
-                    # print('processing node %s with subtrees %s and %s' % (current, e_child, o_child))
-
                     if not e_child.children:
                         inner.id = e_child.id
                         inner.lca_even = e_child
@@ -603,6 +623,8 @@ def overmerge(t_even, t_odd, S):
                     inner.even_subtree = e_child
                     inner.odd_subtree = o_child
                     merger_helper(inner, e_child, o_child)
+
+                    t_overmerged.update_leaf_list()
 
                     had_lca_even_too = False
                     overwrote = False
@@ -688,12 +710,19 @@ def compute_lcp_tree(t_overmerged):
     # ---------------------------------------
     # CREATE LCP TREE
     # ---------------------------------------
+    lca_f = fast_lca.LCA()
+    lca_f.preprocess(t_overmerged)
     for node1, node2 in lca_nodepairs:
         # TODO: using naive_lca to find lca to create suffix link, this
         #       must instead be the constant time lookup as described in
         #       the article [Ht84], otherwise we do not achieve O(n) running
         #       time for the algorithm
-        lca = naive_lca(node1, node2, t_overmerged, id2node)
+
+
+        lca = lca_f.query(id2node[node1.id], id2node[node2.id])
+        #lca_naive = naive_lca(node1, node2, t_overmerged, id2node)
+
+        #assert lca == lca_naive
 
         if (lca.id == 'root' or
                 node1.id + 1 not in id2node or
@@ -702,9 +731,12 @@ def compute_lcp_tree(t_overmerged):
             continue
         node1_next = id2node[node1.id + 1]
         node2_next = id2node[node2.id + 1]
-        lca_parent = naive_lca(node1_next, node2_next, t_overmerged, id2node)
-
+        lca_parent = lca_f.query(node1_next, node2_next)
+        #lca_parent_naive = naive_lca(node1_next, node2_next, t_overmerged, id2node)
+        
+        #assert(lca_parent == lca_parent_naive)
         lca.suffix_link = lca_parent
+
     # ---------------------------------------
     # ADD LCP DEPTH TO ALL NODES USING A SINGLE DFS
     # ---------------------------------------
@@ -831,6 +863,12 @@ def cleanup_tree(t_overmerged):
             delattr(node, 'lca_even')
         if hasattr(node, 'lca_odd'):
             delattr(node, 'lca_odd')
+        if hasattr(node, 'INLABEL'):
+            delattr(node, 'INLABEL')
+        if hasattr(node, 'PREORDER'):
+            delattr(node, 'PREORDER')
+        if hasattr(node, 'bitList'):
+            delattr(node, 'bitList')
     t_overmerged.traverse(helper)
 
 def printif(s):
@@ -842,7 +880,7 @@ def main():
     inputstr = str2int(input)
     inputstr_copy = inputstr[:]
 
-    suffix_tree = construct_suffix_tree(inputstr, True)
+    suffix_tree = construct_suffix_tree(inputstr, False)
     print('final tree for input %s:' % inputstr)
     print(suffix_tree.fancyprint(inputstr))
 
