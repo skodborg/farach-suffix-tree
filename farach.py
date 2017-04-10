@@ -7,8 +7,9 @@ from collections import deque
 # input = '121112212221'
 # input = '111222122121'
 # input = '12121212121'
-# input = 'mississippi'
-input = 'banana'
+input = 'mississippi'
+# input = 'banana'
+input = 'ababcacac'
 _printstuff = False
 
 def str2int(string):
@@ -53,9 +54,11 @@ def construct_suffix_tree(inputstr, printstuff=False):
 
     t_odd = T_odd(inputstr)
     printif('odd tree for %s' % inputstr)
+    printif(t_odd.fancyprint(inputstr))
 
     t_even = T_even(t_odd, inputstr)
-    printif('even tree for %s' % inputstr)  
+    printif('even tree for %s' % inputstr)
+    printif(t_even.fancyprint(inputstr))
     
     t_overmerged = overmerge(t_even, t_odd, inputstr)
     printif('overmerge tree for %s' % inputstr)
@@ -764,6 +767,7 @@ def adjust_overmerge(t_overmerged, t_even, t_odd, S):
 
             if curr_node.str_length != curr_node.lcp_depth:
                 # parentEdge_length = curr_node.lcp_depth - curr_node.parent.str_length
+                # assert False
 
                 curr_node.children = []
 
@@ -779,20 +783,24 @@ def adjust_overmerge(t_overmerged, t_even, t_odd, S):
                 even_tree.bfs(helper)
                 odd_tree.bfs(helper)
 
-                if even_tree.is_leaf():
-                    even_leaf_id = even_tree.id
-                else:
-                    even_leaf_descendant = even_tree.leaflist[0]
-                    even_leaf_id = even_leaf_descendant.id
+                # if even_tree.is_leaf():
+                #     even_leaf_id = even_tree.id
+                # else:
+                #     even_leaf_descendant = even_tree.leaflist[0]
+                #     even_leaf_id = even_leaf_descendant.id
+
+                even_leaf_id = curr_node.lca_even.id
 
                 even_tree_parentEdge_char = S[even_leaf_id - 1 + curr_node.lcp_depth]
 
 
-                if odd_tree.is_leaf():
-                    odd_leaf_id = odd_tree.id
-                else:
-                    odd_leaf_descendant = odd_tree.leaflist[0]
-                    odd_leaf_id = odd_leaf_descendant.id
+                # if odd_tree.is_leaf():
+                #     odd_leaf_id = odd_tree.id
+                # else:
+                #     odd_leaf_descendant = odd_tree.leaflist[0]
+                #     odd_leaf_id = odd_leaf_descendant.id
+
+                odd_leaf_id = curr_node.lca_odd.id
 
                 odd_tree_parentEdge_char = S[odd_leaf_id - 1 + curr_node.lcp_depth]
                 
