@@ -272,18 +272,28 @@ def T_even(t_odd, inputstr):
     # (ii)
     # compute lcp for adjacent even suffixes
     # TODO: NOT O(n), TREE SHOULD BE PREPROCESSED ACCORDING TO [HT84]
+    lca_f = fast_lca.LCA()
+    lca_f.preprocess(t_odd)
+
+    id2node = []
+    t_odd.traverse(lambda n: id2node.append((n.id, n))
+                          if 'inner' not in str(n.id) else 'do nothing')
+    id2node = dict(id2node)
+
+
     lcp = {}
     for idx in range(0, len(even_suffixes) - 1):
         i = even_suffixes[idx]
         j = even_suffixes[idx + 1]
         curr_lcp = 0
-        while i < n and j < n:
-            if S[i - 1] == S[j - 1]:
-                curr_lcp += 1
-                i += 1
-                j += 1
+
+        if(S[i-1] == S[j-1] and i < n and j < n):
+            if j+1 in id2node and i+1 in id2node:
+                lca_parent = lca_f.query(id2node[i+1], id2node[j+1])
+                curr_lcp = lca_parent.str_length + 1
             else:
-                break
+                curr_lcp = 1
+
         lcp[(even_suffixes[idx], even_suffixes[idx + 1])] = curr_lcp
 
 
@@ -727,6 +737,7 @@ def compute_lcp_tree(t_overmerged):
             continue
         node1_next = id2node[node1.id + 1]
         node2_next = id2node[node2.id + 1]
+
         lca_parent = lca_f.query(node1_next, node2_next)
         #lca_parent_naive = naive_lca(node1_next, node2_next, t_overmerged, id2node)
         

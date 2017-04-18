@@ -6,6 +6,48 @@ import string
 import traceback
 import time
 
+
+def createExampleToReport():
+
+    nodes = []
+    rootNode = Node(aId="root")
+
+    inner_2 = Node(aId="inner2")
+    inner_8 = Node(aId="inner8")
+
+    rootNode.add_child(inner_2)
+
+    nodes.append(Node(aId=3))
+    inner_2.add_child(nodes[0])
+
+    inner_4 = Node(aId="inner4")
+
+    inner_2.add_child(inner_4)
+
+    nodes.append(Node(aId=5))
+    nodes.append(Node(aId=6))
+    nodes.append(Node(aId=7))
+
+
+    inner_4.add_child(nodes[1])
+    inner_4.add_child(nodes[2])
+    inner_4.add_child(nodes[3])
+    
+
+
+
+    rootNode.add_child(inner_8)
+    nodes.append(Node(aId=9))
+    nodes.append(Node(aId=10))
+    inner_8.add_child(nodes[4])
+    inner_8.add_child(nodes[5])
+
+    lca_al = lca.LCA()
+    lca_al.preprocess(rootNode)
+
+    print(rootNode.fancyprintLCA())
+
+
 def createTreeOne():
     rootNode = Node(aStrLength=0, aId="root")
     n1_l = Node(aId="inner1",aStrLength=1,)
@@ -204,7 +246,8 @@ def automaticTests():
 
 
 def main():
-    run_tests()
+    createExampleToReport()
+    #run_tests()
     #automaticTests()
     #check_speed()
 

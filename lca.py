@@ -12,6 +12,16 @@ class LCA:
         P = dict()
 
     def preprocess(self, tree):
+        def cleanup(node):
+            if hasattr(node, 'INLABEL'):
+                delattr(node, 'INLABEL')
+            if hasattr(node, 'PREORDER'):
+                delattr(node, 'PREORDER')
+            if hasattr(node, 'bitList'):
+                delattr(node, 'bitList')
+        tree.dfs(cleanup)
+
+
         currPREORDER = 1
         def preorder(node):
             nonlocal currPREORDER
@@ -53,6 +63,7 @@ class LCA:
             
         tree.bitList = self.shiftBitBasedOnHeight(0, self.leastSignificantBit(tree.INLABEL))
         createAncestor(tree)
+
 
 
     def shiftBitBasedOnHeight(self, bit, height):
