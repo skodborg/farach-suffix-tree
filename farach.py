@@ -121,8 +121,8 @@ def construct_suffix_tree(inputstr, printstuff=False):
         
 
         print(", " + ", ".join([key for key in timers]))
-        for i in range(len(timers["total"])):
-            print(str(timers["total"][i][0]) + ", " + ", ".join([str(value[i][1]) for value in timers.values()]))
+        for i in range(len(timers["T_even"])):
+            print(str(timers["T_even"][i][0]) + ", " + ", ".join([str(value[i][1]) for value in timers.values()]))
 
   
     return t_overmerged
@@ -156,8 +156,8 @@ def create_tree(tree, root):
 
 def T_odd(inputstr):
     global _printstuff, timers
-    if(len(inputstr) == maxLength):
-        start = time.time()
+    # if(len(inputstr) == maxLength):
+    #     start = time.time()
 
     S = inputstr
     n = len(S)
@@ -278,13 +278,13 @@ def T_odd(inputstr):
         pair = (int(S[2 * i - 2]), int(S[2 * i - 1]))
         Sm.append(pair2single[pair])
     
-    if(len(inputstr) == maxLength):
-        end = time.time()
-        curr_time = end - start
+    # if(len(inputstr) == maxLength):
+    #     end = time.time()
+    #     curr_time = end - start
 
     tree_Sm = construct_suffix_tree(Sm, _printstuff)
-    if(len(inputstr) == maxLength):
-        start = time.time()
+    # if(len(inputstr) == maxLength):
+    #     start = time.time()
     tree_Sm.update_leaf_list()
 
 
@@ -300,13 +300,13 @@ def T_odd(inputstr):
     resolve_suffix_tree(tree_Sm)
 
     tree_Sm.update_leaf_list()
-    if(len(inputstr) == maxLength):
-        end = time.time()
-        total = (end-start) + curr_time
-        if "T_odd" in timers:
-            timers["T_odd"].append((maxLength, total))
-        else:
-            timers["T_odd"] = [(maxLength, total)]
+    # if(len(inputstr) == maxLength):
+    #     end = time.time()
+    #     total = (end-start) + curr_time
+    #     if "T_odd" in timers:
+    #         timers["T_odd"].append((maxLength, total))
+    #     else:
+    #         timers["T_odd"] = [(maxLength, total)]
 
     return tree_Sm
 
@@ -351,7 +351,7 @@ def T_even(t_odd, inputstr):
 
     # (ii)
     # compute lcp for adjacent even suffixes
-    # TODO: NOT O(n), TREE SHOULD BE PREPROCESSED ACCORDING TO [HT84]
+
     lca_f = fast_lca.LCA()
     lca_f.preprocess(t_odd)
 
@@ -387,6 +387,10 @@ def T_even(t_odd, inputstr):
     node_fst_suf = Node(fst_suf_len, fst_suf)
     root.add_child(node_fst_suf)
     id2node = {fst_suf: node_fst_suf}
+
+    currLoopTime = 0
+    updatingLeafList = 0
+
     for i in range(1, len(even_suffixes)):
         prev_suf = even_suffixes[i - 1]
         curr_suf = even_suffixes[i]
@@ -414,6 +418,8 @@ def T_even(t_odd, inputstr):
                 remaining_until_insertion = prev_lcp - curr_lcp
 
                 possible_insertion_node = prev_node.parent
+
+                startLoop = time.time()
                 while remaining_until_insertion > 0:
                     # run up through parentEdges until
                     # remaining_until_insertion is 0
@@ -421,6 +427,8 @@ def T_even(t_odd, inputstr):
 
                     remaining_until_insertion -= len_of_edge
                     possible_insertion_node = possible_insertion_node.parent
+
+                currLoopTime = currLoopTime + (time.time()-startLoop)
 
                 # possible_insertion_node is now the spot at which we
                 # should place curr_suf
@@ -451,8 +459,6 @@ def T_even(t_odd, inputstr):
                     innernode.add_child(new_node)
 
                     id2node[curr_suf] = new_node
-                root.update_leaf_list()
-
 
             else:
                 innernode_len = curr_lcp
@@ -564,7 +570,7 @@ def overmerge(t_even, t_odd, S):
                 # the the first char (by lexicographic order), and insert.
                 # Count that up to preceed to next child in child list
                 if(o_char < e_char):
-                    t_overmerged.update_leaf_list()
+                    # t_overmerged.update_leaf_list()
 
                     o_child.old_parent = o_child.parent
                     current.add_child(o_child)
@@ -718,7 +724,7 @@ def overmerge(t_even, t_odd, S):
                     inner.odd_subtree = o_child
                     merger_helper(inner, e_child, o_child)
 
-                    t_overmerged.update_leaf_list()
+                    # t_overmerged.update_leaf_list()
 
                     had_lca_even_too = False
                     overwrote = False

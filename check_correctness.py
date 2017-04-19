@@ -246,7 +246,7 @@ def main():
     while True:
         try:
             # outputfilename = 'outputtree.txt'
-            S = ''.join(random.choice(string.digits) for _ in range(25000))
+            S = ''.join(random.choice(string.digits) for _ in range(250))
             start = time.time()
             # TODO: the correctness verification is timed too??? unintended
             correct_tree = check_correctness2(S)
