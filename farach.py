@@ -13,6 +13,7 @@ input = '121112212221'
 input = 'mississippi'
 # input = 'banana'
 input = 'ababcacac'
+input = '1'
 
 maxLength = 0
 timers = dict()
@@ -53,17 +54,23 @@ def construct_suffix_tree(inputstr, printstuff=False):
 
     # assumes inputstr converted to integer alphabet, takes O(n) to do anyway
     inputstr = append_unique_char(inputstr)
-    if maxLength < len(inputstr):
+    if maxLength <= len(inputstr):
         maxLength = len(inputstr)
         totalTimerStart = time.time()
         total_recursive = 1
-        
+    
+    if len(inputstr) - 1 == 0:
+        root = Node(aId='root')
+        root.add_child(Node(aId=1, aStrLength=1))
+        root.update_leaf_list()
+        return root
 
     if len(inputstr) - 1 == 1:
         # inputstr was just a single char before we appended the unique_char
         root = Node(aId='root')
         root.add_child(Node(aId=1, aStrLength=2))
         root.add_child(Node(aId=2, aStrLength=1))
+        root.update_leaf_list()
         return root
 
     t_odd = T_odd(inputstr)
@@ -105,8 +112,7 @@ def construct_suffix_tree(inputstr, printstuff=False):
             timers["adjust_overmerge"] = [(maxLength, total)]
 
     if maxLength == len(inputstr):
-        startClean = time.time()
-        print(startClean)    
+        startClean = time.time()   
     cleanup_tree(t_overmerged)
 
     # printif('adjusted tree for %s' % inputstr)
@@ -979,17 +985,17 @@ def adjust_overmerge(t_overmerged, t_even, t_odd, S):
     t_overmerged.update_leaf_list()
 
 
-toDelete = set()
+# toDelete = set()
 
-toDelete.add("suffix_link")
-toDelete.add("old_parentEdge")
-toDelete.add("old_parent")
-toDelete.add("lcp_depth")
-toDelete.add("lca_even")
-toDelete.add("lca_odd")
-toDelete.add("INLABEL")
-toDelete.add("PREORDER")
-toDelete.add("BITLIST")
+# toDelete.add("suffix_link")
+# toDelete.add("old_parentEdge")
+# toDelete.add("old_parent")
+# toDelete.add("lcp_depth")
+# toDelete.add("lca_even")
+# toDelete.add("lca_odd")
+# toDelete.add("INLABEL")
+# toDelete.add("PREORDER")
+# toDelete.add("BITLIST")
 
 def cleanup_tree(t_overmerged):
     global toDelete
@@ -1000,36 +1006,44 @@ def cleanup_tree(t_overmerged):
         # for t in node.__dict__.items():
         #     if t[0] in toDelete:
         #         delList.append(t[0])
-        node_dic = node.__dict__
+        # node_dic = node.__dict__
         # for delete in toDelete:
         #     node.__dict__.pop(delete, None)
         # for elm in delList:
         #     delattr(node, elm)
-        if 'suffix_link' in node_dic:
+        if hasattr(node, 'suffix_link'):
             del node.suffix_link
 
-        if 'old_parent' in node_dic:
+        # if 'old_parent' in node_dic:
+        if hasattr(node, 'old_parent'):        
             del node.old_parent
 
-        if 'old_parentEdge' in node_dic:
+        # if 'old_parentEdge' in node_dic:
+        if hasattr(node, 'old_parentEdge'):
             del node.old_parentEdge
 
-        if 'lcp_depth' in node_dic:
+        # if 'lcp_depth' in node_dic:
+        if hasattr(node, 'lcp_depth'):
             del node.lcp_depth
 
-        if 'lca_even' in node_dic:
+        # if 'lca_even' in node_dic:
+        if hasattr(node, 'lca_even'):
             del node.lca_even
 
-        if 'lca_odd' in node_dic:
+        # if 'lca_odd' in node_dic:
+        if hasattr(node, 'lca_odd'):
             del node.lca_odd
 
-        if 'INLABEL' in node_dic:
+        # if 'INLABEL' in node_dic:
+        if hasattr(node, 'INLABEL'):
             del node.INLABEL
 
-        if 'PREORDER' in node_dic:
+        # if 'PREORDER' in node_dic:
+        if hasattr(node, 'PREORDER'):
             del node.PREORDER
 
-        if 'bitList' in node_dic:
+        # if 'bitList' in node_dic:
+        if hasattr(node, 'bitList'):
             del node.bitList
         # if getattr(node, 'suffix_link', None) != None:
         #     delattr(node, 'suffix_link')
@@ -1061,8 +1075,8 @@ def cleanup_tree(t_overmerged):
         #     delattr(node, 'PREORDER')
 
         # if getattr(node, 'bitList', None) != None:
-        # #if hasattr(node, 'bitList'):
-        #     delattr(node, 'bitList')
+        # if hasattr(node, 'bitList'):
+            # delattr(node, 'bitList')
 
     t_overmerged.traverse(helper)
 

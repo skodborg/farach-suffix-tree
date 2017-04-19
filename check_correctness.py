@@ -153,7 +153,7 @@ def check_correctness2(inputstr):
     def helper(node):
         if node.id == 'root':
             assert len(node.children) >= 1
-        if not node.is_leaf():
+        elif not node.is_leaf():
             assert len(node.children) >= 2
     tree.traverse(helper)
 
