@@ -16,7 +16,7 @@ input = 'ababcacac'
 
 maxLength = 0
 timers = dict()
-
+total_recursive = 1
 # input = '1222112221212'
 
 _printstuff = False
@@ -48,7 +48,7 @@ def append_unique_char(string):
 
 
 def construct_suffix_tree(inputstr, printstuff=False):
-    global _printstuff, maxLength, timers
+    global _printstuff, maxLength, timers, total_recursive
     _printstuff = printstuff
 
     # assumes inputstr converted to integer alphabet, takes O(n) to do anyway
@@ -56,6 +56,7 @@ def construct_suffix_tree(inputstr, printstuff=False):
     if maxLength < len(inputstr):
         maxLength = len(inputstr)
         totalTimerStart = time.time()
+        total_recursive = 1
         
 
     if len(inputstr) - 1 == 1:
@@ -103,10 +104,25 @@ def construct_suffix_tree(inputstr, printstuff=False):
         else:
             timers["adjust_overmerge"] = [(maxLength, total)]
 
-
+    if maxLength == len(inputstr):
+        startClean = time.time()
+        print(startClean)    
     cleanup_tree(t_overmerged)
+
     printif('adjusted tree for %s' % inputstr)
     printif(t_overmerged.fancyprint(inputstr))
+    if maxLength == len(inputstr):
+        total = time.time()- startClean
+        if "clean" in timers:
+            timers["clean"].append((maxLength, total))
+        else:
+            timers["clean"] = [(maxLength, total)]
+        print("DONE")
+
+        
+
+
+
 
     if maxLength == len(inputstr):
         totalTimerEnd = time.time()
@@ -115,6 +131,11 @@ def construct_suffix_tree(inputstr, printstuff=False):
             timers["total"].append((maxLength, total))
         else:
             timers["total"] = [(maxLength, total)]
+
+        if "recursive" in timers:
+            timers["recursive"].append((maxLength, total_recursive))
+        else:
+            timers["recursive"] = [(maxLength, total_recursive)]
 
     if maxLength == len(inputstr):
         os.system('clear')
@@ -155,9 +176,9 @@ def create_tree(tree, root):
 
 
 def T_odd(inputstr):
-    global _printstuff, timers
-    # if(len(inputstr) == maxLength):
-    #     start = time.time()
+    global _printstuff, timers, total_recursive
+    if(len(inputstr) == maxLength):
+        start = time.time()
 
     S = inputstr
     n = len(S)
@@ -278,13 +299,14 @@ def T_odd(inputstr):
         pair = (int(S[2 * i - 2]), int(S[2 * i - 1]))
         Sm.append(pair2single[pair])
     
-    # if(len(inputstr) == maxLength):
-    #     end = time.time()
-    #     curr_time = end - start
+    if(len(inputstr) == maxLength):
+        end = time.time()
+        curr_time = end - start
 
+    total_recursive += 1
     tree_Sm = construct_suffix_tree(Sm, _printstuff)
-    # if(len(inputstr) == maxLength):
-    #     start = time.time()
+    if(len(inputstr) == maxLength):
+        start = time.time()
     tree_Sm.update_leaf_list()
 
 
@@ -300,13 +322,13 @@ def T_odd(inputstr):
     resolve_suffix_tree(tree_Sm)
 
     tree_Sm.update_leaf_list()
-    # if(len(inputstr) == maxLength):
-    #     end = time.time()
-    #     total = (end-start) + curr_time
-    #     if "T_odd" in timers:
-    #         timers["T_odd"].append((maxLength, total))
-    #     else:
-    #         timers["T_odd"] = [(maxLength, total)]
+    if(len(inputstr) == maxLength):
+        end = time.time()
+        total = (end-start) + curr_time
+        if "T_odd" in timers:
+            timers["T_odd"].append((maxLength, total))
+        else:
+            timers["T_odd"] = [(maxLength, total)]
 
     return tree_Sm
 
@@ -957,28 +979,97 @@ def adjust_overmerge(t_overmerged, t_even, t_odd, S):
     t_overmerged.update_leaf_list()
 
 
+toDelete = set()
+
+toDelete.add("suffix_link")
+toDelete.add("old_parentEdge")
+toDelete.add("old_parent")
+toDelete.add("lcp_depth")
+toDelete.add("lca_even")
+toDelete.add("lca_odd")
+toDelete.add("INLABEL")
+toDelete.add("PREORDER")
+toDelete.add("BITLIST")
+
 def cleanup_tree(t_overmerged):
+    global toDelete
+    counter = 0
     # remove suffix links on all nodes with one
     def helper(node):
-        if hasattr(node, 'suffix_link'):
-            delattr(node, 'suffix_link')
-        if hasattr(node, 'old_parent'):
-            delattr(node, 'old_parent')
-        if hasattr(node, 'old_parentEdge'):
-            delattr(node, 'old_parentEdge')
-        if hasattr(node, 'lcp_depth'):
-            delattr(node, 'lcp_depth')
-        if hasattr(node, 'lca_even'):
-            delattr(node, 'lca_even')
-        if hasattr(node, 'lca_odd'):
-            delattr(node, 'lca_odd')
-        if hasattr(node, 'INLABEL'):
-            delattr(node, 'INLABEL')
-        if hasattr(node, 'PREORDER'):
-            delattr(node, 'PREORDER')
-        if hasattr(node, 'bitList'):
-            delattr(node, 'bitList')
+        nonlocal counter
+        counter += 1
+        # delList = []
+        # for t in node.__dict__.items():
+        #     if t[0] in toDelete:
+        #         delList.append(t[0])
+        node_dic = node.__dict__
+        # for delete in toDelete:
+        #     node.__dict__.pop(delete, None)
+        # for elm in delList:
+        #     delattr(node, elm)
+        if 'suffix_link' in node_dic:
+            del node.suffix_link
+
+        if 'old_parent' in node_dic:
+            del node.old_parent
+
+        if 'old_parentEdge' in node_dic:
+            del node.old_parentEdge
+
+        if 'lcp_depth' in node_dic:
+            del node.lcp_depth
+
+        if 'lca_even' in node_dic:
+            del node.lca_even
+
+        if 'lca_odd' in node_dic:
+            del node.lca_odd
+
+        if 'INLABEL' in node_dic:
+            del node.INLABEL
+
+        if 'PREORDER' in node_dic:
+            del node.PREORDER
+
+        if 'bitList' in node_dic:
+            del node.bitList
+        # if getattr(node, 'suffix_link', None) != None:
+        #     delattr(node, 'suffix_link')
+        # if getattr(node, 'old_parent', None) != None:
+        # #if hasattr(node, 'old_parent'):
+        #     delattr(node, 'old_parent')
+        # if getattr(node, 'old_parentEdge', None) != None:
+        # #if hasattr(node, 'old_parentEdge'):
+        #     delattr(node, 'old_parentEdge')
+
+        # if getattr(node, 'lcp_depth', None) != None:
+        # #if hasattr(node, 'lcp_depth'):
+        #     delattr(node, 'lcp_depth')
+
+        # if getattr(node, 'lca_even', None) != None:
+        # #if hasattr(node, 'lca_even'):
+        #     delattr(node, 'lca_even')
+
+        # if getattr(node, 'lca_odd', None) != None:
+        # #if hasattr(node, 'lca_odd'):
+        #     delattr(node, 'lca_odd')
+
+        # if getattr(node, 'INLABEL', None) != None:
+        # #if hasattr(node, 'INLABEL'):
+        #     delattr(node, 'INLABEL')
+
+        # if getattr(node, 'PREORDER', None) != None:
+        # #if hasattr(node, 'PREORDER'):
+        #     delattr(node, 'PREORDER')
+
+        # if getattr(node, 'bitList', None) != None:
+        # #if hasattr(node, 'bitList'):
+        #     delattr(node, 'bitList')
+
+    startTime = time.time()
     t_overmerged.traverse(helper)
+
+    print(str(counter) + " in " + str((time.time() - startTime)))
 
 def printif(s):
     global _printstuff
