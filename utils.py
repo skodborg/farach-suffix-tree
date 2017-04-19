@@ -90,8 +90,8 @@ class Node:
             return [self]
 
         for n in self.children:
-            self.leaflist.extend(n.update_leaf_list())
-
+            self.leaflist = n.update_leaf_list()
+            #self.leaflist.extend(n.update_leaf_list())
         return self.leaflist
 
     def getParentEdge(self, S):

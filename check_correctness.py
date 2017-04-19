@@ -138,7 +138,13 @@ def check_correctness2(inputstr):
     # the construction adds a unique char to the string to ensure deterministic
     # trees; therefore, the tree will contain a single leaf from root with this
     # unique char, hence the leaves will be n + 1, one per suffix plus an extra
-    assert len(tree.leaflist) == n + 1
+    leaflist = []
+    def get_leafs(node):
+        nonlocal leaflist
+        if node.is_leaf():
+            leaflist.append(node)
+    tree.dfs(get_leafs)
+    assert len(leaflist) == n + 1
 
     # -------------------------------------------------------------
     # Except for the root, every internal node has at least two

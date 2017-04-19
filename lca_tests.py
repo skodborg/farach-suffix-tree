@@ -200,17 +200,17 @@ def check_speed():
         print('%i,%f' % ((i*50),(end - start)))
 
 def run_tests():
-    test_tree_two()
-    test_tree_one()
-    test_tree_three()
-    test_tree_four()
-    check_correctness("mississippi")
-    check_correctness("121112212221")
-    check_correctness("111222122121")
-    check_correctness("12121212121")
-    check_correctness("banana")
-    check_correctness("mississippiisaniceplaceithink")
-    check_correctness("12121")
+    # test_tree_two()
+    # test_tree_one()
+    # test_tree_three()
+    # test_tree_four()
+    # check_correctness("mississippi")
+    # check_correctness("121112212221")
+    # check_correctness("111222122121")
+    # check_correctness("12121212121")
+    # check_correctness("banana")
+    # check_correctness("mississippiisaniceplaceithink")
+    # check_correctness("12121")
     print("lca_tests success")
 
 

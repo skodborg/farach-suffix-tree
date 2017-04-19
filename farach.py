@@ -4,6 +4,8 @@ from utils import Node
 import check_correctness
 from collections import deque
 import lca as fast_lca
+import time
+import os
 
 input = '121112212221'
 # input = '111222122121'
@@ -11,6 +13,10 @@ input = '121112212221'
 input = 'mississippi'
 # input = 'banana'
 input = 'ababcacac'
+
+maxLength = 0
+timers = dict()
+
 # input = '1222112221212'
 
 _printstuff = False
@@ -42,11 +48,15 @@ def append_unique_char(string):
 
 
 def construct_suffix_tree(inputstr, printstuff=False):
-    global _printstuff
+    global _printstuff, maxLength, timers
     _printstuff = printstuff
 
     # assumes inputstr converted to integer alphabet, takes O(n) to do anyway
     inputstr = append_unique_char(inputstr)
+    if maxLength < len(inputstr):
+        maxLength = len(inputstr)
+        totalTimerStart = time.time()
+        
 
     if len(inputstr) - 1 == 1:
         # inputstr was just a single char before we appended the unique_char
@@ -67,18 +77,57 @@ def construct_suffix_tree(inputstr, printstuff=False):
     printif('overmerge tree for %s' % inputstr)
     printif(t_overmerged.fancyprint(inputstr))
 
+    if maxLength == len(inputstr):
+        start = time.time()
 
     compute_lcp_tree(t_overmerged)
 
+    if maxLength == len(inputstr):
+        end = time.time()
+        total = (end-start)
+        if "compute_lcp_tree" in timers:
+            timers["compute_lcp_tree"].append((maxLength, total))
+        else:
+            timers["compute_lcp_tree"] = [(maxLength, total)]
+
+    if maxLength == len(inputstr):
+        start = time.time()
+
     adjust_overmerge(t_overmerged, t_even, t_odd, inputstr)
+
+    if maxLength == len(inputstr):
+        end = time.time()
+        total = (end-start)
+        if "adjust_overmerge" in timers:
+            timers["adjust_overmerge"].append((maxLength, total))
+        else:
+            timers["adjust_overmerge"] = [(maxLength, total)]
 
 
     cleanup_tree(t_overmerged)
     printif('adjusted tree for %s' % inputstr)
     printif(t_overmerged.fancyprint(inputstr))
 
-    
+    if maxLength == len(inputstr):
+        totalTimerEnd = time.time()
+        total = totalTimerEnd- totalTimerStart
+        if "total" in timers:
+            timers["total"].append((maxLength, total))
+        else:
+            timers["total"] = [(maxLength, total)]
+
+    if maxLength == len(inputstr):
+        os.system('clear')
+        
+
+        print(", " + ", ".join([key for key in timers]))
+        for i in range(len(timers["total"])):
+            print(str(timers["total"][i][0]) + ", " + ", ".join([str(value[i][1]) for value in timers.values()]))
+
+  
     return t_overmerged
+
+
 
 
 
@@ -106,7 +155,10 @@ def create_tree(tree, root):
 
 
 def T_odd(inputstr):
-    global _printstuff
+    global _printstuff, timers
+    if(len(inputstr) == maxLength):
+        start = time.time()
+
     S = inputstr
     n = len(S)
 
@@ -226,8 +278,13 @@ def T_odd(inputstr):
         pair = (int(S[2 * i - 2]), int(S[2 * i - 1]))
         Sm.append(pair2single[pair])
     
+    if(len(inputstr) == maxLength):
+        end = time.time()
+        curr_time = end - start
 
     tree_Sm = construct_suffix_tree(Sm, _printstuff)
+    if(len(inputstr) == maxLength):
+        start = time.time()
     tree_Sm.update_leaf_list()
 
 
@@ -243,16 +300,35 @@ def T_odd(inputstr):
     resolve_suffix_tree(tree_Sm)
 
     tree_Sm.update_leaf_list()
+    if(len(inputstr) == maxLength):
+        end = time.time()
+        total = (end-start) + curr_time
+        if "T_odd" in timers:
+            timers["T_odd"].append((maxLength, total))
+        else:
+            timers["T_odd"] = [(maxLength, total)]
+
     return tree_Sm
 
 
+
 def T_even(t_odd, inputstr):
+    if(len(inputstr) == maxLength):
+        start = time.time()
     S = inputstr
     n = len(S)
 
     # (i)
     # find the lexicographical ordering of the even suffixes
-    odd_suffix_ordering = [node.id for node in t_odd.leaflist]
+    leaflist = []
+    def get_leafs(node):
+        nonlocal leaflist
+        if node.is_leaf():
+            leaflist.append(node)
+    
+    t_odd.dfs(get_leafs)
+
+    odd_suffix_ordering = [node.id for node in leaflist]#t_odd.leaflist]
 
     # even_suffixes is a list of tuples (x[2i], suffix[2i + 1]) to radix sort
     even_suffixes = [(int(S[node - 2]), node) for node in odd_suffix_ordering
@@ -402,11 +478,19 @@ def T_even(t_odd, inputstr):
                 innernode.add_child(new_node)
     t_even = root
     t_even.update_leaf_list()
+    if(len(inputstr) == maxLength):
+        end = time.time()
+        total = end-start
+        if "T_even" in timers:
+            timers["T_even"].append((maxLength, total))
+        else:
+            timers["T_even"] = [(maxLength, total)]
     return t_even
 
 
 def overmerge(t_even, t_odd, S):
-
+    if(len(S) == maxLength):
+        start = time.time()
     t_overmerged = Node(aId="root", aStrLength=0)
 
     def merger_helper(current, even, odd):
@@ -655,6 +739,13 @@ def overmerge(t_even, t_odd, S):
                 e += 1
     merger_helper(t_overmerged, t_even, t_odd)
     t_overmerged.update_leaf_list()
+    if(len(S) == maxLength):
+        end = time.time()
+        total = end-start
+        if "t_overmerged" in timers:
+            timers["t_overmerged"].append((maxLength, total))
+        else:
+            timers["t_overmerged"] = [(maxLength, total)]
     return t_overmerged
 
 
@@ -698,6 +789,7 @@ def naive_lca(node1, node2, tree, id2node):
 
 
 def compute_lcp_tree(t_overmerged):
+
     ''' Augments every, to the algorithm relevant, node in t_overmerged with
         an attribute, node.suffix_link, pointing to the node representing
         the string of the current node minus first character

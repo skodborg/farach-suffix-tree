@@ -12,13 +12,18 @@ def runFarach(inputstr):
 
 
 def main():
+	total = []
 	for i in range(1, 100000, 1000):
 		S = ''.join(random.choice(string.digits) for _ in range(i))
 		start = time.time()
 		correct_tree = runFarach(S)
 		end = time.time()
-
-		print("%i, %f" % (i, (end - start)))
+		total.append((i, (end-start)))
+		# print("Total:")
+		# for n, t in total:
+		# 	if n == 1:
+		# 		continue
+		# 	print("%i, %f" % (n, t))
 
 if __name__ == '__main__':
 	main()
