@@ -67,16 +67,16 @@ def construct_suffix_tree(inputstr, printstuff=False):
         return root
 
     t_odd = T_odd(inputstr)
-    printif('odd tree for %s' % inputstr)
-    printif(t_odd.fancyprint(inputstr))
+    #printif('odd tree for %s' % inputstr)
+    #printif(t_odd.fancyprint(inputstr))
 
     t_even = T_even(t_odd, inputstr)
-    printif('even tree for %s' % inputstr)
-    printif(t_even.fancyprint(inputstr))
+    #printif('even tree for %s' % inputstr)
+    #printif(t_even.fancyprint(inputstr))
     
     t_overmerged = overmerge(t_even, t_odd, inputstr)
-    printif('overmerge tree for %s' % inputstr)
-    printif(t_overmerged.fancyprint(inputstr))
+    #printif('overmerge tree for %s' % inputstr)
+    #printif(t_overmerged.fancyprint(inputstr))
 
     if maxLength == len(inputstr):
         start = time.time()
@@ -109,8 +109,8 @@ def construct_suffix_tree(inputstr, printstuff=False):
         print(startClean)    
     cleanup_tree(t_overmerged)
 
-    printif('adjusted tree for %s' % inputstr)
-    printif(t_overmerged.fancyprint(inputstr))
+    # printif('adjusted tree for %s' % inputstr)
+    # printif(t_overmerged.fancyprint(inputstr))
     if maxLength == len(inputstr):
         total = time.time()- startClean
         if "clean" in timers:
@@ -993,11 +993,9 @@ toDelete.add("BITLIST")
 
 def cleanup_tree(t_overmerged):
     global toDelete
-    counter = 0
     # remove suffix links on all nodes with one
     def helper(node):
-        nonlocal counter
-        counter += 1
+
         # delList = []
         # for t in node.__dict__.items():
         #     if t[0] in toDelete:
@@ -1066,10 +1064,8 @@ def cleanup_tree(t_overmerged):
         # #if hasattr(node, 'bitList'):
         #     delattr(node, 'bitList')
 
-    startTime = time.time()
     t_overmerged.traverse(helper)
 
-    print(str(counter) + " in " + str((time.time() - startTime)))
 
 def printif(s):
     global _printstuff
