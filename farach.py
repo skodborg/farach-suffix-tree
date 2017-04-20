@@ -1,6 +1,6 @@
 import math
 import radixsort
-from utils import Node
+from utils import Node, append_unique_char, str2int
 import check_correctness
 from collections import deque
 import lca as fast_lca
@@ -12,8 +12,8 @@ input = '121112212221'
 # input = '12121212121'
 input = 'mississippi'
 # input = 'banana'
-input = 'ababcacac'
-input = '1'
+# input = 'ababcacac'
+# input = '1'
 
 maxLength = 0
 timers = dict()
@@ -21,31 +21,6 @@ total_recursive = 1
 # input = '1222112221212'
 
 _printstuff = False
-
-def str2int(string):
-    ''' list append is O(1), string join() is O(n), totaling O(n) conversion
-        time from string to string over int alphabet '''
-    int_alph = {}
-    new_str_list = []
-    count = 1
-    for c in string:
-        if c not in int_alph:
-            int_alph[c] = count
-            count += 1
-        new_str_list.append(int_alph[c])
-    return new_str_list
-
-
-def append_unique_char(string):
-    # O(n) running time
-    count = 0
-    seen_chars = {}
-    for c in string:
-        if c not in seen_chars:
-            count += 1
-            seen_chars[c] = count
-    string.append(count + 1)
-    return string
 
 
 def construct_suffix_tree(inputstr, printstuff=False):

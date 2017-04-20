@@ -338,4 +338,30 @@ def get_lca_nodepairs(nodelist):
         
     return lca_nodepairs
 
+
+def str2int(string):
+    ''' list append is O(1), string join() is O(n), totaling O(n) conversion
+        time from string to string over int alphabet '''
+    int_alph = {}
+    new_str_list = []
+    count = 1
+    for c in string:
+        if c not in int_alph:
+            int_alph[c] = count
+            count += 1
+        new_str_list.append(int_alph[c])
+    return new_str_list
+
+
+def append_unique_char(string):
+    # O(n) running time
+    count = 0
+    seen_chars = {}
+    for c in string:
+        if c not in seen_chars:
+            count += 1
+            seen_chars[c] = count
+    string.append(count + 1)
+    return string
+
 # get_lca_nodepairs([1,3,2,4,5])

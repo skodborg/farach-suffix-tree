@@ -8,7 +8,7 @@ def run_tests():
 
 
 def test_even_tree_for_string_1():
-	inputstr = farach.str2int("11112122")
+	inputstr = utils.str2int("11112122")
 
 	t_odd = farach.T_odd(inputstr)
 
