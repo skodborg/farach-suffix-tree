@@ -946,7 +946,7 @@ def main():
     print('final tree for input %s:' % inputstr)
     print(suffix_tree.fancyprint(inputstr))
 
-    check_correctness.check_correctness2(inputstr_copy)
+    check_correctness.check_correctness(suffix_tree, inputstr)
 
 
 if __name__ == '__main__':
