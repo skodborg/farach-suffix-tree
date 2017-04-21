@@ -364,4 +364,12 @@ def append_unique_char(string):
     string.append(count + 1)
     return string
 
-# get_lca_nodepairs([1,3,2,4,5])
+def lcp(string1, string2):
+    shorter = min(len(string1), len(string2))
+    lcp = 0
+    for i in range(shorter):
+        if string1[i] == string2[i]:
+            lcp += 1
+        else:
+            break
+    return string1[:lcp]

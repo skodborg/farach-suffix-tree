@@ -1,4 +1,5 @@
 import farach
+import naive
 from utils import Node, str2int
 import random
 import string
@@ -155,25 +156,32 @@ def run_tests():
 def main():
     #run_tests()
     while True:
-        S = str2int(''.join(random.choice(string.digits) for _ in range(250)))
-        try:
-            start = time.time()
-            tree = farach.construct_suffix_tree(S)
-            end = time.time()
-            correct_tree = check_correctness(tree, S)
-            print('took %f' % (end - start))
-        except AssertionError:
-            print('attempting string: %s' % S)
-            print('assertion error!')
-            traceback.print_exc()
-        except TypeError:
-            print('attempting string: %s' % S)
-            print('type error!')
-            traceback.print_exc()
-        except:
-            print('attempting string: %s' % S)
-            print('some error!')
-            traceback.print_exc()
+        S = str2int(''.join(random.choice(string.digits) for _ in range(100)))
+        # print(S)
+        # tree = naive.construct_suffix_tree(S)
+        # correct_tree = check_correctness(tree, S)
+        tree = farach.construct_suffix_tree(S)
+        correct_tree = check_correctness(tree, S)
+            
+        # try:
+        #     start = time.time()
+        #     # tree = farach.construct_suffix_tree(S)
+        #     tree = naive.construct_suffix_tree(S)
+        #     end = time.time()
+        #     correct_tree = check_correctness(tree, S)
+        #     print('took %f' % (end - start))
+        # except AssertionError:
+        #     print('attempting string: %s' % S)
+        #     print('assertion error!')
+        #     traceback.print_exc()
+        # except TypeError:
+        #     print('attempting string: %s' % S)
+        #     print('type error!')
+        #     traceback.print_exc()
+        # except:
+        #     print('attempting string: %s' % S)
+        #     print('some error!')
+        #     traceback.print_exc()
 
 
 if __name__ == '__main__':

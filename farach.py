@@ -114,7 +114,7 @@ def construct_suffix_tree(inputstr, printstuff=False):
             timers["recursive"] = [(maxLength, total_recursive)]
 
     if maxLength == len(inputstr):
-        os.system('clear')
+        print("\033c")  # clear screen, no scrollback
 
         print(", " + ", ".join([key for key in timers]))
         for i in range(len(timers["T_even"])):
@@ -940,7 +940,6 @@ def printif(s):
 
 def main():
     inputstr = str2int(input)
-    inputstr_copy = inputstr[:]
 
     suffix_tree = construct_suffix_tree(inputstr, False)
     print('final tree for input %s:' % inputstr)
