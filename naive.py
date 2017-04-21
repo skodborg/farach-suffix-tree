@@ -52,6 +52,8 @@ def construct_suffix_tree(inputstr, printstuff=False):
                 searching = False
                 break
 
+        # TODO: sort children lexicographically?
+
         if child_to_merge:
             internal_strlength = parent.str_length + len(lcp_with_child)
             internal = Node(aId='inner', aStrLength=internal_strlength)
