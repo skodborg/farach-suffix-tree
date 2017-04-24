@@ -85,10 +85,11 @@ class LCA:
         return self.mostSignificantBit(x&-x)
 
     def query(self, x, y):
+        # Step 1
         j = self.mostSignificantBit(x.INLABEL ^ y.INLABEL)
-
         j = max(j, self.leastSignificantBit(x.INLABEL), self.leastSignificantBit(y.INLABEL))
 
+        # Step 2
         x_temp_bitList = (x.bitList >> j) << j
         y_temp_bitList = (y.bitList >> j) << j
 
@@ -96,44 +97,37 @@ class LCA:
 
         j = self.leastSignificantBit(total_list)
         
-        # STEP 3:
-        pos_l = self.leastSignificantBit(x.bitList)
-        x_bar = None
-        if pos_l == j:
-            x_bar = x
-        elif pos_l < j:
-            temp_bitList = (x.bitList >> j) << j
-            temp_bitList = temp_bitList ^ x.bitList
-            pos_k = self.mostSignificantBit(temp_bitList)
+        # Step 3 & 4
+        x_bar = self.findNodeClosestToRun(j, x)
+        y_bar = self.findNodeClosestToRun(j, y)
 
-            x_temp = x.INLABEL >> pos_k
-            x_temp = x_temp | 1
-            x_temp = x_temp << pos_k
-
-            x_bar = self.L[self.P[x_temp].INLABEL].parent
-
-
-        # STEP 3 AGAIN!:
-        pos_l = self.leastSignificantBit(y.bitList)
-        y_bar = None
-
-        if pos_l == j:
-            y_bar = y
-
-        elif pos_l < j:
-            temp_bitList = (y.bitList >> j ) << j 
-            temp_bitList = temp_bitList ^ y.bitList
-            pos_k = self.mostSignificantBit(temp_bitList)
-
-            y_temp = y.INLABEL >> pos_k
-            y_temp = y_temp | 1
-            y_temp = y_temp << pos_k
-
-            y_bar = self.L[self.P[y_temp].INLABEL].parent
-
-
+        # Step 5
         z = x_bar
         if y_bar.PREORDER < x_bar.PREORDER:
             z = y_bar
 
         return z
+
+    def findNodeClosestToRun(self, j, node):
+
+        pos_l = self.leastSignificantBit(node.bitList)
+        node_bar = None
+        # Step 3
+        if pos_l == j:
+            node_bar = node
+        #Step 4
+        elif pos_l < j:
+            temp_bitList = (node.bitList >> j) << j
+            temp_bitList = temp_bitList ^ node.bitList
+
+            pos_k = self.mostSignificantBit(temp_bitList)
+
+            node_temp = node.INLABEL >> pos_k
+            node_temp = node_temp | 1
+            node_temp = node_temp << pos_k
+
+            node_bar = self.L[self.P[node_temp].INLABEL].parent
+
+        return node_bar
+
+        
