@@ -364,6 +364,7 @@ def append_unique_char(string):
     string.append(count + 1)
     return string
 
+
 def lcp(string1, string2):
     shorter = min(len(string1), len(string2))
     lcp = 0
@@ -373,3 +374,42 @@ def lcp(string1, string2):
         else:
             break
     return string1[:lcp]
+
+
+def naive_lca(node1, node2, tree, id2node):
+    ''' strategy:   from node1, test if node2 is in the subtree of node1
+                        - if so, report node1 as LCA
+                    if not, proceed to parent node and do:
+                        - if parent node is node2, report parent node as LCA
+                        - if parent node has node2 in its subtree, report
+                          parent node as LCA
+                        - if neither, recurse to parent's parent
+        running time: awful!
+    '''
+    # Notice:   there may be a difference between the node1 and node2
+    #           as they are given and the final state of node1 and node2,
+    #           therefore id2node is necessary for now
+    node1 = id2node[node1.id]
+    node2 = id2node[node2.id]
+
+    def node_is_descendant(node1, node2):
+        descendants = []
+        node1.traverse(lambda n: descendants.append(n)
+                       if 'inner' not in str(n.id) else 'do nothing')
+        is_descendant = True in [n.id == node2.id for n in descendants]
+        return is_descendant
+
+    curr_node = node1
+    no_result = True
+
+    while no_result:
+        if curr_node.id == "root":
+            no_result = False
+
+        if node_is_descendant(curr_node, node2):
+            no_result = False
+            return curr_node
+        else:
+            curr_node = curr_node.parent
+
+    return None

@@ -123,29 +123,6 @@ def construct_suffix_tree(inputstr, printstuff=False):
     return t_overmerged
 
 
-def create_tree(tree, root):
-    def helper(lvl, node):
-        for n in node.children:
-            n_id = n.id
-            if type(n_id) is str:
-                n_id = "\"%s\"" % n.id
-            print("inner%s = Node(%s, %s)"
-                  % (lvl + 1, n.str_length, n_id))
-            print("inner%s.add_child(inner%s)" % (lvl, lvl + 1))
-            helper(lvl + 1, n)
-    tree_id = tree.id
-    if type(tree_id) is str:
-                tree_id = "\"%s\"" % tree.id
-    print("%s = Node(%s,%s)" % (root, tree.str_length, tree_id))
-    for n in tree.children:
-        n_id = n.id
-        if type(n_id) is str:
-            n_id = "\"%s\"" % n.id
-        print("inner1 = Node(%s, %s)" % (n.str_length, n_id))
-        print("%s.add_child(inner1)" % root)
-        helper(1, n)
-
-
 def T_odd(inputstr):
     global _printstuff, timers, total_recursive
     if(len(inputstr) == maxLength):
@@ -732,45 +709,6 @@ def overmerge(t_even, t_odd, S):
     return t_overmerged
 
 
-def naive_lca(node1, node2, tree, id2node):
-    ''' strategy:   from node1, test if node2 is in the subtree of node1
-                        - if so, report node1 as LCA
-                    if not, proceed to parent node and do:
-                        - if parent node is node2, report parent node as LCA
-                        - if parent node has node2 in its subtree, report
-                          parent node as LCA
-                        - if neither, recurse to parent's parent
-        running time: awful!
-    '''
-    # Notice:   there may be a difference between the node1 and node2
-    #           as they are given and the final state of node1 and node2,
-    #           therefore id2node is necessary for now
-    node1 = id2node[node1.id]
-    node2 = id2node[node2.id]
-
-    def node_is_descendant(node1, node2):
-        descendants = []
-        node1.traverse(lambda n: descendants.append(n)
-                       if 'inner' not in str(n.id) else 'do nothing')
-        is_descendant = True in [n.id == node2.id for n in descendants]
-        return is_descendant
-
-    curr_node = node1
-    no_result = True
-
-    while no_result:
-        if curr_node.id == "root":
-            no_result = False
-
-        if node_is_descendant(curr_node, node2):
-            no_result = False
-            return curr_node
-        else:
-            curr_node = curr_node.parent
-
-    return None
-
-
 def compute_lcp_tree(t_overmerged):
     ''' Augments every, to the algorithm relevant, node in t_overmerged with
         an attribute, node.suffix_link, pointing to the node representing
@@ -846,13 +784,6 @@ def compute_lcp_tree(t_overmerged):
 
     t_overmerged.lcp_depth = 0
     t_overmerged.bfs(lcp_depth)
-
-
-def test_child_parent_relations(tree):
-    def helper(node):
-        for child in node.children:
-            assert child.parent == node
-    tree.traverse(helper)
 
 
 def adjust_overmerge(t_overmerged, t_even, t_odd, S):
