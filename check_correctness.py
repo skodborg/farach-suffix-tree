@@ -1,112 +1,13 @@
 import farach
-from utils import Node
+import naive
+from utils import Node, str2int
 import random
 import string
 import traceback
 import time
 
-def check_correctness(inputstr):
-    # TODO: i think it fails to identify trees that are not proper
-    #       compacted tries; if an inner node only has a single inner
-    #       node as child, it is not correct, but still reported as so
-    # fixed in check_correctness2 though
-    inputstrOld = inputstr
-    inputstr = farach.str2int(inputstr)
 
-    suffix_tree = farach.construct_suffix_tree(inputstr)
-
-    add_str_length(suffix_tree, 0)
-    farach.compute_lcp_tree(suffix_tree)
-    make_inners_unique(suffix_tree)
-
-    suffix_tree.traverse(check_suffix_link_length)
-
-    check_string_length(suffix_tree)
-
-    suffix_tree.traverse(check_descendants(inputstr))
-
-    suffix_tree.traverse(children_different_first_char)
-
-    print("tree for input : \"%s\" is correct" % inputstrOld)
-
-    return suffix_tree
-
-
-def children_different_first_char(node):
-    # For each internal node x with children c1...ck
-    # then each of substr xci begins with a different char
-    current_chars = set()
-    for n in node.children:
-        assert n.parentEdge[0] not in current_chars
-        current_chars.add(n.parentEdge[0])
-
-
-def make_inners_unique(node):
-    curr = 0
-
-    def helper(n):
-        nonlocal curr
-        if n.id == "inner":
-            n.id += str(curr)
-            curr += 1
-    node.bfs(helper)
-
-
-def check_descendants(inputstr):
-    # if y is a child of x, then sl(y) is a descendant of sl(x)
-    # and x and y begin with the same char
-    def check_descendants_helper(node):
-        if hasattr(node, "suffix_link"):
-            for n in node.children:
-                if hasattr(n, "suffix_link"):
-                    assert node_is_descendant(node.suffix_link, n.suffix_link)
-                if n.is_leaf():
-                    nth_suffix_firstchar = inputstr[n.id - 1]
-                    current = n
-
-                    while current.parent.id != "root":
-                        current = current.parent
-
-                    first_char_path_to_n = current.parentEdge[0]
-                    assert nth_suffix_firstchar == first_char_path_to_n
-    return check_descendants_helper
-
-
-def node_is_descendant(node1, node2):
-        descendants = []
-        node1.traverse(lambda n: descendants.append(n))
-        is_descendant = True in [n.id == node2.id for n in descendants]
-        return is_descendant
-
-
-def check_suffix_link_length(node):
-    # For each node x,
-    # |sl(x)| = |x| - 1
-
-    if hasattr(node, "suffix_link"):
-        assert node.str_length - 1 == node.suffix_link.str_length
-
-
-def check_string_length(node):
-    # If r is the root, then |r| = 0
-    # If y is a child of x, then |y| > |x|
-
-    if(node.id == "root"):
-        assert node.str_length == 0
-
-    else:
-        for child in node.children:
-            assert node.str_length < child.str_length
-            check_string_length(child)
-
-
-def add_str_length(node, prev_length):
-        node.str_length = prev_length + len(node.parentEdge)
-        for n in node.children:
-            add_str_length(n, node.str_length)
-
-
-def check_correctness2(inputstr):
+def check_correctness(tree, inputstr):
     # TODO: find some definition of a suffix tree and refer it?
     #       below is from wikipedia with a dead reference to it, hmm..
     #       https://en.wikipedia.org/wiki/Suffix_tree#Definition
@@ -115,10 +16,10 @@ def check_correctness2(inputstr):
     # The suffix tree for the string S of length n is defined as a
     # tree such that:
     # -------------------------------------------------------------
-    S = farach.str2int(inputstr)
+    S = inputstr
     # S = farach.append_unique_char(S)
     n = len(S)
-    tree = farach.construct_suffix_tree(S)
+    # tree = farach.construct_suffix_tree(S)
     # print('check_correctness 2 final tree on inputstr = %s:' % S)
     # print(tree.fancyprint(S))
 
@@ -134,17 +35,13 @@ def check_correctness2(inputstr):
     # -------------------------------------------------------------
     # The tree has exactly n leaves numbered from 1 to n.
     # -------------------------------------------------------------
-
-    # the construction adds a unique char to the string to ensure deterministic
-    # trees; therefore, the tree will contain a single leaf from root with this
-    # unique char, hence the leaves will be n + 1, one per suffix plus an extra
     leaflist = []
     def get_leafs(node):
         nonlocal leaflist
         if node.is_leaf():
             leaflist.append(node)
     tree.dfs(get_leafs)
-    assert len(leaflist) == n + 1
+    assert len(leaflist) == n
 
     # -------------------------------------------------------------
     # Except for the root, every internal node has at least two
@@ -153,7 +50,7 @@ def check_correctness2(inputstr):
     def helper(node):
         if node.id == 'root':
             assert len(node.children) >= 1
-        if not node.is_leaf():
+        elif not node.is_leaf():
             assert len(node.children) >= 2
     tree.traverse(helper)
 
@@ -210,6 +107,7 @@ def check_correctness2(inputstr):
                 helper(n, new_str)
     helper(tree, [])
 
+    print('tree was verified and correct')
     return tree
 
     # print('tree for input \"%s\" is correct' % inputstr)
@@ -232,43 +130,58 @@ def check_correctness2(inputstr):
 
 
 def run_tests():
-    check_correctness2("mississippi")
-    check_correctness2("121112212221")
-    check_correctness2("111222122121")
-    check_correctness2("12121212121")
-    check_correctness2("banana")
-    check_correctness2("mississippiisaniceplaceithink")
-    check_correctness2("12121")
+    inputstr = str2int("mississippi")
+    tree = farach.construct_suffix_tree(inputstr)
+    check_correctness(tree, inputstr)
+    inputstr = str2int("121112212221")
+    tree = farach.construct_suffix_tree(inputstr)
+    check_correctness(tree, inputstr)
+    inputstr = str2int("111222122121")
+    tree = farach.construct_suffix_tree(inputstr)
+    check_correctness(tree, inputstr)
+    inputstr = str2int("12121212121")
+    tree = farach.construct_suffix_tree(inputstr)
+    check_correctness(tree, inputstr)
+    inputstr = str2int("banana")
+    tree = farach.construct_suffix_tree(inputstr)
+    check_correctness(tree, inputstr)
+    inputstr = str2int("mississippiisaniceplaceithink")
+    tree = farach.construct_suffix_tree(inputstr)
+    check_correctness(tree, inputstr)
+    inputstr = str2int("12121")
+    tree = farach.construct_suffix_tree(inputstr)
+    check_correctness(tree, inputstr)
 
 
 def main():
     #run_tests()
     while True:
-        try:
-            # outputfilename = 'outputtree.txt'
-            S = ''.join(random.choice(string.digits) for _ in range(250))
-            start = time.time()
-            # TODO: the correctness verification is timed too??? unintended
-            correct_tree = check_correctness2(S)
-            end = time.time()
-            print('worked')
-            print('took %f' % (end - start))
-            # outputfile = open(outputfilename, 'w')
-            # outputfile.write(correct_tree.fancyprint(S, onlylengths=True))
-            # outputfile.close()
-            # print('stored in %s' % outputfilename)
-        except AssertionError:
-            print('attempting string: %s' % S)
-            print('assertion error!')
-            traceback.print_exc()
-        except TypeError:
-            print('attempting string: %s' % S)
-            print('type error!')
-            traceback.print_exc()
-        except:
-            print('attempting string: %s' % S)
-            print('some error!')
-            traceback.print_exc()
+        S = str2int(''.join(random.choice(string.digits) for _ in range(100)))
+        # print(S)
+        # tree = naive.construct_suffix_tree(S)
+        # correct_tree = check_correctness(tree, S)
+        tree = farach.construct_suffix_tree(S)
+        correct_tree = check_correctness(tree, S)
+            
+        # try:
+        #     start = time.time()
+        #     # tree = farach.construct_suffix_tree(S)
+        #     tree = naive.construct_suffix_tree(S)
+        #     end = time.time()
+        #     correct_tree = check_correctness(tree, S)
+        #     print('took %f' % (end - start))
+        # except AssertionError:
+        #     print('attempting string: %s' % S)
+        #     print('assertion error!')
+        #     traceback.print_exc()
+        # except TypeError:
+        #     print('attempting string: %s' % S)
+        #     print('type error!')
+        #     traceback.print_exc()
+        # except:
+        #     print('attempting string: %s' % S)
+        #     print('some error!')
+        #     traceback.print_exc()
 
 
 if __name__ == '__main__':

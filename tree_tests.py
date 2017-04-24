@@ -1,6 +1,6 @@
 import farach
-from check_correctness import check_correctness2
-from utils import Node
+from check_correctness import check_correctness
+from utils import Node, str2int
 
 
 def run_tests():
@@ -10,7 +10,7 @@ def run_tests():
 
 def str12121():
     string = '12121'
-    string = farach.str2int(string)
+    string = str2int(string)
     constructed_tree = farach.construct_suffix_tree(string)
 
     actual_tree = Node(aId='root')
@@ -38,11 +38,11 @@ def str12121():
     # print(actual_tree.fancyprint(string))
     # print(constructed_tree.fancyprint(string))
 
-    check_correctness2('12121')
+    check_correctness(constructed_tree, string)
 
     assert constructed_tree.fancyprint(string) == actual_tree.fancyprint(string)
 
-    # check_correctness2(string[:-1])
+    # check_correctness(string[:-1])
 
 
 if __name__ == '__main__':

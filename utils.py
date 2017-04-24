@@ -338,4 +338,78 @@ def get_lca_nodepairs(nodelist):
         
     return lca_nodepairs
 
-# get_lca_nodepairs([1,3,2,4,5])
+
+def str2int(string):
+    ''' list append is O(1), string join() is O(n), totaling O(n) conversion
+        time from string to string over int alphabet '''
+    int_alph = {}
+    new_str_list = []
+    count = 1
+    for c in string:
+        if c not in int_alph:
+            int_alph[c] = count
+            count += 1
+        new_str_list.append(int_alph[c])
+    return new_str_list
+
+
+def append_unique_char(string):
+    # O(n) running time
+    count = 0
+    seen_chars = {}
+    for c in string:
+        if c not in seen_chars:
+            count += 1
+            seen_chars[c] = count
+    string.append(count + 1)
+    return string
+
+
+def lcp(string1, string2):
+    shorter = min(len(string1), len(string2))
+    lcp = 0
+    for i in range(shorter):
+        if string1[i] == string2[i]:
+            lcp += 1
+        else:
+            break
+    return string1[:lcp]
+
+
+def naive_lca(node1, node2, tree, id2node):
+    ''' strategy:   from node1, test if node2 is in the subtree of node1
+                        - if so, report node1 as LCA
+                    if not, proceed to parent node and do:
+                        - if parent node is node2, report parent node as LCA
+                        - if parent node has node2 in its subtree, report
+                          parent node as LCA
+                        - if neither, recurse to parent's parent
+        running time: awful!
+    '''
+    # Notice:   there may be a difference between the node1 and node2
+    #           as they are given and the final state of node1 and node2,
+    #           therefore id2node is necessary for now
+    node1 = id2node[node1.id]
+    node2 = id2node[node2.id]
+
+    def node_is_descendant(node1, node2):
+        descendants = []
+        node1.traverse(lambda n: descendants.append(n)
+                       if 'inner' not in str(n.id) else 'do nothing')
+        is_descendant = True in [n.id == node2.id for n in descendants]
+        return is_descendant
+
+    curr_node = node1
+    no_result = True
+
+    while no_result:
+        if curr_node.id == "root":
+            no_result = False
+
+        if node_is_descendant(curr_node, node2):
+            no_result = False
+            return curr_node
+        else:
+            curr_node = curr_node.parent
+
+    return None
