@@ -17,8 +17,8 @@ class LCA:
                 delattr(node, 'INLABEL')
             if hasattr(node, 'PREORDER'):
                 delattr(node, 'PREORDER')
-            if hasattr(node, 'bitList'):
-                delattr(node, 'bitList')
+            if hasattr(node, 'ancestors'):
+                delattr(node, 'ancestors')
         tree.dfs(cleanup)
 
 
@@ -55,13 +55,13 @@ class LCA:
         def createAncestor(node):
             
             if node.parent != None:
-                node.bitList = node.parent.bitList
-                node.bitList = self.shiftBitBasedOnHeight(node.bitList, self.leastSignificantBit(node.INLABEL))
+                node.ancestors = node.parent.ancestors
+                node.ancestors = self.shiftBitBasedOnHeight(node.ancestors, self.leastSignificantBit(node.INLABEL))
 
             for child in node.children:
                 createAncestor(child)
             
-        tree.bitList = self.shiftBitBasedOnHeight(0, self.leastSignificantBit(tree.INLABEL))
+        tree.ancestors = self.shiftBitBasedOnHeight(0, self.leastSignificantBit(tree.INLABEL))
         createAncestor(tree)
 
 
@@ -90,10 +90,10 @@ class LCA:
         j = max(j, self.leastSignificantBit(x.INLABEL), self.leastSignificantBit(y.INLABEL))
 
         # Step 2
-        x_temp_bitList = (x.bitList >> j) << j
-        y_temp_bitList = (y.bitList >> j) << j
+        x_temp_ancestors = (x.ancestors >> j) << j
+        y_temp_ancestors = (y.ancestors >> j) << j
 
-        total_list = y_temp_bitList & x_temp_bitList
+        total_list = y_temp_ancestors & x_temp_ancestors
 
         j = self.leastSignificantBit(total_list)
         
@@ -110,17 +110,17 @@ class LCA:
 
     def findNodeClosestToRun(self, j, node):
 
-        pos_l = self.leastSignificantBit(node.bitList)
+        pos_l = self.leastSignificantBit(node.ancestors)
         node_bar = None
         # Step 3
         if pos_l == j:
             node_bar = node
         #Step 4
         elif pos_l < j:
-            temp_bitList = (node.bitList >> j) << j
-            temp_bitList = temp_bitList ^ node.bitList
+            temp_ancestors = (node.ancestors >> j) << j
+            temp_ancestors = temp_ancestors ^ node.ancestors
 
-            pos_k = self.mostSignificantBit(temp_bitList)
+            pos_k = self.mostSignificantBit(temp_ancestors)
 
             node_temp = node.INLABEL >> pos_k
             node_temp = node_temp | 1
