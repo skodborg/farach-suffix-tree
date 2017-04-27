@@ -177,6 +177,25 @@ class Node:
             result += child.fancyprintLCA(level + 1)
         return result
 
+    def fancyprint_mcc(self, level=0):
+        self_id = str(self.id) + ':' if self.id else ''
+
+        if self.id == 'root':
+            edge = ''
+        else:
+            edge = str(self.edge)
+            edge += ' len: %i' % len(self.str)
+            if hasattr(self, 'start'):
+                edge += '  (%i,%i)' % (self.start, self.stop)
+            if hasattr(self, 'suffix_link'):
+                edge += ' sl: %s' % self.suffix_link.str
+
+        self_id += str(edge)
+        result = '\t' * level + self_id + '\n'
+        for child in self.children:
+            result += child.fancyprint_mcc(level + 1)
+        return result
+
     def fancyprint(self, S, level=0, onlylengths=False):
 
 

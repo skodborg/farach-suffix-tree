@@ -1,5 +1,6 @@
 import farach
 import naive
+import mccreight
 from utils import Node, str2int
 import random
 import string
@@ -75,6 +76,8 @@ def check_correctness(tree, inputstr):
             seen_chars = set()
             for c in node.children:
                 seen_chars.add(c.getParentEdge(S)[0])
+            if len(seen_chars) != len(node.children):
+                print('wtf ', seen_chars, node.children)
             assert len(seen_chars) == len(node.children)
     tree.traverse(helper)
 
@@ -156,12 +159,15 @@ def run_tests():
 def main():
     #run_tests()
     while True:
-        S = str2int(''.join(random.choice(string.digits) for _ in range(100)))
-        # print(S)
+        S = ''.join(random.choice(string.digits) for _ in range(20))
+        print(S)
+        S = str2int(S)
         # tree = naive.construct_suffix_tree(S)
         # correct_tree = check_correctness(tree, S)
-        tree = farach.construct_suffix_tree(S)
+        tree = mccreight.construct_suffix_tree(S)
         correct_tree = check_correctness(tree, S)
+        # tree = farach.construct_suffix_tree(S)
+        # correct_tree = check_correctness(tree, S)
             
         # try:
         #     start = time.time()

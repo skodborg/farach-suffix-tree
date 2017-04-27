@@ -10,10 +10,14 @@ import os
 input = '121112212221'
 # input = '111222122121'
 # input = '12121212121'
-input = 'mississippi'
-# input = 'banana'
+# input = 'mississippi'
+input = 'banana'
 # input = 'ababcacac'
 # input = '1'
+input = '1212'
+input = '12313'
+
+input = '42029751273509278886376606279127770209140388866035'
 
 maxLength = 0
 timers = dict()
@@ -57,8 +61,8 @@ def construct_suffix_tree(inputstr, printstuff=False):
     # printif(t_even.fancyprint(inputstr))
 
     t_overmerged = overmerge(t_even, t_odd, inputstr)
-    # printif('overmerge tree for %s' % inputstr)
-    # printif(t_overmerged.fancyprint(inputstr))
+    printif('overmerge tree for %s' % inputstr)
+    printif(t_overmerged.fancyprint(inputstr))
 
     if maxLength == len(inputstr):
         start = time.time()
@@ -114,7 +118,7 @@ def construct_suffix_tree(inputstr, printstuff=False):
             timers["recursive"] = [(maxLength, total_recursive)]
 
     if maxLength == len(inputstr):
-        print("\033c")  # clear screen, no scrollback
+        # print("\033c")  # clear screen, no scrollback
 
         print(", " + ", ".join([key for key in timers]))
         for i in range(len(timers["T_even"])):
@@ -534,7 +538,6 @@ def overmerge(t_even, t_odd, S):
 
                     o_child.old_parent = o_child.parent
                     current.add_child(o_child)
-
                     o += 1
                     # prepare the LCA nodepair thingy during the overmerge
                     if not hasattr(current, 'lca_odd') or hasattr(current, 'overwrite_lca'):
@@ -837,7 +840,6 @@ def adjust_overmerge(t_overmerged, t_even, t_odd, S):
 
 
 def cleanup_tree(t_overmerged):
-    global toDelete
     # remove suffix links on all nodes with one
 
     def helper(node):
@@ -872,7 +874,7 @@ def printif(s):
 def main():
     inputstr = str2int(input)
 
-    suffix_tree = construct_suffix_tree(inputstr, False)
+    suffix_tree = construct_suffix_tree(inputstr, True)
     print('final tree for input %s:' % inputstr)
     print(suffix_tree.fancyprint(inputstr))
 
