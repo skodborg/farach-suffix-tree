@@ -98,6 +98,9 @@ class Node:
         if self.id == 'root':
             return ''
 
+        if hasattr(self, 'edge'):
+            return self.edge
+
         if self.is_leaf():
             leaf_id = self.id
         else:

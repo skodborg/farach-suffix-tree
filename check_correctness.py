@@ -162,6 +162,7 @@ def main():
         S = ''.join(random.choice(string.digits) for _ in range(20))
         print(S)
         S = str2int(S)
+
         # tree = naive.construct_suffix_tree(S)
         # correct_tree = check_correctness(tree, S)
         tree = mccreight.construct_suffix_tree(S)
