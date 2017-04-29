@@ -73,6 +73,8 @@ def fastscan(u, v):
 
 
 def construct_suffix_tree(inputstr, printstuff=False):
+    # TODO: should run in linear time; remove strings from edges n stuff
+
     S = append_unique_char(inputstr)
     n = len(S)
 
