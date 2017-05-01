@@ -55,11 +55,33 @@ def slowscan(u, v, S):
 
 def fastscan(u, v):
     # Identify u_i, the child of u matching some prefix of v
-    ui = None
-    for child in u.children:
-        if lcp(child.edge, v):
-            ui = child
+    ui = u
+    prev_idx = 0
+    idx = 0
+    searching = True
+    while searching:
+        if idx >= len(v):
+            # we have covered more characters in the tree than is contained
+            # in v; break the loop with ui being the node covering v plus some
             break
+        found_child = False
+        for child in ui.children:
+            # compare the first character on edges to all children of u
+            # if some edge matches current char in v, walk down this edge and
+            # reloop to look further down from this new node ui
+            if child.edge[0] == v[idx]:
+                prev_idx = idx
+                idx += len(child.edge)
+                ui = child
+                found_child = True
+                break
+        if not found_child:
+            # looped through all children of current node ui, and none of them
+            # shared paths with v; break out with ui being the node with the
+            # longest path shared with v
+            searching = False
+            break
+
 
     if not ui:
         # apparently it can be none, in which case the returned node is
@@ -68,18 +90,10 @@ def fastscan(u, v):
         # in case the None is returned, the root is used
         return None, ''
     
-    lcp_ui_v = lcp(ui.edge, v)
+    # slowscan for the exact location where the mismatch occurs
+    lcp_ui_v = len(lcp(ui.edge, v[prev_idx:]))
 
-    # 1) len(v) > len(ui):
-    #       search recursively from ui for the remainder of v
-    if len(v) > len(ui.edge):
-        assert ui.edge == lcp_ui_v
-        return fastscan(ui, v[len(ui.edge):])
-
-    if len(v) <= len(ui.edge):
-        # all of v was covered by some edge or node
-        assert ui.edge[:len(v)] == v
-        return ui, ui.edge[len(v):]
+    return ui, ui.edge[lcp_ui_v:]
 
 
 def construct_suffix_tree(inputstr, printstuff=False):
