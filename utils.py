@@ -180,23 +180,24 @@ class Node:
             result += child.fancyprintLCA(level + 1)
         return result
 
-    def fancyprint_mcc(self, level=0):
+    def fancyprint_mcc(self, S, level=0):
         self_id = str(self.id) + ':' if self.id else ''
 
         if self.id == 'root':
             edge = ''
         else:
-            edge = str(self.edge)
-            edge += ' len: %i' % len(self.str)
+            leafID = self.leaflist[0].id
+            edge = S[leafID + self.parent.str_length:]
+            edge += ' len: %i' % self.str_length
             if hasattr(self, 'start'):
                 edge += '  (%i,%i)' % (self.start, self.stop)
             if hasattr(self, 'suffix_link'):
-                edge += ' sl: %s' % self.suffix_link.str
+                edge += ' sl: %s' % self.suffix_link.str_length
 
         self_id += str(edge)
         result = '\t' * level + self_id + '\n'
         for child in self.children:
-            result += child.fancyprint_mcc(level + 1)
+            result += child.fancyprint_mcc(S, level + 1)
         return result
 
     def fancyprint(self, S, level=0, onlylengths=False):
@@ -387,15 +388,26 @@ def append_unique_char(string):
     return string
 
 
-def lcp(string1, string2):
-    shorter = min(len(string1), len(string2))
+def string_length(span):
+    if(span[0] > span[1]):
+        return 0
+    return span[1] - span[0]
+
+def lcp(string1, string2, S):
+
+    string_1_len = string_length(string1)
+    string_2_len = string_length(string2)
+    shorter = min(string_1_len, string_2_len)
+
     lcp = 0
     for i in range(shorter):
-        if string1[i] == string2[i]:
+        if S[string1[0] + i] == S[string2[0] + i]:
             lcp += 1
         else:
             break
-    return string1[:lcp]
+    if lcp == 0:
+        return None
+    return (string1[0], string1[0] + lcp) #string1[:lcp]
 
 
 def naive_lca(node1, node2, tree, id2node):
