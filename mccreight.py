@@ -2,14 +2,11 @@ from utils import Node, append_unique_char, str2int, lcp, string_length
 import check_correctness
 
 # inputstr = 'banana'
-# inputstr = 'mississippi'
+inputstr = 'mississippi'
 # inputstr = 'aabc'
 # inputstr = 'abaab'
 
 # from book, p. 115, fig. 5.2
-
-inputstr = '1112112'
-
 
 def slowscan(u, v, S):
     # searches for string v starting in node u
@@ -21,7 +18,6 @@ def slowscan(u, v, S):
     for child in curr_node.children:
         leafID = child.leaflist[0].id - 1
         edge = (leafID + child.parent.str_length, leafID + child.str_length)
-        #edge = S[leafID + child.parent.str_length: leafID + child.str_length]
         curr_lcp = lcp(remaining, edge, S)
         if curr_lcp:
 
@@ -29,22 +25,17 @@ def slowscan(u, v, S):
                 # remaining contains more than curr_lcp; we need to look
                 # further down the tree
                 return slowscan(child, (remaining[0]+string_length(curr_lcp), remaining[1]), S)
-                #return slowscan(child, remaining[len(curr_lcp):], S)
-
+       
             # make new internal node
             internal = Node(aId='inner')
             internal.leaflist = child.leaflist
             internal.str_length = curr_node.str_length + string_length(curr_lcp) 
 
-            # internal.str = curr_node.str + curr_lcp
-            # internal.edge = curr_lcp
-
+    
             curr_node.remove_child(child)
             curr_node.add_child(internal)
             internal.add_child(child)
 
-            #child.edge = child.edge[len(curr_lcp):]
-            #remaining = remaining[len(curr_lcp):]
             remaining = (remaining[0]+string_length(curr_lcp), remaining[1])
 
             return internal, remaining
@@ -53,25 +44,29 @@ def slowscan(u, v, S):
     return curr_node, remaining
 
 
-def fastscan(u, v):
+def fastscan(u, v, S):
     # Identify u_i, the child of u matching some prefix of v
     ui = u
     prev_idx = 0
     idx = 0
     searching = True
     while searching:
-        if idx >= len(v):
+        if idx >= string_length(v):
             # we have covered more characters in the tree than is contained
             # in v; break the loop with ui being the node covering v plus some
             break
         found_child = False
+
         for child in ui.children:
             # compare the first character on edges to all children of u
             # if some edge matches current char in v, walk down this edge and
             # reloop to look further down from this new node ui
-            if child.edge[0] == v[idx]:
+            leafID = child.leaflist[0].id - 1
+            first_char_edge = S[leafID + child.parent.str_length]
+           
+            if first_char_edge == S[v[0]+idx]:
                 prev_idx = idx
-                idx += len(child.edge)
+                idx += (child.str_length - child.parent.str_length)
                 ui = child
                 found_child = True
                 break
@@ -91,9 +86,20 @@ def fastscan(u, v):
         return None, ''
     
     # slowscan for the exact location where the mismatch occurs
-    lcp_ui_v = len(lcp(ui.edge, v[prev_idx:]))
+    
 
-    return ui, ui.edge[lcp_ui_v:]
+    if ui.id == "root":
+
+        ui_edge = (0, 0)
+    else:
+        leafID = ui.leaflist[0].id - 1
+        ui_edge = (leafID + ui.parent.str_length, leafID + ui.str_length)
+
+    v_updated = (v[0] + prev_idx, v[1])
+
+    lcp_ui_v = string_length(lcp(ui_edge, v_updated, S))
+
+    return ui, (ui_edge[0] + lcp_ui_v, ui_edge[1])
 
 
 def construct_suffix_tree(inputstr, printstuff=False):
@@ -111,7 +117,7 @@ def construct_suffix_tree(inputstr, printstuff=False):
 
     fst_child.str_length = n
     fst_child.leaflist = [fst_child]
-    #fst_child.str = fst_child.edge = S
+   
     root.add_child(fst_child)
     root.leaflist = [fst_child]
     id2node[1] = fst_child
@@ -122,7 +128,6 @@ def construct_suffix_tree(inputstr, printstuff=False):
     for i in range(1, n):
 
         if head_i == root:
-            #tail_i = tail_i[1:]
             tail_i = (tail_i[0]+1, tail_i[1])
 
             head_i, remaining = slowscan(root, tail_i, S)
@@ -130,14 +135,12 @@ def construct_suffix_tree(inputstr, printstuff=False):
             # add i+1 and head(i+1) as node if necessary
             leaf_iplus1 = Node(aId=i + 1)
             leaf_iplus1.str_length = n - i #TODO: correct index?
-            #leaf_iplus1.str = S[i:]
-            #leaf_iplus1.edge = remaining
-
+           
             head_i.add_child(leaf_iplus1)
 
             tail_i = (tail_i[0] + head_i.str_length, tail_i[1]) #tail_i[head_i.str_length:]
             leaf_iplus1.leaflist = [leaf_iplus1]
-            #tail_i = tail_i[len(head_i.str):]
+
             continue
 
         u = head_i.parent
@@ -145,13 +148,13 @@ def construct_suffix_tree(inputstr, printstuff=False):
 
         v = (leafID + head_i.parent.str_length, leafID + head_i.str_length)
         # v = head_i.edge
-       
+
         if u != root:
-            w, remaining = slowscan(u.suffix_link, v, S) #fastscan(u.suffix_link, v)
+            w, remaining = fastscan(u.suffix_link, v, S)
             if w is None:
                 w = root
         else:
-            w, remaining = slowscan(root, (v[0]+1, v[1]), S) #fastscan(root, v[1:])
+            w, remaining = fastscan(root, (v[0]+1, v[1]), S)
             if w is None:
                 w = root
 
@@ -160,45 +163,35 @@ def construct_suffix_tree(inputstr, printstuff=False):
             parent = w.parent
             leaf = w
             w = Node(aId='inner')
-            w.str_length = n - string_length(remaining)
 
-            # w.edge = leaf.edge[: len(leaf.edge) - len(remaining)]
-            # w.str = parent.str + w.edge
-
+            w.str_length = leaf.str_length - string_length(remaining)
+          
             parent.add_child(w)
             parent.remove_child(leaf)
             w.add_child(leaf)
             w.leaflist = leaf.leaflist
-            #leaf.edge = leaf.edge[len(w.edge):]
 
+        
             head_i.suffix_link = w
             head_i = w
 
             new_leaf = Node(aId=i + 1)
-            #new_leaf.str = S[i:]
-            #new_leaf.edge = new_leaf.str[len(w.str):]
             new_leaf.leaflist = [new_leaf]
             new_leaf.str_length = n - i #TODO: correct index?
             w.add_child(new_leaf)
 
         else:
+
             head_i.suffix_link = w
             head_i, remaining = slowscan(w, tail_i, S)
             leaf_iplus1 = Node(aId=i + 1)
             leaf_iplus1.str_length = n - i
             leaf_iplus1.leaflist = [leaf_iplus1]
-            # leaf_iplus1.str = S[i:]
-            # leaf_iplus1.edge = remaining
 
             head_i.add_child(leaf_iplus1)
             tail_i = (i + head_i.str_length, n)
-            #tail_i = S[i + head_i.str_length:]
 
     root.update_leaf_list()
-
-    # def add_str_length(node):
-    #     node.str_length = len(node.str)
-    # root.traverse(add_str_length)
 
     return root
 

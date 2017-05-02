@@ -159,7 +159,7 @@ def run_tests():
 def main():
     #run_tests()
     while True:
-        S = ''.join(random.choice(string.digits) for _ in range(20))
+        S = ''.join(random.choice(string.digits) for _ in range(2000))
         print(S)
         S = str2int(S)
 
