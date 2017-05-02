@@ -7,23 +7,30 @@ import time
 import mccreight
 import naive
 
-def testRandomStringWithMultipleIterations(algorithm):
+def getAverageForString(S, algorithm):
+	totalTime = 0
+	iterations = 5
+	for j in range(iterations):
+			start = time.time()
+			tree = algorithm.construct_suffix_tree(S)
+			end = time.time()
+			totalTime += (end - start)
+	return totalTime / iterations
+
+def testRandomStringWithMultipleIterations(algorithms):
 	iterations = 5
 	for i in range(1, 100000, 1000):
 		totalTime = 0
+		S = ''.join(random.choice(string.digits) for _ in range(i))
+		inputstr = farach.str2int(S)
+		results = []
+		for alg in algorithms:
+			results.append(getAverageForString(inputstr, alg))
 
-		for j in range(iterations):
-			S = ''.join(random.choice(string.digits) for _ in range(i))
-			inputstr = farach.str2int(S)
-			start = time.time()
-			tree = algorithm.construct_suffix_tree(inputstr)
-			end = time.time()
-			totalTime += (end - start)
-
-		print(i, ",", (totalTime / iterations))
+		print(str(i)+", " + ", ".join(map(str, results)))
 
 def main():
-	testRandomStringWithMultipleIterations(naive)
+	testRandomStringWithMultipleIterations([naive, mccreight, farach])
 
 if __name__ == '__main__':
 	main()
