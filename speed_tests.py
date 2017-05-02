@@ -6,10 +6,11 @@ import traceback
 import time
 import mccreight
 import naive
-
+# commit e6d458690371c0e5839b7247167ae92c67f53739 for mccreight without dict
+# remember to change line 143 and 35
 def getAverageForString(S, algorithm):
 	totalTime = 0
-	iterations = 5
+	iterations = 1
 	for j in range(iterations):
 			start = time.time()
 			tree = algorithm.construct_suffix_tree(S)
@@ -17,20 +18,23 @@ def getAverageForString(S, algorithm):
 			totalTime += (end - start)
 	return totalTime / iterations
 
+
+	
+
 def testRandomStringWithMultipleIterations(algorithms):
-	iterations = 5
-	for i in range(1, 100000, 1000):
+	for i in range(1, 100000, 100):
 		totalTime = 0
-		S = ''.join(random.choice(string.digits) for _ in range(i))
-		inputstr = farach.str2int(S)
+		#S = ''.join(random.choice(string.digits) for _ in range(i))
+		S = [1 for n in range(i)]
+		#inputstr = farach.str2int(S)
 		results = []
 		for alg in algorithms:
-			results.append(getAverageForString(inputstr, alg))
+			results.append(getAverageForString(S, alg))
 
 		print(str(i)+", " + ", ".join(map(str, results)))
 
 def main():
-	testRandomStringWithMultipleIterations([naive, mccreight, farach])
+	testRandomStringWithMultipleIterations([naive])
 
 if __name__ == '__main__':
 	main()

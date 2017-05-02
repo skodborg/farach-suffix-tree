@@ -75,7 +75,9 @@ def check_correctness(tree, inputstr):
         if not node.is_leaf():
             seen_chars = set()
             for c in node.children:
-                seen_chars.add(c.getParentEdge(S)[0])
+
+                edge = c.getParentEdge()
+                seen_chars.add(S[edge[0]])
             if len(seen_chars) != len(node.children):
                 print('wtf ', seen_chars, node.children)
             assert len(seen_chars) == len(node.children)
@@ -91,7 +93,7 @@ def check_correctness(tree, inputstr):
             # check if curr_str + parentEdge equals i'th suffix
             # where i is node.id
             ith_suffix = S[node.id - 1:]
-            str_curr_node = curr_str + node.getParentEdge(S)
+            str_curr_node = curr_str + S[node.getParentEdge()[0] : node.getParentEdge()[1]] 
             if ith_suffix != str_curr_node:
                 print('OUCH! %s != %s' % (ith_suffix, str_curr_node))
             assert ith_suffix == str_curr_node
@@ -105,7 +107,7 @@ def check_correctness(tree, inputstr):
                 # it far too much
                 new_str = []
                 new_str.extend(curr_str)
-                new_str.extend(node.getParentEdge(S))
+                new_str.extend(S[node.getParentEdge()[0] : node.getParentEdge()[1]])
             for n in node.children:
                 helper(n, new_str)
     helper(tree, [])
@@ -165,7 +167,7 @@ def main():
 
         # tree = naive.construct_suffix_tree(S)
         # correct_tree = check_correctness(tree, S)
-        tree = mccreight.construct_suffix_tree(S)
+        tree = naive.construct_suffix_tree(S)
         correct_tree = check_correctness(tree, S)
         # tree = farach.construct_suffix_tree(S)
         # correct_tree = check_correctness(tree, S)

@@ -17,7 +17,7 @@ input = 'banana'
 input = '1212'
 input = '12313'
 
-input = '92619559212321032143'
+input = 'mississippi'
 
 maxLength = 0
 timers = dict()

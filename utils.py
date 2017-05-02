@@ -94,20 +94,25 @@ class Node:
             #self.leaflist.extend(n.update_leaf_list())
         return self.leaflist
 
-    def getParentEdge(self, S):
+    def getParentEdge(self):
         if self.id == 'root':
-            return ''
+            return (0,0)
 
-        if hasattr(self, 'edge'):
-            return self.edge
+        leafID = self.leaflist[0].id - 1
+        return (leafID + self.parent.str_length, leafID + self.str_length)
 
-        if self.is_leaf():
-            leaf_id = self.id
-        else:
-            leaf_descendant = self.leaflist[0]
-            leaf_id = leaf_descendant.id
+        # if hasattr(self, 'edge'):
+        #     return self.edge
+
+
+
+        # if self.is_leaf():
+        #     leaf_id = self.id
+        # else:
+        #     leaf_descendant = self.leaflist[0]
+        #     leaf_id = leaf_descendant.id
         
-        return S[leaf_id - 1 + self.parent.str_length : leaf_id - 1 + self.str_length]
+        # return S[leaf_id - 1 + self.parent.str_length : leaf_id - 1 + self.str_length]
     
 
 
@@ -393,15 +398,7 @@ def string_length(span):
     if(span == None or span[0] > span[1]):
         return 0
     return span[1] - span[0]
-def lcp_string(string1, string2):
-    shorter = min(len(string1), len(string2))
-    lcp = 0
-    for i in range(shorter):
-        if string1[i] == string2[i]:
-            lcp += 1
-        else:
-            break
-    return string1[:lcp]
+
 
 def lcp(string1, string2, S):
 
