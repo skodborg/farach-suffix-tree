@@ -31,8 +31,8 @@ def slowscan(u, v, S):
         edge = (leafID + child.parent.str_length, leafID + child.str_length)
         curr_lcp = lcp(remaining, edge, S)
         if curr_lcp:
-
-            if S[curr_lcp[0] : curr_lcp[1]] == S[edge[0] : edge[1]]:
+            if string_length(curr_lcp) == string_length(edge):
+            #if S[curr_lcp[0] : curr_lcp[1]] == S[edge[0] : edge[1]]:
                 # remaining contains more than curr_lcp; we need to look
                 # further down the tree
                 return slowscan(child, (remaining[0]+string_length(curr_lcp), remaining[1]), S)

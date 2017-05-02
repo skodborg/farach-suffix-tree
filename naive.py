@@ -1,4 +1,4 @@
-from utils import Node, append_unique_char, str2int, lcp
+from utils import Node, append_unique_char, str2int, lcp_string
 import check_correctness
 
 inputstr = 'banana'
@@ -30,7 +30,7 @@ def construct_suffix_tree(inputstr, printstuff=False):
             continue_loop = False
             for c in parent.children:
                 c_parentEdge = c.getParentEdge(S)
-                curr_lcp = lcp(c_parentEdge, remaining)
+                curr_lcp = lcp_string(c_parentEdge, remaining)
                 if curr_lcp:
                     if len(curr_lcp) == len(c_parentEdge):
                         # continue with c as parent

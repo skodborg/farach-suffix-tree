@@ -5,22 +5,25 @@ import string
 import traceback
 import time
 import mccreight
+import naive
 
-def runFarach(inputstr):
-	S = farach.str2int(inputstr)
-	tree = farach.construct_suffix_tree(S)
+def testRandomStringWithMultipleIterations(algorithm):
+	iterations = 5
+	for i in range(1, 100000, 1000):
+		totalTime = 0
 
+		for j in range(iterations):
+			S = ''.join(random.choice(string.digits) for _ in range(i))
+			inputstr = farach.str2int(S)
+			start = time.time()
+			tree = algorithm.construct_suffix_tree(inputstr)
+			end = time.time()
+			totalTime += (end - start)
+
+		print(i, ",", (totalTime / iterations))
 
 def main():
-
-	for i in range(1, 100000, 1000):
-		S = ''.join(random.choice(string.digits) for _ in range(i))
-		start = time.time()
-		tree = mccreight.construct_suffix_tree(farach.str2int(S))
-		#correct_tree = runFarach(S)
-		end = time.time()
-		i += 1000
-		print(i, ",", (end - start))
+	testRandomStringWithMultipleIterations(naive)
 
 if __name__ == '__main__':
 	main()

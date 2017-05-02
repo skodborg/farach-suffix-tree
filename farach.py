@@ -61,68 +61,68 @@ def construct_suffix_tree(inputstr, printstuff=False):
     # printif(t_even.fancyprint(inputstr))
 
     t_overmerged = overmerge(t_even, t_odd, inputstr)
-    printif('overmerge tree for %s' % inputstr)
-    printif(t_overmerged.fancyprint(inputstr))
+    # printif('overmerge tree for %s' % inputstr)
+    # printif(t_overmerged.fancyprint(inputstr))
 
-    if maxLength == len(inputstr):
-        start = time.time()
+    # if maxLength == len(inputstr):
+    #     start = time.time()
 
     compute_lcp_tree(t_overmerged)
 
-    if maxLength == len(inputstr):
-        end = time.time()
-        total = (end - start)
-        if "compute_lcp_tree" in timers:
-            timers["compute_lcp_tree"].append((maxLength, total))
-        else:
-            timers["compute_lcp_tree"] = [(maxLength, total)]
+    # if maxLength == len(inputstr):
+    #     end = time.time()
+    #     total = (end - start)
+    #     if "compute_lcp_tree" in timers:
+    #         timers["compute_lcp_tree"].append((maxLength, total))
+    #     else:
+    #         timers["compute_lcp_tree"] = [(maxLength, total)]
 
-    if maxLength == len(inputstr):
-        start = time.time()
+    # if maxLength == len(inputstr):
+    #     start = time.time()
 
     adjust_overmerge(t_overmerged, t_even, t_odd, inputstr)
 
-    if maxLength == len(inputstr):
-        end = time.time()
-        total = (end - start)
-        if "adjust_overmerge" in timers:
-            timers["adjust_overmerge"].append((maxLength, total))
-        else:
-            timers["adjust_overmerge"] = [(maxLength, total)]
+    # if maxLength == len(inputstr):
+    #     end = time.time()
+    #     total = (end - start)
+    #     if "adjust_overmerge" in timers:
+    #         timers["adjust_overmerge"].append((maxLength, total))
+    #     else:
+    #         timers["adjust_overmerge"] = [(maxLength, total)]
 
-    if maxLength == len(inputstr):
-        startClean = time.time()
+    # if maxLength == len(inputstr):
+    #     startClean = time.time()
     cleanup_tree(t_overmerged)
 
     # printif('adjusted tree for %s' % inputstr)
     # printif(t_overmerged.fancyprint(inputstr))
-    if maxLength == len(inputstr):
-        total = time.time() - startClean
-        if "clean" in timers:
-            timers["clean"].append((maxLength, total))
-        else:
-            timers["clean"] = [(maxLength, total)]
-        print("DONE")
+    # if maxLength == len(inputstr):
+    #     total = time.time() - startClean
+    #     if "clean" in timers:
+    #         timers["clean"].append((maxLength, total))
+    #     else:
+    #         timers["clean"] = [(maxLength, total)]
+    #     print("DONE")
 
-    if maxLength == len(inputstr):
-        totalTimerEnd = time.time()
-        total = totalTimerEnd - totalTimerStart
-        if "total" in timers:
-            timers["total"].append((maxLength, total))
-        else:
-            timers["total"] = [(maxLength, total)]
+    # if maxLength == len(inputstr):
+    #     totalTimerEnd = time.time()
+    #     total = totalTimerEnd - totalTimerStart
+    #     if "total" in timers:
+    #         timers["total"].append((maxLength, total))
+    #     else:
+    #         timers["total"] = [(maxLength, total)]
 
-        if "recursive" in timers:
-            timers["recursive"].append((maxLength, total_recursive))
-        else:
-            timers["recursive"] = [(maxLength, total_recursive)]
+    #     if "recursive" in timers:
+    #         timers["recursive"].append((maxLength, total_recursive))
+    #     else:
+    #         timers["recursive"] = [(maxLength, total_recursive)]
 
-    if maxLength == len(inputstr):
-        # print("\033c")  # clear screen, no scrollback
+    # if maxLength == len(inputstr):
+    #     # print("\033c")  # clear screen, no scrollback
 
-        print(", " + ", ".join([key for key in timers]))
-        for i in range(len(timers["T_even"])):
-            print(str(timers["T_even"][i][0]) + ", " + ", ".join([str(value[i][1]) for value in timers.values()]))
+        # print(", " + ", ".join([key for key in timers]))
+        # for i in range(len(timers["T_even"])):
+        #     print(str(timers["T_even"][i][0]) + ", " + ", ".join([str(value[i][1]) for value in timers.values()]))
 
     return t_overmerged
 

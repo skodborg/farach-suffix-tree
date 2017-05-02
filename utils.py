@@ -393,6 +393,15 @@ def string_length(span):
     if(span == None or span[0] > span[1]):
         return 0
     return span[1] - span[0]
+def lcp_string(string1, string2):
+    shorter = min(len(string1), len(string2))
+    lcp = 0
+    for i in range(shorter):
+        if string1[i] == string2[i]:
+            lcp += 1
+        else:
+            break
+    return string1[:lcp]
 
 def lcp(string1, string2, S):
 
