@@ -316,7 +316,7 @@ def construct_suffix_tree(inputstr, printstuff=False):
             head_i.charDict[leaf_iplus1Char] = leaf_iplus1
 
             tail_i = (i + head_i.str_length, n)
-    print("Fastscan: " + str(timers["fastscan"]))
+    # print("Fastscan: " + str(timers["fastscan"]))
     return root
 
 
