@@ -3,7 +3,7 @@ import check_correctness
 from bisect import bisect_left
 import time
 # inputstr = 'banana'
-inputstr = '1'*100
+inputstr = '1'*10
 # inputstr = 'aabc'
 # inputstr = 'abaab'
 
@@ -138,8 +138,6 @@ def fastscan(u, v, S):
         timers["fastscan"] += time.time() - start
         return None, ''
     
-    # slowscan for the exact location where the mismatch occurs
-    
 
     if ui.id == "root":
 
@@ -150,7 +148,8 @@ def fastscan(u, v, S):
 
     v_updated = (v[0] + prev_idx, v[1])
 
-    lcp_ui_v = string_length(lcp(ui_edge, v_updated, S))
+    lcp_ui_v = min(string_length(ui_edge), string_length(v_updated))
+
     timers["fastscan"] += time.time() - start
     return ui, (ui_edge[0] + lcp_ui_v, ui_edge[1])
 
@@ -197,7 +196,7 @@ def construct_suffix_tree(inputstr, printstuff=False):
     tail_i = (0, n)
 
     for i in range(1, n):
-        
+
         if head_i == root:
             tail_i = (tail_i[0]+1, tail_i[1])
 

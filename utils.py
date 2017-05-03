@@ -405,7 +405,7 @@ def lcp(string1, string2, S):
     string_1_len = string_length(string1)
     string_2_len = string_length(string2)
     shorter = min(string_1_len, string_2_len)
-    print(shorter)
+    # print(shorter)
     lcp = 0
     for i in range(shorter):
         if S[string1[0] + i] == S[string2[0] + i]:
