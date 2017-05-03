@@ -1,15 +1,17 @@
 from utils import Node, append_unique_char, str2int, lcp, string_length
 import check_correctness
 from bisect import bisect_left
-
+import time
 # inputstr = 'banana'
-inputstr = 'mississippi'
+inputstr = '1'*100
 # inputstr = 'aabc'
 # inputstr = 'abaab'
 
 # from book, p. 115, fig. 5.2
 
 
+timers = dict()
+timers["fastscan"] = 0
 
 def binary_search(array, element):
     idx = bisect_left(array, element)
@@ -18,15 +20,15 @@ def binary_search(array, element):
         result_idx = -1
     return result_idx
 
-
+jump = 0
 def slowscan(u, v, S):
+    global jump
     # searches for string v starting in node u
     # create a node for v if necessary and return it
-
     curr_node = u
     remaining = v
-
-    for child in curr_node.children:
+    if S[remaining[0]] in curr_node.charDict:
+        child = curr_node.charDict[S[remaining[0]]]
         leafID = child.leaflist[0].id - 1
         edge = (leafID + child.parent.str_length, leafID + child.str_length)
         curr_lcp = lcp(remaining, edge, S)
@@ -75,18 +77,21 @@ def slowscan(u, v, S):
 
 
 def fastscan(u, v, S):
+    global jump
+    start = time.time()
     # Identify u_i, the child of u matching some prefix of v
     ui = u
     prev_idx = 0
     idx = 0
+
     searching = True
     while searching:
+        jump += 1
         if idx >= string_length(v):
             # we have covered more characters in the tree than is contained
             # in v; break the loop with ui being the node covering v plus some
             break
         found_child = False
-
 
         if S[v[0]+idx] in ui.charDict:
             child = ui.charDict[S[v[0]+idx]]
@@ -130,6 +135,7 @@ def fastscan(u, v, S):
         # expected to be root? Not available to grab here, so an ugly
         # test of None returned is performed where fastscan is called;
         # in case the None is returned, the root is used
+        timers["fastscan"] += time.time() - start
         return None, ''
     
     # slowscan for the exact location where the mismatch occurs
@@ -145,13 +151,13 @@ def fastscan(u, v, S):
     v_updated = (v[0] + prev_idx, v[1])
 
     lcp_ui_v = string_length(lcp(ui_edge, v_updated, S))
-
+    timers["fastscan"] += time.time() - start
     return ui, (ui_edge[0] + lcp_ui_v, ui_edge[1])
 
 
 def construct_suffix_tree(inputstr, printstuff=False):
+    timers["fastscan"] = 0
     # TODO: should run in linear time; remove strings from edges n stuff
-
     S = append_unique_char(inputstr)
     
     alphabet = {}
@@ -191,7 +197,7 @@ def construct_suffix_tree(inputstr, printstuff=False):
     tail_i = (0, n)
 
     for i in range(1, n):
-
+        
         if head_i == root:
             tail_i = (tail_i[0]+1, tail_i[1])
 
@@ -311,9 +317,7 @@ def construct_suffix_tree(inputstr, printstuff=False):
             head_i.charDict[leaf_iplus1Char] = leaf_iplus1
 
             tail_i = (i + head_i.str_length, n)
-
-    root.update_leaf_list()
-
+    print("Fastscan: " + str(timers["fastscan"]))
     return root
 
 
@@ -325,8 +329,7 @@ def main():
 
     print('final tree for input %s:' % inputstr)
     #print(suffix_tree.fancyprint_mcc(inputstr))
-    print(suffix_tree.fancyprint(inputstr))
-    check_correctness.check_correctness(suffix_tree, inputstr)
+    #check_correctness.check_correctness(suffix_tree, inputstr)
 
 
 if __name__ == '__main__':
