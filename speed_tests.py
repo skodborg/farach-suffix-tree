@@ -10,7 +10,7 @@ import naive
 # remember to change line 143 and 35
 def getAverageForString(S, algorithm):
 	totalTime = 0
-	iterations = 1
+	iterations = 5
 	for j in range(iterations):
 			start = time.time()
 			tree = algorithm.construct_suffix_tree(S)
@@ -25,7 +25,7 @@ def testRandomStringWithMultipleIterations(algorithms):
 	for i in range(1, 100000, 100):
 		totalTime = 0
 		#S = ''.join(random.choice(string.digits) for _ in range(i))
-		S = [1 for n in range(i)]
+		S = [i for n in range(i)]
 		#inputstr = farach.str2int(S)
 		results = []
 		for alg in algorithms:
