@@ -3,7 +3,7 @@ import check_correctness
 from bisect import bisect_left
 import time
 # inputstr = 'banana'
-inputstr = '1'*100
+inputstr = '1'*10
 # inputstr = 'aabc'
 # inputstr = 'abaab'
 
@@ -233,7 +233,7 @@ def construct_suffix_tree(inputstr, printstuff=False):
 
         v = (leafID + head_i.parent.str_length, leafID + head_i.str_length)
         # v = head_i.edge
-
+        print(root.fancyprint(inputstr))
         if u != root:
             w, remaining = fastscan(u.suffix_link, v, S)
             if w is None:
@@ -328,8 +328,8 @@ def main():
     suffix_tree = construct_suffix_tree(inputstr, False)
 
     print('final tree for input %s:' % inputstr)
-    #print(suffix_tree.fancyprint_mcc(inputstr))
-    #check_correctness.check_correctness(suffix_tree, inputstr)
+    print(suffix_tree.fancyprint(inputstr))
+    check_correctness.check_correctness(suffix_tree, inputstr)
 
 
 if __name__ == '__main__':

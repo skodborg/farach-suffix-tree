@@ -34,7 +34,7 @@ def testRandomStringWithMultipleIterations(algorithms):
 		print(str(i)+", " + ", ".join(map(str, results)))
 
 def main():
-	testRandomStringWithMultipleIterations([mccreight])
+	testRandomStringWithMultipleIterations([farach])
 
 if __name__ == '__main__':
 	main()

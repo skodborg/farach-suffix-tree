@@ -75,7 +75,6 @@ def check_correctness(tree, inputstr):
         if not node.is_leaf():
             seen_chars = set()
             for c in node.children:
-
                 edge = c.getParentEdge()
                 seen_chars.add(S[edge[0]])
             if len(seen_chars) != len(node.children):
@@ -160,15 +159,17 @@ def run_tests():
 
 def main():
     #run_tests()
-    while True:
-        S = ''.join(random.choice(string.digits) for _ in range(2000))
-        print(S)
-        S = str2int(S)
+    # while True:
+    S = ''.join(random.choice(string.digits) for _ in range(10))
+    S = str2int(S)
 
-        # tree = naive.construct_suffix_tree(S)
-        # correct_tree = check_correctness(tree, S)
-        tree = naive.construct_suffix_tree(S)
-        correct_tree = check_correctness(tree, S)
+    # tree = naive.construct_suffix_tree(S)
+    # correct_tree = check_correctness(tree, S)
+    tree = farach.construct_suffix_tree(S)
+    tree.update_leaf_list()
+    correct_tree = check_correctness(tree, S)
+
+    print("done")
         # tree = farach.construct_suffix_tree(S)
         # correct_tree = check_correctness(tree, S)
             
