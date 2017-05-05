@@ -87,6 +87,7 @@ class Node:
         self.leaflist = []
 
         if self.is_leaf():
+            self.leaflist = [self]
             return [self]
 
         for n in self.children:
