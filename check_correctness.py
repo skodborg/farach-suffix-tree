@@ -166,7 +166,7 @@ def main():
     # tree = naive.construct_suffix_tree(S)
     # correct_tree = check_correctness(tree, S)
     tree = farach.construct_suffix_tree(S)
-    tree.update_leaf_list()
+
     correct_tree = check_correctness(tree, S)
 
     print("done")

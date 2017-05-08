@@ -1,5 +1,7 @@
 from utils import Node, append_unique_char, str2int, lcp, string_length
 import check_correctness
+import random
+import string
 
 inputstr = 'banana'
 inputstr = 'mississippi'
@@ -97,12 +99,13 @@ def construct_suffix_tree(inputstr, printstuff=False):
 
 def main():
     global inputstr
-    inputstr = str2int(inputstr)
+    inputstr = str2int(str2int(''.join(random.choice(string.digits) for _ in range(10000*1000))))
     suffix_tree = construct_suffix_tree(inputstr, False)
 
-    print('final tree for input %s:' % inputstr)
-    print(suffix_tree.fancyprint(inputstr))
-    check_correctness.check_correctness(suffix_tree, inputstr)
+    print("done")
+    #print('final tree for input %s:' % inputstr)
+    #print(suffix_tree.fancyprint(inputstr))
+    #check_correctness.check_correctness(suffix_tree, inputstr)
 
 
 if __name__ == '__main__':

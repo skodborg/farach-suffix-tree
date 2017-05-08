@@ -17,7 +17,7 @@ input = 'banana'
 input = '1212'
 input = '12313'
 
-input = '111111111111'
+input = '12334415267355128923774847392925544838571011310528298910109758458910367896442410106853911093294435210483101091098'
 
 maxLength = 0
 timers = dict()
@@ -877,7 +877,7 @@ def main():
     suffix_tree = construct_suffix_tree(inputstr, True)
     print('final tree for input %s:' % inputstr)
     print(suffix_tree.fancyprint(inputstr))
-
+    suffix_tree.update_leaf_list()
     check_correctness.check_correctness(suffix_tree, inputstr)
 
 
