@@ -71,9 +71,9 @@ def testNoise():
 			f.close()
 
 def testMemoryTracking():
-	i = 400000
+	i = 4000
 	while i < 1000*40000000:
-		i +=  100000*10
+		i +=  10000*10
 
 		current_process = psutil.Process(os.getpid())
 		mem1 = psutil.virtual_memory().used >> 20
@@ -83,7 +83,7 @@ def testMemoryTracking():
 		mem = psutil.virtual_memory().used >> 20
 		
 		f = open("testData/memoryTracking.txt", 'a')
-		f.write(str(i)+"," + str(mem1-mem) + "\n")  # python will convert \n to os.linesep
+		f.write(str(i)+"," + str(abs(mem1-mem)) + "\n")  # python will convert \n to os.linesep
 		f.close()
 		del test
 
