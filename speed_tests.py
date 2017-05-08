@@ -8,6 +8,10 @@ import mccreight
 import naive
 import check_correctness
 
+import os
+import psutil
+
+
 # commit e6d458690371c0e5839b7247167ae92c67f53739 for mccreight without dict
 # remember to change line 143 and 35
 def getAverageForString(S, algorithm):
@@ -66,6 +70,23 @@ def testNoise():
 			f.write(str(i)+"," + str((end - start)) + "\n")  # python will convert \n to os.linesep
 			f.close()
 
+def testMemoryTracking():
+	i = 4000
+	while i < 1000*40000000:
+		i +=  10000*10
+
+		current_process = psutil.Process(os.getpid())
+		mem1 = psutil.virtual_memory().used >> 20
+		# print(mem1)
+		test = [n for n in range(i)]
+
+		mem = psutil.virtual_memory().used >> 20
+		
+		f = open("testData/memoryTracking.txt", 'a')
+		f.write(str(i)+"," + str(abs(mem1-mem)) + "\n")  # python will convert \n to os.linesep
+		f.close()
+		del test
+
 # DATA ALGORITHMS:
 def fibonacci(n):
 	a, b = 0, 1
@@ -83,7 +104,8 @@ def random_data(i):
 	return str2int(''.join(random.choice(string.digits) for _ in range(i)))
 
 def main():
-	testNoise()
+	testMemoryTracking()
+	#testNoise()
 	#testRandomStringWithMultipleIterations([(farach, fibonacci)])
 
 if __name__ == '__main__':
