@@ -85,6 +85,7 @@ def testMemoryTracking():
 		f = open("testData/memoryTracking.txt", 'a')
 		f.write(str(i)+"," + str(mem1-mem) + "\n")  # python will convert \n to os.linesep
 		f.close()
+		del test
 
 # DATA ALGORITHMS:
 def fibonacci(n):
