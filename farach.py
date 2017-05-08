@@ -5,6 +5,7 @@ import check_correctness
 from collections import deque
 import lca as fast_lca
 import time
+import memory_tracker
 import os
 
 input = '121112212221'
@@ -51,7 +52,7 @@ def construct_suffix_tree(inputstr, printstuff=False):
         root.add_child(Node(aId=2, aStrLength=1))
         root.update_leaf_list()
         return root
-
+    memory_tracker.update_peak()
     t_odd = T_odd(inputstr)
     # printif('odd tree for %s' % inputstr)
     # printif(t_odd.fancyprint(inputstr))
@@ -93,7 +94,7 @@ def construct_suffix_tree(inputstr, printstuff=False):
     # if maxLength == len(inputstr):
     #     startClean = time.time()
     cleanup_tree(t_overmerged)
-
+    memory_tracker.update_peak()
     # printif('adjusted tree for %s' % inputstr)
     # printif(t_overmerged.fancyprint(inputstr))
     # if maxLength == len(inputstr):
@@ -274,7 +275,7 @@ def T_odd(inputstr):
             timers["T_odd"].append((maxLength, total))
         else:
             timers["T_odd"] = [(maxLength, total)]
-
+    memory_tracker.update_peak()
     return tree_Sm
 
 
@@ -341,7 +342,7 @@ def T_even(t_odd, inputstr):
                 curr_lcp = 1
 
         lcp[(even_suffixes[idx], even_suffixes[idx + 1])] = curr_lcp
-
+    memory_tracker.update_peak()
     # (iii)
     # construct T_even using information from (i) and (ii)
     root = Node(aId='root')
@@ -455,6 +456,7 @@ def T_even(t_odd, inputstr):
             timers["T_even"].append((maxLength, total))
         else:
             timers["T_even"] = [(maxLength, total)]
+    memory_tracker.update_peak()
     return t_even
 
 
@@ -700,8 +702,11 @@ def overmerge(t_even, t_odd, S):
                                 current.overwrite_lca = True
                 o += 1
                 e += 1
+    memory_tracker.update_peak()
     merger_helper(t_overmerged, t_even, t_odd)
+    memory_tracker.update_peak()
     t_overmerged.update_leaf_list()
+    memory_tracker.update_peak()
     if(len(S) == maxLength):
         end = time.time()
         total = end - start
@@ -761,7 +766,7 @@ def compute_lcp_tree(t_overmerged):
 
         # assert(lca_parent == lca_parent_naive)
         lca.suffix_link = lca_parent
-
+    memory_tracker.update_peak()
     # ---------------------------------------
     # ADD LCP DEPTH TO ALL NODES USING A SINGLE DFS
     # ---------------------------------------
@@ -787,6 +792,7 @@ def compute_lcp_tree(t_overmerged):
 
     t_overmerged.lcp_depth = 0
     t_overmerged.bfs(lcp_depth)
+    memory_tracker.update_peak()
 
 
 def adjust_overmerge(t_overmerged, t_even, t_odd, S):
@@ -834,9 +840,10 @@ def adjust_overmerge(t_overmerged, t_even, t_odd, S):
                     curr_node.add_child(odd_tree)
                     curr_node.add_child(even_tree)
                 return 'continue'
-
+    memory_tracker.update_peak()
     bfs(t_overmerged, adjust_overmerge_helper)
     t_overmerged.update_leaf_list()
+    memory_tracker.update_peak()
 
 
 def cleanup_tree(t_overmerged):
