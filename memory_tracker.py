@@ -1,14 +1,14 @@
 import psutil
 
 
-_baseline = 0
+_baseline = _baseline = psutil.virtual_memory().used >> 10
 _peak = 0
 
 
 
 def rebase():
 	global _peak, _baseline
-	_baseline = psutil.virtual_memory().used >> 10
+	#_baseline = psutil.virtual_memory().used >> 10
 
 
 	_peak = 0
