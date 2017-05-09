@@ -27,6 +27,7 @@ def getAverageForString(S, algorithm):
 
 			memory_tracker.rebase()
 			tree = algorithm.construct_suffix_tree(S)
+			del tree
 			totalMemory = memory_tracker.getPeak()
 			end = time.time()
 			totalTime += (end - start)
@@ -34,15 +35,14 @@ def getAverageForString(S, algorithm):
 			maximum = max(maximum, (end-start))
 	totalTime = totalTime
 	totalTime = totalTime
-	return totalTime / iterations, tree, (totalMemory / iterations)
+	return totalTime / iterations, None, (totalMemory / iterations)
 
 
 
 
 def testRandomStringWithMultipleIterations(algorithms):
-	for i in range(37301*2, 1000000, 100):
+	for i in range(1, 1000000, 100):
 		totalTime = 0
-		S = [i for n in range(i)]
 
 		for alg in algorithms:
 			data = alg[1](i)
@@ -53,10 +53,10 @@ def testRandomStringWithMultipleIterations(algorithms):
 
 			if len(alg) == 3 and alg[2]:
 				ret[1].update_leaf_list()
+				print("testing")
 				check_correctness.check_correctness(ret[1], data)
-
 			f = open("testData/" + alg[0].__name__ + "_" + alg[1].__name__, 'a')
-			f.write(str(i)+", "  + str(ret[0]) +  ", " + str(memory_tracker.getPeak()) + ", " + str(psutil.virtual_memory().used) >> 10 + "\n") 
+			f.write(str(i)+", "  + str(ret[0]) +  ", " + str(memory_tracker.getPeak()) + ", " + str(psutil.virtual_memory().used >> 10) + "\n") 
 			f.close()
 
 	
