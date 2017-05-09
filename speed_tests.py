@@ -3,7 +3,6 @@ from utils import Node, str2int
 import random
 import string
 import traceback
-import time
 import mccreight
 import naive
 import check_correctness
@@ -11,6 +10,7 @@ import sys
 
 import os
 import psutil
+import time
 import memory_tracker
 
 # commit e6d458690371c0e5839b7247167ae92c67f53739 for mccreight without dict
@@ -41,26 +41,39 @@ def getAverageForString(S, algorithm):
 
 
 
-def testRandomStringWithMultipleIterations(algorithms):
-	for i in range(40000, 1000000, 1000):
-		totalTime = 0
+def testRandomStringWithMultipleIterations(algorithms, data_functions):
+	iterations = 5
+	maxTime = 5*60  #sekunder
 
-		for alg in algorithms:
-			data = alg[1](i)
-			if len(alg[1](i)) <= 1:
-				continue
-			ret = getAverageForString(S_test, alg[0])
-			ret = getAverageForString(data, alg[0])
+	timeTaken = dict()
 
+	for i in range(40000, 1000000, 10000):
+		for data_func in data_functions:
+			data = data_func(i)
+			for alg in algorithms:
+				
+				for t in range(iterations):
+					if alg.__name__ in timeTaken and timeTaken[alg.__name__] > maxTime:
+						break
+					start = time.time()
+					memory_tracker.rebase()
+					alg.construct_suffix_tree(data)
+					end = time.time()
 
-			if len(alg) == 3 and alg[2]:
-				ret[1].update_leaf_list()
-				print("testing")
-				check_correctness.check_correctness(ret[1], data)
-			f = open("testData/" + alg[0].__name__ + "_" + alg[1].__name__, 'a')
-			proc = psutil.Process(os.getpid())
-			f.write(str(i)+", "  + str(ret[0]) +  ", " + str(memory_tracker.getPeak()) + "\n") 
-			f.close()
+					memory = memory_tracker.getPeak()
+					t = end-start
+
+					timeTaken[alg.__name__] = t
+					
+
+					# if len(alg) == 3 and alg[2]:
+					# 	ret[1].update_leaf_list()
+					# 	print("testing")
+					# 	check_correctness.check_correctness(ret[1], data)
+					f = open("testData/" + alg.__name__ + "_" + data_func.__name__, 'a')
+					proc = psutil.Process(os.getpid())
+					f.write(str(i)+", "  + str(timeTaken) +  ", " + str(memory) + "\n") 
+					f.close()
 
 	
 
@@ -114,7 +127,7 @@ def random_data(i):
 def main():
 	#testMemoryTracking()
 	#testNoise()
-	testRandomStringWithMultipleIterations([(farach, random_data)])
+	testRandomStringWithMultipleIterations([farach, naive, mccreight], [random_data])
 
 if __name__ == '__main__':
 	main()

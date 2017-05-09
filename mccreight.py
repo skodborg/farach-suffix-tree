@@ -2,6 +2,7 @@ from utils import Node, append_unique_char, str2int, lcp, string_length
 import check_correctness
 from bisect import bisect_left
 import time
+import memory_tracker
 # inputstr = 'banana'
 inputstr = '1'*10
 # inputstr = 'aabc'
@@ -86,6 +87,7 @@ def fastscan(u, v, S):
 
     searching = True
     while searching:
+        memory_tracker.update_peak()
         jump += 1
         if idx >= string_length(v):
             # we have covered more characters in the tree than is contained
@@ -151,6 +153,7 @@ def fastscan(u, v, S):
     lcp_ui_v = min(string_length(ui_edge), string_length(v_updated))
 
     timers["fastscan"] += time.time() - start
+    memory_tracker.update_peak()
     return ui, (ui_edge[0] + lcp_ui_v, ui_edge[1])
 
 
@@ -196,7 +199,7 @@ def construct_suffix_tree(inputstr, printstuff=False):
     tail_i = (0, n)
 
     for i in range(1, n):
-
+        memory_tracker.update_peak()
         if head_i == root:
             tail_i = (tail_i[0]+1, tail_i[1])
 
@@ -231,8 +234,8 @@ def construct_suffix_tree(inputstr, printstuff=False):
         leafID = head_i.leaflist[0].id - 1
 
         v = (leafID + head_i.parent.str_length, leafID + head_i.str_length)
-        # v = head_i.edge
-        print(root.fancyprint(inputstr))
+        # # v = head_i.edge
+        # print(root.fancyprint(inputstr))
         if u != root:
             w, remaining = fastscan(u.suffix_link, v, S)
             if w is None:
@@ -248,7 +251,7 @@ def construct_suffix_tree(inputstr, printstuff=False):
             leaf = w
             w = Node(aId='inner')
             w.charDict = dict()
-
+            memory_tracker.update_peak()
             # w.edge = leaf.edge[: len(leaf.edge) - len(remaining)]
             # w.str = parent.str + w.edge
             # TODO: ADD LIST HERE
@@ -317,6 +320,7 @@ def construct_suffix_tree(inputstr, printstuff=False):
 
             tail_i = (i + head_i.str_length, n)
     # print("Fastscan: " + str(timers["fastscan"]))
+    memory_tracker.update_peak()
     return root
 
 
