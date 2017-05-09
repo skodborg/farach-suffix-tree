@@ -47,7 +47,7 @@ def testRandomStringWithMultipleIterations(algorithms, data_functions):
 
 	timeTaken = dict()
 
-	for i in range(40000, 1000000, 10000):
+	for i in range(10000, 1000000000000, 10000):
 		for data_func in data_functions:
 			data = data_func(i)
 			for alg in algorithms:
@@ -72,7 +72,7 @@ def testRandomStringWithMultipleIterations(algorithms, data_functions):
 					# 	check_correctness.check_correctness(ret[1], data)
 					f = open("testData/" + alg.__name__ + "_" + data_func.__name__, 'a')
 					proc = psutil.Process(os.getpid())
-					f.write(str(i)+", "  + str(timeTaken) +  ", " + str(memory) + "\n") 
+					f.write(str(i)+", "  + str(t) +  ", " + str(memory) + "\n") 
 					f.close()
 
 	

@@ -4,12 +4,10 @@ import math
 
 
 class LCA:
-    L = dict()
-    P = dict()
 
     def __init__(self):
-        L = dict()
-        P = dict()
+        self.L = dict()
+        self.P = dict()
 
     def preprocess(self, tree):
         def cleanup(node):

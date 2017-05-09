@@ -135,7 +135,7 @@ def T_odd(inputstr):
 
     S = inputstr
     n = len(S)
-
+    
     def extend_length(node):
 
         def helper(node):
@@ -276,6 +276,7 @@ def T_odd(inputstr):
         else:
             timers["T_odd"] = [(maxLength, total)]
     memory_tracker.update_peak()
+    del S, n, chr_pairs, unique_chr_pairs, Sm, count, pair2single
     return tree_Sm
 
 
@@ -322,7 +323,6 @@ def T_even(t_odd, inputstr):
 
     lca_f = fast_lca.LCA()
     lca_f.preprocess(t_odd)
-
     id2node = []
     t_odd.traverse(lambda n: id2node.append((n.id, n))
                    if 'inner' not in str(n.id) else 'do nothing')
@@ -457,6 +457,8 @@ def T_even(t_odd, inputstr):
         else:
             timers["T_even"] = [(maxLength, total)]
     memory_tracker.update_peak()
+
+    del S, n, leaflist, odd_suffix_ordering, even_suffixes, lca_f, id2node
     return t_even
 
 
@@ -725,7 +727,6 @@ def compute_lcp_tree(t_overmerged):
     '''
 
     lca_nodepairs = []
-
     def helper(node):
         nonlocal lca_nodepairs
         if hasattr(node, 'lca_even'):
@@ -792,7 +793,11 @@ def compute_lcp_tree(t_overmerged):
 
     t_overmerged.lcp_depth = 0
     t_overmerged.bfs(lcp_depth)
+
     memory_tracker.update_peak()
+    
+    del lca_nodepairs, id2node, lca_f,
+
 
 
 def adjust_overmerge(t_overmerged, t_even, t_odd, S):
