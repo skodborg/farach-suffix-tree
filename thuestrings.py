@@ -1,6 +1,18 @@
 def generate_2_3(n):
     ''' ??? '''
-    return
+    morphisms = {}
+    morphisms['a'] = 'ab'
+    morphisms['b'] = 'ba'
+
+    t_i = 'a'
+    for i in range(n):
+        t_j = []
+        for char in t_i:
+            t_j.append(morphisms[char])
+        t_i = ''.join(t_j)
+        print(i, len(t_i))
+    return t_i
+
 
 
 def generate_3_2(n):
@@ -13,11 +25,12 @@ def generate_3_2(n):
     morphisms['c'] = 'acbcacb'
 
     t_i = 'a'
-    for _ in range(n):
+    for i in range(n):
         t_j = []
         for char in t_i:
             t_j.append(morphisms[char])
         t_i = ''.join(t_j)
+        print(i, len(t_i))
     return t_i
 
 
@@ -29,6 +42,7 @@ def main():
     except:
         print('error: not an int')
         return
+    print(generate_2_3(n))
     print(generate_3_2(n))
 
 
