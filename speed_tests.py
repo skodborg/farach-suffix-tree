@@ -40,7 +40,7 @@ def getAverageForString(S, algorithm):
 
 
 def testRandomStringWithMultipleIterations(algorithms):
-	for i in range(37301*2, 100000, 100):
+	for i in range(1, 100000, 100):
 		totalTime = 0
 		S = [i for n in range(i)]
 
@@ -111,7 +111,7 @@ def random_data(i):
 def main():
 	#testMemoryTracking()
 	#testNoise()
-	testRandomStringWithMultipleIterations([(farach, random_data)])
+	testRandomStringWithMultipleIterations([(naive, random_data)])
 
 if __name__ == '__main__':
 	main()

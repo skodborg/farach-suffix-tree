@@ -2,6 +2,7 @@ from utils import Node, append_unique_char, str2int, lcp, string_length
 import check_correctness
 import random
 import string
+import memory_tracker
 
 inputstr = 'banana'
 inputstr = 'mississippi'
@@ -37,7 +38,7 @@ def construct_suffix_tree(inputstr, printstuff=False):
 
         child_to_merge = None
         lcp_with_child = ''
-
+        memory_tracker.update_peak()
         while searching:
             continue_loop = False
             if S[remaining[0]] in parent.charDict:
@@ -94,6 +95,7 @@ def construct_suffix_tree(inputstr, printstuff=False):
             parent.add_child(suff_node)
             suff_nodeChar = S[ suff_node.getParentEdge()[0]]
             parent.charDict[suff_nodeChar] =  suff_node
+    memory_tracker.update_peak()
     return root
 
 
