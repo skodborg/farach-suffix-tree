@@ -40,7 +40,7 @@ def getAverageForString(S, algorithm):
 
 
 def testRandomStringWithMultipleIterations(algorithms):
-	for i in range(1, 100000, 100):
+	for i in range(36901, 100000, 100):
 		totalTime = 0
 		S = [i for n in range(i)]
 
