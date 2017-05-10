@@ -15,6 +15,7 @@ import memory_tracker
 
 # commit e6d458690371c0e5839b7247167ae92c67f53739 for mccreight without dict
 # remember to change line 143 and 35
+sys.setrecursionlimit(30*1000)
 def getAverageForString(S, algorithm):
 	totalTime = 0
 	iterations = 5
@@ -47,7 +48,7 @@ def testProcedure(algorithms, data_functions):
 
 	timeTaken = dict()
 
-	for i in range(10000, 1000000000000, 10000):
+	for i in range(1, 24500, 500):
 		for data_func in data_functions:
 			data = data_func(i)
 			for alg in algorithms:
@@ -135,11 +136,7 @@ def random_data_varying_alphabet(length):
 def same_char(length):
 	return [0]*length
 
-def testNaiveWorstCase():
-	testProcedure([farach, naive, mccreight], [same_char])
 
-def testVaryingLCP():
-	testProcedure([farach, naive, mccreight], [random_data_varying_alphabet(100*10000)])
 
 
 
@@ -147,7 +144,7 @@ def main():
 	#testMemoryTracking()
 	#testNoise()
 	#testProcedure([farach, naive, mccreight], [random_data])
-	testProcedure([farach, naive, mccreight], [different_char])
+	testProcedure([farach, naive, mccreight], [only_ones])
 
 
 if __name__ == '__main__':
