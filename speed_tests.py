@@ -41,7 +41,7 @@ def getAverageForString(S, algorithm):
 
 
 
-def testRandomStringWithMultipleIterations(algorithms, data_functions):
+def testProcedure(algorithms, data_functions):
 	iterations = 5
 	maxTime = 5*60  #sekunder
 
@@ -121,13 +121,34 @@ def fibonacci(n):
 def only_ones(i):
 	return [1 for n in range(i)]
 
+def different_char(i):
+	return [n for n in range(i)]
+
 def random_data(i):
 	return str2int(''.join(random.choice(string.digits) for _ in range(i)))
+
+def random_data_varying_alphabet(length):
+		def helper(i):
+			return [random.randint(0,i) for _ in range(length)]
+		return helper
+
+def same_char(length):
+	return [0]*length
+
+def testNaiveWorstCase():
+	testProcedure([farach, naive, mccreight], [same_char])
+
+def testVaryingLCP():
+	testProcedure([farach, naive, mccreight], [random_data_varying_alphabet(100*10000)])
+
+
 
 def main():
 	#testMemoryTracking()
 	#testNoise()
-	testRandomStringWithMultipleIterations([farach, naive, mccreight], [random_data])
+	#testProcedure([farach, naive, mccreight], [random_data])
+	testProcedure([farach, naive, mccreight], [different_char])
+
 
 if __name__ == '__main__':
 	main()
