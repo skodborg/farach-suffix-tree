@@ -3,7 +3,7 @@ import check_correctness
 import random
 import string
 import memory_tracker
-
+import speed_tests
 inputstr = 'banana'
 inputstr = 'mississippi'
 
@@ -101,14 +101,18 @@ def construct_suffix_tree(inputstr, printstuff=False):
 
 def main():
     global inputstr
-    inputstr = str2int(str2int(''.join(random.choice(string.digits) for _ in range(10000*1000))))
-    suffix_tree = construct_suffix_tree(inputstr, False)
+    # inputstr = str2int(str2int(''.join(random.choice(string.digits) for _ in range(10000*1000))))
+    # suffix_tree = construct_suffix_tree(inputstr, False)
 
-    print("done")
+    # print("done")
     #print('final tree for input %s:' % inputstr)
     #print(suffix_tree.fancyprint(inputstr))
     #check_correctness.check_correctness(suffix_tree, inputstr)
-
+    suffix_tree = construct_suffix_tree([1 for _ in range(6000)])
+    #suffix_tree = construct_suffix_tree(str2int("a"*10))
+    print('final tree for input %s:' % inputstr)
+    #print(suffix_tree.fancyprint(inputstr))
+    print(suffix_tree.getSize() >> 20)
 
 if __name__ == '__main__':
     main()

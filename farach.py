@@ -7,6 +7,8 @@ import lca as fast_lca
 import time
 import memory_tracker
 import os
+import speed_tests
+import sys
 
 input = '121112212221'
 # input = '111222122121'
@@ -886,11 +888,12 @@ def printif(s):
 def main():
     inputstr = str2int(input)
 
-    suffix_tree = construct_suffix_tree(inputstr, True)
+    suffix_tree = construct_suffix_tree(speed_tests.random_data(340*1000))
     print('final tree for input %s:' % inputstr)
-    print(suffix_tree.fancyprint(inputstr))
+    #print(suffix_tree.fancyprint(inputstr))
     suffix_tree.update_leaf_list()
-    check_correctness.check_correctness(suffix_tree, inputstr)
+    print(suffix_tree.getSize() >> 10)
+    #check_correctness.check_correctness(suffix_tree, inputstr)
 
 
 if __name__ == '__main__':

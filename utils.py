@@ -1,7 +1,7 @@
 from itertools import count
 import random as rnd
 from collections import deque
-
+import sys
 
 class Tree:
     def traverse(self, fn):
@@ -319,6 +319,15 @@ class Node:
         self.str_length = aStrLength
         self.children = []
 
+    def getSize(self):
+        totalSize = 0
+
+        for child in self.children:
+            totalSize += child.getSize()
+
+
+
+        return totalSize + sys.getsizeof(self) + sys.getsizeof(self.id) + sys.getsizeof(self.data) + sys.getsizeof(self.str_length) + sys.getsizeof(self.children)
     def __repr__(self):
         self_id = 'no-id'
         if self.id:
