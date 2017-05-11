@@ -48,7 +48,7 @@ def testProcedure(algorithms, data_functions):
 
 	timeTaken = dict()
 
-	for i in range(1, 24500, 500):
+	for i in range(10*1000, 340*1000, 10*1000):
 		for data_func in data_functions:
 			data = data_func(i)
 			for alg in algorithms:
@@ -144,7 +144,7 @@ def main():
 	#testMemoryTracking()
 	#testNoise()
 	#testProcedure([farach, naive, mccreight], [random_data])
-	testProcedure([farach, naive, mccreight], [only_ones])
+	testProcedure([farach], [random_data])
 
 
 if __name__ == '__main__':
