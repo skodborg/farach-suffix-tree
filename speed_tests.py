@@ -43,19 +43,19 @@ def getAverageForString(S, algorithm):
 
 
 def testProcedure(algorithms, data_functions):
-	iterations = 5
-	maxTime = 5*60  #sekunder
+	iterations = 10
+	# maxTime = 5*60  #sekunder
 
 	timeTaken = dict()
 
-	for i in range(10*1000, 340*1000, 10*1000):
+	for i in range(10*1000, 340*1000, 2500):
 		for data_func in data_functions:
 			data = data_func(i)
 			for alg in algorithms:
 				
 				for t in range(iterations):
-					if alg.__name__ in timeTaken and timeTaken[alg.__name__] > maxTime:
-						break
+					# if alg.__name__ in timeTaken and timeTaken[alg.__name__] > maxTime:
+					# 	break
 					start = time.time()
 					memory_tracker.rebase()
 					alg.construct_suffix_tree(data)
@@ -64,7 +64,7 @@ def testProcedure(algorithms, data_functions):
 					memory = memory_tracker.getPeak()
 					t = end-start
 
-					timeTaken[alg.__name__] = t
+					# timeTaken[alg.__name__] = t
 					
 
 					# if len(alg) == 3 and alg[2]:
@@ -143,7 +143,7 @@ def same_char(length):
 def main():
 	#testMemoryTracking()
 	#testNoise()
-	#testProcedure([farach, naive, mccreight], [random_data])
+	testProcedure([farach], [random_data])
 
 	# testProcedure([farach], [random_data])
 
