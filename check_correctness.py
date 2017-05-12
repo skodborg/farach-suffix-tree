@@ -7,6 +7,48 @@ import string
 import traceback
 import time
 
+def sort_tree(tree, S):
+    def sort_children_fn(S):
+        def str_parentedge(node):
+            start, stop = node.getParentEdge()
+            return S[start:stop]
+        return lambda n: n.children.sort(key=str_parentedge)
+
+    tree.bfs(sort_children_fn(S))
+
+
+def tree_equality(tree1, tree2, S):
+    ''' assumes trees are lexicographically sorted w.r.t. edge labels '''
+    tree1_nodes = []
+    tree1.bfs(lambda n: tree1_nodes.append(n))
+
+    tree2_nodes = []
+    tree2.bfs(lambda n: tree2_nodes.append(n))
+
+    # same total number of nodes in trees
+    assert len(tree1_nodes) == len(tree2_nodes)
+
+    for i in range(len(tree1_nodes)):
+        node1 = tree1_nodes[i]
+        node2 = tree2_nodes[i]
+
+        # same no. of children
+        assert len(node1.children) == len(node2.children)
+
+        # same length of string represented
+        assert node1.str_length == node2.str_length
+
+        # same initial character on parent edges
+        node1_edgechar = S[node1.getParentEdge()[0]]
+        node2_edgechar = S[node2.getParentEdge()[0]]
+        assert node1_edgechar == node2_edgechar
+
+        # same leaf id
+        if node1.is_leaf():
+            assert node1.id == node2.id
+
+    return True
+
 
 def check_correctness(tree, inputstr):
     # TODO: find some definition of a suffix tree and refer it?
@@ -160,18 +202,25 @@ def run_tests():
 def main():
     #run_tests()
     # while True:
-    S = ''.join(random.choice(string.digits) for _ in range(10))
-    S = str2int(S)
+    for _ in range(1000):
+        S = ''.join(random.choice(string.digits) for _ in range(1000))
+        S = str2int(S)
 
-    # tree = naive.construct_suffix_tree(S)
-    # correct_tree = check_correctness(tree, S)
-    tree = farach.construct_suffix_tree(S)
+        tree1 = naive.construct_suffix_tree(S[:])
+        tree2 = farach.construct_suffix_tree(S[:])
+        tree3 = mccreight.construct_suffix_tree(S)
 
-    correct_tree = check_correctness(tree, S)
+        sort_tree(tree1, S)
+        sort_tree(tree3, S)
+        assert tree_equality(tree1, tree2, S)
+        assert tree_equality(tree1, tree3, S)
+        # correct_tree = check_correctness(tree1, S)
+        # correct_tree = check_correctness(tree2, S)
+        # correct_tree = check_correctness(tree3, S)
 
-    print("done")
-        # tree = farach.construct_suffix_tree(S)
-        # correct_tree = check_correctness(tree, S)
+        # print(tree1.fancyprint(S))
+        # print(tree2.fancyprint(S))
+        # print(tree3.fancyprint(S))
             
         # try:
         #     start = time.time()
