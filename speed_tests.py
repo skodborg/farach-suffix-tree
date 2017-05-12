@@ -144,7 +144,8 @@ def main():
 	#testMemoryTracking()
 	#testNoise()
 	#testProcedure([farach, naive, mccreight], [random_data])
-	testProcedure([farach], [random_data])
+
+	# testProcedure([farach], [random_data])
 
 
 if __name__ == '__main__':
