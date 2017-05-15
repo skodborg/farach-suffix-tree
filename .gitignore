@@ -16,7 +16,6 @@ downloads/
 eggs/
 .eggs/
 c++/
-testData/
 lib/
 lib64/
 parts/
