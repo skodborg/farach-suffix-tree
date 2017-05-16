@@ -9,6 +9,7 @@ import memory_tracker
 import os
 import speed_tests
 import sys
+import inspect
 
 input = '121112212221'
 # input = '111222122121'
@@ -29,6 +30,11 @@ total_recursive = 1
 
 _printstuff = False
 
+_odd_calls = 0
+_even_calls = 0
+_overmerge = 0
+_lcp_depth = 0
+_currentMaxLength = 0
 
 def construct_suffix_tree(inputstr, printstuff=False):
     global _printstuff, maxLength, timers, total_recursive
@@ -131,12 +137,13 @@ def construct_suffix_tree(inputstr, printstuff=False):
 
 
 def T_odd(inputstr):
-    global _printstuff, timers, total_recursive
+    global _printstuff, timers, total_recursive, _odd_calls
     if(len(inputstr) == maxLength):
         start = time.time()
 
     S = inputstr
     n = len(S)
+    _odd_calls += 1
     
     def extend_length(node):
 
@@ -283,10 +290,12 @@ def T_odd(inputstr):
 
 
 def T_even(t_odd, inputstr):
+    global _even_calls
     if(len(inputstr) == maxLength):
         start = time.time()
     S = inputstr
     n = len(S)
+    _even_calls += 1
 
     # (i)
     # find the lexicographical ordering of the even suffixes
@@ -465,11 +474,15 @@ def T_even(t_odd, inputstr):
 
 
 def overmerge(t_even, t_odd, S):
+
     if(len(S) == maxLength):
         start = time.time()
     t_overmerged = Node(aId="root", aStrLength=0)
 
-    def merger_helper(current, even, odd):
+    def merger_helper(current, even, odd, depth=0):
+        global _overmerge
+        memory_tracker.update_calls(max(depth, memory_tracker.get_calls()))
+
         even_children = even.children
         odd_children = odd.children
         e = 0
@@ -619,10 +632,10 @@ def overmerge(t_even, t_odd, S):
 
                     if swapped:
                         # short_child originates in even_tree
-                        merger_helper(inner_node, short_child, short_child_sub)
+                        merger_helper(inner_node, short_child, short_child_sub, depth + 1)
                     else:
                         # short_child originates in odd_tree
-                        merger_helper(inner_node, short_child_sub, short_child)
+                        merger_helper(inner_node, short_child_sub, short_child, depth + 1)
 
                     had_lca_even_too = False
                     overwrote = False
@@ -685,7 +698,7 @@ def overmerge(t_even, t_odd, S):
                     current.add_child(inner)
                     inner.even_subtree = e_child
                     inner.odd_subtree = o_child
-                    merger_helper(inner, e_child, o_child)
+                    merger_helper(inner, e_child, o_child, depth + 1)
 
                     # t_overmerged.update_leaf_list()
 
@@ -711,6 +724,7 @@ def overmerge(t_even, t_odd, S):
     memory_tracker.update_peak()
     t_overmerged.update_leaf_list()
     memory_tracker.update_peak()
+
     if(len(S) == maxLength):
         end = time.time()
         total = end - start
@@ -722,6 +736,7 @@ def overmerge(t_even, t_odd, S):
 
 
 def compute_lcp_tree(t_overmerged):
+    global _lcp_depth
     ''' Augments every, to the algorithm relevant, node in t_overmerged with
         an attribute, node.suffix_link, pointing to the node representing
         the string of the current node minus first character
@@ -773,12 +788,15 @@ def compute_lcp_tree(t_overmerged):
     # ---------------------------------------
     # ADD LCP DEPTH TO ALL NODES USING A SINGLE DFS
     # ---------------------------------------
-    def lcp_depth(node):
+    _lcp_depth = 0
+    def lcp_depth(node, depth=0):
+        global _lcp_depth
+        depth += 1
         if hasattr(node, 'lcp_depth'):
             # we already computed this node as a result of computing an
             # earlier node with a suffix link to this node, no need to
             # repeat the computation
-
+            _lcp_depth = max(_lcp_depth, depth)
             return node.lcp_depth
 
         if hasattr(node, 'suffix_link'):
@@ -788,9 +806,9 @@ def compute_lcp_tree(t_overmerged):
                 # continue the bfs. This is still within O(n) as we simply
                 # skip the node when we encounter it the second time in
                 # the initial bfs
-                node.lcp_depth = lcp_depth(node.suffix_link) + 1
+                node.lcp_depth = lcp_depth(node.suffix_link, depth=depth) + 1
             node.lcp_depth = node.suffix_link.lcp_depth + 1
-
+            _lcp_depth = max(_lcp_depth, depth)
             return node.lcp_depth
 
     t_overmerged.lcp_depth = 0
@@ -886,13 +904,24 @@ def printif(s):
 
 
 def main():
-    inputstr = str2int(input)
+    global _currentMaxLength, _odd_calls, _even_calls, _overmerge, _lcp_depth
 
-    suffix_tree = construct_suffix_tree(speed_tests.random_data(340*1000))
-    print('final tree for input %s:' % inputstr)
-    #print(suffix_tree.fancyprint(inputstr))
-    suffix_tree.update_leaf_list()
-    print(suffix_tree.getSize() >> 10)
+    for i in range(1, 21*1000, 1000):
+        _currentMaxLength = i
+        _odd_calls = 0
+        _even_calls = 0
+        _overmerge = 0
+        _lcp_depth = 0
+        S = speed_tests.random_data(_currentMaxLength-1)
+        suffix_tree = construct_suffix_tree(S)
+        print(i-1, ",", _even_calls, ",", _odd_calls, ",", _overmerge, ",", _lcp_depth)
+        #print(suffix_tree.fancyprint(S))
+
+
+    # print('final tree for input %s:' % inputstr)
+    # #print(suffix_tree.fancyprint(inputstr))
+    # suffix_tree.update_leaf_list()
+    # print(suffix_tree.getSize() >> 10)
     #check_correctness.check_correctness(suffix_tree, inputstr)
 
 

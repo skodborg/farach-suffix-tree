@@ -43,12 +43,12 @@ def getAverageForString(S, algorithm):
 
 
 def testProcedure(algorithms, data_functions):
-	iterations = 10
+	iterations = 1
 	# maxTime = 5*60  #sekunder
 
 	timeTaken = dict()
 
-	for i in range(10*1000, 340*1000, 2500):
+	for i in range(10*1000, 3400000000*1000, 40*1000):
 		for data_func in data_functions:
 			data = data_func(i)
 			for alg in algorithms:
@@ -71,15 +71,16 @@ def testProcedure(algorithms, data_functions):
 					# 	ret[1].update_leaf_list()
 					# 	print("testing")
 					# 	check_correctness.check_correctness(ret[1], data)
-					f = open("testData/" + alg.__name__ + "_" + data_func.__name__, 'a')
+
+					f = open("testData/nightTest" + alg.__name__ + "_" + data_func.__name__, 'a')
 					proc = psutil.Process(os.getpid())
-					f.write(str(i)+", "  + str(t) +  ", " + str(memory) + "\n") 
+					f.write(str(i)+", "  + str(t) +  ", " + str(memory) + ", " + str(memory_tracker.get_calls()) +  "\n") 
 					f.close()
 
 	
 
 def testNoise():
-	i = 0
+	i = 1
 	while True:
 		i += 1000*10000
 		for n in range(100):
