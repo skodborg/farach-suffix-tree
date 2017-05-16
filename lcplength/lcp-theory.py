@@ -14,6 +14,53 @@ def lcp(str1, str2):
     return len_lcp
 
 
+def read_fasta(fname):
+    with open(fname, 'r') as f:
+        # skip first line, a description
+        f.readline()
+        content = f.read().replace('\n', '')
+    return content
+
+
+def avg_suff_lcp_length(fname):
+    string = read_fasta(fname)
+    m = len(string)
+
+    sum_lcp_length = 0
+    no_of_summands = m * (m - 1) / 2
+
+    # determine sum of length of all LCPs of the strings
+    for i in range(m):
+        # if i % 1000 == 0:
+        print(i)
+        for j in range(m):
+            if j <= i:
+                # only calculate each unique pair once
+                continue
+            sum_lcp_length += lcp(string[i:], string[j:])
+
+    avg_lcp = sum_lcp_length / no_of_summands
+
+    print('length: %i \t avg suffix lcp length: %i \t percentage of length: %f' % (m, avg_lcp, avg_lcp / m * 100))
+
+
+def character_frequency(fname):
+    string = read_fasta(fname)
+    m = len(string)
+
+    seen_chars = {}
+
+    for i in range(m):
+        if i % 1000 == 0:
+            print(i)
+        if string[i] in seen_chars:
+            seen_chars[string[i]] += 1
+        else:
+            seen_chars[string[i]] = 1
+
+    return seen_chars
+
+
 def alphabet_dependence(A, n=100, m=100, points=10000, use_suffixes=False):
     ''' Constructs m strings of length n, drawn from an alphabet of size A,
         and determines the average LCP length, average repeated over i times'''
@@ -91,8 +138,7 @@ def alphabet_dependence(A, n=100, m=100, points=10000, use_suffixes=False):
 
 
 def main():
-    alphabet_dependence(list(range(2, 51, 1)), use_suffixes=True)
-    alphabet_dependence(list(range(2, 51, 1)), use_suffixes=False)
+    avg_suff_lcp_length('BRCA1_chromosome-17-excerpt.fasta')
 
 
 if __name__ == '__main__':

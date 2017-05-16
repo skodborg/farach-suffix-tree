@@ -427,6 +427,14 @@ def lcp(string1, string2, S):
     return (string1[0], string1[0] + lcp) #string1[:lcp]
 
 
+def read_fasta(fname):
+    with open(fname, 'r') as f:
+        # skip first line, a description
+        f.readline()
+        content = f.read().replace('\n', '')
+    return content
+
+
 def naive_lca(node1, node2, tree, id2node):
     ''' strategy:   from node1, test if node2 is in the subtree of node1
                         - if so, report node1 as LCA
