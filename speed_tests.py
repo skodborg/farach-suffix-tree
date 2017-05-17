@@ -43,39 +43,60 @@ def getAverageForString(S, algorithm):
 
 
 def testProcedure(algorithms, data_functions):
-	iterations = 1
+	iterations = 5
 	# maxTime = 5*60  #sekunder
 
 	timeTaken = dict()
 
-	for i in range(10*1000, 3400000000*1000, 40*1000):
+	# for i in [range(10*1000, 3400000000*1000, 40*1000)]:
+	for i in range(2, 50):
+		a_size = 2**i
+
 		for data_func in data_functions:
-			data = data_func(i)
+			# data = data_func(i)
+			rnd_data = data_func(a_size)
+
 			for alg in algorithms:
-				
+			
 				for t in range(iterations):
-					# if alg.__name__ in timeTaken and timeTaken[alg.__name__] > maxTime:
-					# 	break
+					data = rnd_data(100*1000)
+
 					start = time.time()
-					memory_tracker.rebase()
+
 					alg.construct_suffix_tree(data)
 					end = time.time()
-
-					memory = memory_tracker.getPeak()
+					print(len(data))
 					t = end-start
 
-					# timeTaken[alg.__name__] = t
-					
-
-					# if len(alg) == 3 and alg[2]:
-					# 	ret[1].update_leaf_list()
-					# 	print("testing")
-					# 	check_correctness.check_correctness(ret[1], data)
-
-					f = open("testData/nightTest" + alg.__name__ + "_" + data_func.__name__, 'a')
-					proc = psutil.Process(os.getpid())
-					f.write(str(i)+", "  + str(t) +  ", " + str(memory) + ", " + str(memory_tracker.get_calls()) +  "\n") 
+					f = open("testData/2" + alg.__name__ + "_" + data_func.__name__, 'a')
+					f.write(str(i)+", "  + str(t)  +  "\n") 
 					f.close()
+
+def test_varying_alphabet_size():
+	iterations = 5
+	start = time.time()
+	naive.construct_suffix_tree(different_char(10000))
+	end = time.time()
+
+	print("base: " + str(end-start))
+	for i in range(2, 50):
+		a_size = 2**i
+
+		rnd_data = random_data_varying_alphabet(a_size)
+
+		for _ in range(iterations):
+			start = time.time()
+			S = rnd_data(100*1000)
+			naive.construct_suffix_tree(S)
+			end = time.time()
+			print(len(S))
+
+			t = end-start
+
+			f = open("testData/naive_alphabet_size_varying_random_data", 'a')
+			f.write(str(a_size)+", "  + str(t)  +  "\n") 
+			f.close()
+
 
 	
 
@@ -124,14 +145,19 @@ def only_ones(i):
 	return [1 for n in range(i)]
 
 def different_char(i):
-	return [n for n in range(i)]
+	#return [n for n in range(i)]
+	l = [n for n in range(i)]
+	random.shuffle(l)
+	return l
+	#return str2int(''.join(random.choice([str(n) for n in range(i)]) for _ in range(i)))
 
 def random_data(i):
 	return str2int(''.join(random.choice(string.digits) for _ in range(i)))
 
 def random_data_varying_alphabet(length):
 		def helper(i):
-			return [random.randint(0,i) for _ in range(length)]
+
+			return str2int([str(random.randint(0,length)) for _ in range(i)])
 		return helper
 
 def same_char(length):
@@ -143,9 +169,14 @@ def same_char(length):
 
 def main():
 	#testMemoryTracking()
-	#testNoise()
-	testProcedure([farach], [random_data])
-
+	# #testNoise()
+	# S = different_char(10*1000)
+	# start = time.time()
+	# farach.construct_suffix_tree(S)
+	# print(time.time() - start)
+	# join(random.choice([str(n) for n in range(i)]) for _ in range(i))
+	testProcedure([naive, farach, mccreight], [random_data_varying_alphabet])
+	# test_varying_alphabet_size()
 	# testProcedure([farach], [random_data])
 
 
