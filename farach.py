@@ -905,16 +905,21 @@ def printif(s):
 
 def main():
     global _currentMaxLength, _odd_calls, _even_calls, _overmerge, _lcp_depth
-
-    for i in range(1, 21*1000, 1000):
-        _currentMaxLength = i
-        _odd_calls = 0
-        _even_calls = 0
-        _overmerge = 0
-        _lcp_depth = 0
-        S = speed_tests.random_data(_currentMaxLength-1)
-        suffix_tree = construct_suffix_tree(S)
-        print(i-1, ",", _even_calls, ",", _odd_calls, ",", _overmerge, ",", _lcp_depth)
+    dna = open('BRCA1_chromosome-17-excerpt.fasta', 'r').read()
+    dna = ''.join(dna.split('\n')[1:-1])
+    dna = str2int(dna)
+    construct_suffix_tree(dna)
+    print(memory_tracker.get_calls())
+  
+    # for i in range(1, 21*1000, 1000):
+    #     _currentMaxLength = i
+    #     _odd_calls = 0
+    #     _even_calls = 0
+    #     _overmerge = 0
+    #     _lcp_depth = 0
+    #     S = speed_tests.random_data(_currentMaxLength-1)
+    #     suffix_tree = construct_suffix_tree(S)
+    #     print(i-1, ",", _even_calls, ",", _odd_calls, ",", _overmerge, ",", _lcp_depth)
         #print(suffix_tree.fancyprint(S))
 
 
