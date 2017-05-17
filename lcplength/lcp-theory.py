@@ -22,26 +22,37 @@ def read_fasta(fname):
     return content
 
 
-def avg_suff_lcp_length(fname):
+def avg_suff_lcp_length(fname, samples=1000):
+    ''' only does random sampling of average length of lcp of suffixes '''
     string = read_fasta(fname)
     m = len(string)
+    no_of_rnd_suf = samples
 
-    sum_lcp_length = 0
+    # sum_lcp_length = 0
     no_of_summands = m * (m - 1) / 2
 
-    # determine sum of length of all LCPs of the strings
-    for i in range(m):
-        # if i % 1000 == 0:
-        print(i)
+    avg_lcps = []
+
+    # determine sum of lcp lengths for no_of_rnd_suf randomly chosen suffixes
+    for i in range(no_of_rnd_suf):
+        sum_lcp_length = 0
+        # select random suffix
+        rnd_suf = random.randint(1, m) - 1
         for j in range(m):
-            if j <= i:
-                # only calculate each unique pair once
+            if j == rnd_suf:
+                # length of lcp of two identical strings is not of interest
                 continue
-            sum_lcp_length += lcp(string[i:], string[j:])
+            sum_lcp_length += lcp(string[rnd_suf:], string[j:])
 
-    avg_lcp = sum_lcp_length / no_of_summands
+    # avg_lcp = sum_lcp_length / no_of_summands
+        avg_lcp = sum_lcp_length / no_of_rnd_suf
+        avg_lcps.append((rnd_suf, avg_lcp))
 
-    print('length: %i \t avg suffix lcp length: %i \t percentage of length: %f' % (m, avg_lcp, avg_lcp / m * 100))
+        print('sample suffix %i \t length: %i \t avg suffix lcp length: %i \t percentage of length: %f' % (rnd_suf, m, avg_lcp, avg_lcp / m * 100))
+
+    with open('avg_lcps.txt', 'w') as f:
+        for tup in avg_lcps:
+            f.write('%i, %f\n' % (tup[0], tup[1]))
 
 
 def character_frequency(fname):
@@ -138,7 +149,7 @@ def alphabet_dependence(A, n=100, m=100, points=10000, use_suffixes=False):
 
 
 def main():
-    avg_suff_lcp_length('BRCA1_chromosome-17-excerpt.fasta')
+    avg_suff_lcp_length('../BRCA1_chromosome-17-excerpt.fasta', 10)
 
 
 if __name__ == '__main__':
