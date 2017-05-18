@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
+import math
 
 # testData = "mbp_only_ones"
 title = "Alphabet size 1"
@@ -48,23 +48,30 @@ def plot(filename, label, color):
 	y.append(temp[int(len(temp)/2)])
 
 	plt.plot(x,y, marker='o', markersize=3, color=color, label=label)
+	# plt.plot(x,[y/x for y,x in zip(x,y)], marker='o', markersize=3, label=label)
 	l1, l2 = zip(*minmax)
 	# ax.fill_between(x, [y/x for x,y in zip(x, l1)], [y/x for x,y in zip(x, l2)], hatch="////", color="#55AA55", linewidth=0.0, alpha=0.5)
-	ax.fill_between(x, l1, l2, hatch="////", color=color, linewidth=0.0, alpha=0.5)
+	# ax.fill_between(x, l1, l2, hatch="////", color=color, linewidth=0.0, alpha=0.5)
 
 # plt.yscale('log')
 # plt.grid(True)
 
 
 fig, ax = plt.subplots()
-ax.set_title(title)
+ax.set_title("2_farach")
 ax.set_xlabel("length of input")
 ax.set_ylabel("construction time in seconds")
 
-plot("testData/20000mccreight_random_data_fixed_alphabet", "test", "green")
+for i_pow in range(14, 18):
+	plot("testData/compare_"+str(i_pow) + "_farach_random_data_varying_alphabet", "farach" + str(i_pow), "green")
+for i_pow in range(14, 18):
+	plot("testData/compare_"+str(i_pow) + "_mccreight_random_data_varying_alphabet", "mccreight"+str(i_pow), "red")
+# for i_pow in range(6, 15):
+# 	plot("testData/2_"+str(i_pow) + "_mccreight_random_data_varying_alphabet", str(i_pow), "green")
+# plot("testData/17_mccreight_random_data_varying_alphabet", str(i_pow), "green")
+# plot("testData/17_mccreight_random_data_varying_alphabet", 11, "green")
 
-
-legend = ax.legend(loc='upper right', shadow=True)
+legend = ax.legend(loc='upper left', shadow=True)
 
 frame = legend.get_frame()
 frame.set_facecolor('0.90')
@@ -76,4 +83,32 @@ for label in legend.get_texts():
 for label in legend.get_lines():
      label.set_linewidth(1.5)  # the legend line width
 
-fig.savefig('fig3.png', bbox_inches='tight')
+fig.savefig('together.png', bbox_inches='tight')
+
+
+# fig, ax = plt.subplots()
+# ax.set_title("2_mccreight")
+# ax.set_xlabel("length of input")
+# ax.set_ylabel("construction time in seconds")
+
+# # for i_pow in range(6, 15):
+# # 	plot("testData/2_"+str(i_pow) + "_farach_random_data_varying_alphabet", str(i_pow), "green")
+# for i_pow in range(14, 17):
+# 	plot("testData/2_"+str(i_pow) + "_mccreight_random_data_varying_alphabet", str(i_pow), "green")
+# # plot("testData/17_mccreight_random_data_varying_alphabet", str(i_pow), "green")
+# # plot("testData/17_mccreight_random_data_varying_alphabet", 11, "green")
+
+# legend = ax.legend(loc='upper left', shadow=True)
+
+# frame = legend.get_frame()
+# frame.set_facecolor('0.90')
+
+
+# for label in legend.get_texts():
+#     label.set_fontsize('large')
+
+# for label in legend.get_lines():
+#      label.set_linewidth(1.5)  # the legend line width
+
+# fig.savefig('2_mccreight.png', bbox_inches='tight')
+# fig.savefig('2_mccreight.png', bbox_inches='tight')
