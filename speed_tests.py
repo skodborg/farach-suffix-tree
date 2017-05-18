@@ -7,6 +7,7 @@ import mccreight
 import naive
 import check_correctness
 import sys
+import math
 
 import os
 import psutil
@@ -42,34 +43,68 @@ def getAverageForString(S, algorithm):
 
 
 
-def testProcedure(algorithms, data_functions):
+def testProcedure(algorithms, data_functions, outputfileprefix):
+
+	def char_freq(s):
+		seen_chars = {}
+		for i in range(len(s)):
+			# if i % 1000 == 0:
+			# 	print(i)
+			if s[i] in seen_chars:
+				seen_chars[s[i]] += 1
+			else:
+				seen_chars[s[i]] = 1
+		return seen_chars
+
+	def count_internal_nodes(tree):
+		count = 0
+		def helper(node):
+			nonlocal count
+			if not node.is_leaf():
+				count += 1
+		tree.dfs(helper)
+		return count
+
+	def depth_below(tree):
+		depths_below = [0]
+		for c in tree.children:
+			depths_below.append(depth_below(c))
+		return max(depths_below) + 1
+
+
+
 	iterations = 5
 	# maxTime = 5*60  #sekunder
 
 	timeTaken = dict()
 
 	# for i in [range(10*1000, 3400000000*1000, 40*1000)]:
-	for i in range(2, 50):
-		a_size = 2**i
+	for i in range(1000, 200000, 1000):
+	# for i in [10*1000]:
+		# a_size = 2**i
+		# a_size = i
 
 		for data_func in data_functions:
-			# data = data_func(i)
-			rnd_data = data_func(a_size)
+			data = data_func(i)
+			# rnd_data_gen = data_func(a_size)
 
 			for alg in algorithms:
 			
-				for t in range(iterations):
-					data = rnd_data(100*1000)
+				for _ in range(iterations):
+					# data = data_func(i)
+					# data = rnd_data_gen(10*1000)
 
 					start = time.time()
-
-					alg.construct_suffix_tree(data)
+					tree = alg.construct_suffix_tree(data[:])
 					end = time.time()
-					print(len(data))
-					t = end-start
+					duration = end - start
 
-					f = open("testData/2" + alg.__name__ + "_" + data_func.__name__, 'a')
-					f.write(str(i)+", "  + str(t)  +  "\n") 
+					depth = depth_below(tree)
+					no_of_internal_nodes = count_internal_nodes(tree)
+
+					f = open("testData/" + outputfileprefix + alg.__name__ + "_mbp_" + data_func.__name__, 'a')
+					s = '%i, %s, %i, %i, %i\n' % (i, repr(duration), len(char_freq(data)), depth, no_of_internal_nodes)
+					f.write(s) 
 					f.close()
 
 def test_varying_alphabet_size():
@@ -144,6 +179,12 @@ def fibonacci(n):
 def only_ones(i):
 	return [1 for n in range(i)]
 
+def periodic_strings(repeated_str):
+	s = repeated_str
+	def helper(i):
+		return str2int((math.floor(i / len(s))) * s + s[:(i % len(s))])
+	return helper	
+
 def different_char(i):
 	#return [n for n in range(i)]
 	l = [n for n in range(i)]
@@ -155,29 +196,31 @@ def random_data(i):
 	return str2int(''.join(random.choice(string.digits) for _ in range(i)))
 
 def random_data_varying_alphabet(length):
-		def helper(i):
-
-			return str2int([str(random.randint(0,length)) for _ in range(i)])
-		return helper
+	def helper(i):
+		return str2int([str(random.randint(0, length - 1)) for _ in range(i)])
+	return helper
 
 def same_char(length):
 	return [0]*length
 
 
-
-
-
 def main():
-	#testMemoryTracking()
-	# #testNoise()
-	# S = different_char(10*1000)
-	# start = time.time()
-	# farach.construct_suffix_tree(S)
-	# print(time.time() - start)
-	# join(random.choice([str(n) for n in range(i)]) for _ in range(i))
-	testProcedure([naive, farach, mccreight], [random_data_varying_alphabet])
 	# test_varying_alphabet_size()
-	# testProcedure([farach], [random_data])
+
+	# testProcedure([naive, mccreight, farach], [random_data_varying_alphabet], 'tree_data_')
+
+	# testProcedure([naive, mccreight, farach], [periodic_strings('abcde')], 'periodic_abcde_')
+	# testProcedure([naive, mccreight, farach], [periodic_strings('abcdefghij')], 'periodic_abcdefghij_')
+	s = [str(i) for i in range(1000)]
+	# print(s)
+	# s = periodic_strings(s)
+	# print(s)
+	# print(mccreight.construct_suffix_tree(s(10)).fancyprint(s(10)))
+	testProcedure([naive, mccreight, farach], [periodic_strings(s)], 'periodic_len1000_')
+
+	# testProcedure([naive, farach, mccreight], [random_data_varying_alphabet])
+	# s = periodic_strings()(10)
+	# return
 
 
 if __name__ == '__main__':
