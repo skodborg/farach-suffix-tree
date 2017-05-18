@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+
 import math
 
 # testData = "mbp_only_ones"
@@ -16,6 +17,12 @@ title = "Alphabet size varying"
 # testData = "random10_timings"
 # title = "Alphabet size 10"
 
+
+filename = 'testData/tree_data_farach_mbp_random_data_varying_alphabet'
+title = 'SOME TITLE'
+xlabel = 'length of input'
+ylabel = 'construction time in seconds'
+outputimgfile = 'fig3.png'
 
 def plot(filename, label, color):
 	global ax
@@ -56,20 +63,18 @@ def plot(filename, label, color):
 # plt.yscale('log')
 # plt.grid(True)
 
-
 fig, ax = plt.subplots()
-ax.set_title("2_farach")
-ax.set_xlabel("length of input")
-ax.set_ylabel("construction time in seconds")
 
 for i_pow in range(14, 18):
 	plot("testData/compare_"+str(i_pow) + "_farach_random_data_varying_alphabet", "farach" + str(i_pow), "green")
 for i_pow in range(14, 18):
 	plot("testData/compare_"+str(i_pow) + "_mccreight_random_data_varying_alphabet", "mccreight"+str(i_pow), "red")
-# for i_pow in range(6, 15):
-# 	plot("testData/2_"+str(i_pow) + "_mccreight_random_data_varying_alphabet", str(i_pow), "green")
-# plot("testData/17_mccreight_random_data_varying_alphabet", str(i_pow), "green")
-# plot("testData/17_mccreight_random_data_varying_alphabet", 11, "green")
+
+ax.set_title(title)
+ax.set_xlabel(xlabel)
+ax.set_ylabel(ylabel)
+ax.grid(True)
+
 
 legend = ax.legend(loc='upper left', shadow=True)
 
@@ -83,32 +88,5 @@ for label in legend.get_texts():
 for label in legend.get_lines():
      label.set_linewidth(1.5)  # the legend line width
 
-fig.savefig('together.png', bbox_inches='tight')
 
-
-# fig, ax = plt.subplots()
-# ax.set_title("2_mccreight")
-# ax.set_xlabel("length of input")
-# ax.set_ylabel("construction time in seconds")
-
-# # for i_pow in range(6, 15):
-# # 	plot("testData/2_"+str(i_pow) + "_farach_random_data_varying_alphabet", str(i_pow), "green")
-# for i_pow in range(14, 17):
-# 	plot("testData/2_"+str(i_pow) + "_mccreight_random_data_varying_alphabet", str(i_pow), "green")
-# # plot("testData/17_mccreight_random_data_varying_alphabet", str(i_pow), "green")
-# # plot("testData/17_mccreight_random_data_varying_alphabet", 11, "green")
-
-# legend = ax.legend(loc='upper left', shadow=True)
-
-# frame = legend.get_frame()
-# frame.set_facecolor('0.90')
-
-
-# for label in legend.get_texts():
-#     label.set_fontsize('large')
-
-# for label in legend.get_lines():
-#      label.set_linewidth(1.5)  # the legend line width
-
-# fig.savefig('2_mccreight.png', bbox_inches='tight')
-# fig.savefig('2_mccreight.png', bbox_inches='tight')
+fig.savefig(outputimgfile, bbox_inches='tight')
