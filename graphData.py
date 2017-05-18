@@ -1,21 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-
-# testData = "mbp_only_ones"
-title = "Alphabet size 1"
-
-# testData = "random_data_varying_alphabet"
-title = "Alphabet size varying"
-
-
-
-# testData = "random_data"
-# title = "Alphabet size 10"
-
-# testData = "random10_timings"
-# title = "Alphabet size 10"
-
+filename = 'testData/tree_data_farach_mbp_random_data_varying_alphabet'
+title = 'SOME TITLE'
+xlabel = 'length of input'
+ylabel = 'construction time in seconds'
+outputimgfile = 'fig3.png'
 
 def plot(filename, label, color):
 	global ax
@@ -55,13 +45,13 @@ def plot(filename, label, color):
 # plt.yscale('log')
 # plt.grid(True)
 
-
 fig, ax = plt.subplots()
 ax.set_title(title)
-ax.set_xlabel("length of input")
-ax.set_ylabel("construction time in seconds")
+ax.set_xlabel(xlabel)
+ax.set_ylabel(ylabel)
+ax.grid(True)
 
-plot("testData/20000mccreight_random_data_fixed_alphabet", "test", "green")
+plot(filename, "test", "green")
 
 
 legend = ax.legend(loc='upper right', shadow=True)
@@ -76,4 +66,4 @@ for label in legend.get_texts():
 for label in legend.get_lines():
      label.set_linewidth(1.5)  # the legend line width
 
-fig.savefig('fig3.png', bbox_inches='tight')
+fig.savefig(outputimgfile, bbox_inches='tight')
