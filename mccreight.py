@@ -199,6 +199,7 @@ def construct_suffix_tree(inputstr, printstuff=False):
     tail_i = (0, n)
 
     for i in range(1, n):
+        # print(root.fancyprint(S))
         memory_tracker.update_peak()
         if head_i == root:
             tail_i = (tail_i[0]+1, tail_i[1])

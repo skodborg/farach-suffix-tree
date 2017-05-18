@@ -45,14 +45,17 @@ def avg_suff_lcp_length(fname, samples=1000):
             sum_lcp_length += lcp(string[rnd_suf:], string[j:])
 
     # avg_lcp = sum_lcp_length / no_of_summands
-        avg_lcp = sum_lcp_length / no_of_rnd_suf
+        avg_lcp = sum_lcp_length / m
         avg_lcps.append((rnd_suf, avg_lcp))
+        with open('avg_lcps_points.txt', 'a') as f:
+            f.write('%i, %s\n' % (sum_lcp_length, repr(avg_lcp)))
+            
 
         print('sample suffix %i \t length: %i \t avg suffix lcp length: %i \t percentage of length: %f' % (rnd_suf, m, avg_lcp, avg_lcp / m * 100))
 
-    with open('avg_lcps.txt', 'w') as f:
+    with open('avg_lcps.txt', 'a') as f:
         for tup in avg_lcps:
-            f.write('%i, %f\n' % (tup[0], tup[1]))
+            f.write('i=%i, avg=%f\n' % (tup[0], repr(tup[1])))
 
 
 def character_frequency(fname):
@@ -72,7 +75,7 @@ def character_frequency(fname):
     return seen_chars
 
 
-def alphabet_dependence(A, n=100, m=100, points=10000, use_suffixes=False):
+def alphabet_dependence(A, n=100, m=100, points=100, use_suffixes=False):
     ''' Constructs m strings of length n, drawn from an alphabet of size A,
         and determines the average LCP length, average repeated over i times'''
     median_lcp_length_per_a = []
@@ -149,7 +152,8 @@ def alphabet_dependence(A, n=100, m=100, points=10000, use_suffixes=False):
 
 
 def main():
-    avg_suff_lcp_length('../BRCA1_chromosome-17-excerpt.fasta', 10)
+    avg_suff_lcp_length('../BRCA1_chromosome-17-excerpt.fasta', 10000)
+    # alphabet_dependence(list(range(1000, 10000, 100)))
 
 
 if __name__ == '__main__':
