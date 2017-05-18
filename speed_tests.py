@@ -48,7 +48,7 @@ def testProcedure(algorithms, data_functions):
 
 	timeTaken = dict()
 
-	for i in range(10*1000, 34000000000*1000, 10*1000):
+	for i in range(10*1000, 34000000000*1000, 50*1000):
 
 		for data_func in data_functions:
 			# data = data_func(i)
@@ -59,6 +59,7 @@ def testProcedure(algorithms, data_functions):
 				for i_pow in range(14, 18):
 					for _ in range(iterations):
 						data = data_func(2**i_pow)(i)
+						uniq = len(set(data))
 
 						start = time.time()
 
@@ -67,8 +68,8 @@ def testProcedure(algorithms, data_functions):
 						t = end-start
 						totalNodes = tree.totalNodes() - len(data)
 
-						f = open("testData/compare_" + str(i_pow) + "_" + alg.__name__ + "_" + data_func.__name__, 'a')
-						f.write(str(i)+", "  + str(t) + "," + str(totalNodes) +  "\n") 
+						f = open("testData/compare_night_" + str(i_pow) + "_" + alg.__name__ + "_" + data_func.__name__, 'a')
+						f.write(str(i)+", "  + str(t) + "," + str(totalNodes) +  "," + str(uniq) +  "\n") 
 						f.close()
 		print(i)
 
