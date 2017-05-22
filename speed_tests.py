@@ -14,8 +14,7 @@ import psutil
 import time
 import memory_tracker
 
-# commit e6d458690371c0e5839b7247167ae92c67f53739 for mccreight without dict
-# remember to change line 143 and 35
+
 def getAverageForString(S, algorithm):
 	totalTime = 0
 	iterations = 5
@@ -69,7 +68,6 @@ def testProcedure(algorithms, data_functions, outputfileprefix):
 		return max(depths_below) + 1
 
 	iterations = 5
-	# maxTime = 5*60  #sekunder
 
 	timeTaken = dict()
 
@@ -80,41 +78,32 @@ def testProcedure(algorithms, data_functions, outputfileprefix):
 			# rnd_data = data_func(a_size)
 
 			for alg in algorithms:
-				for i_pow in [10, 15, 20]:
-
-					data = data_func(i_pow)(i)
-				
-					uniq = len(set(data))
-
-					start = time.time()
-
-					tree = alg.construct_suffix_tree(data[:])
-					end = time.time()
-					duration = end - start
-					totalNodes = count_internal_nodes(tree)
-
-					f = open("testData/" + outputfileprefix + '_mbp_' + str(i_pow) + "_" + alg.__name__ + "_" + data_func.__name__, 'a')
-					s = '%i, %s, %i, %i, %i\n' % (i, repr(duration), len(char_freq(data)), totalNodes, uniq)
-					f.write(s) 
-					f.close()
 				# for i_pow in range(14, 18):
-				# 	for _ in range(iterations):
+				for percent in [10, 15, 20]:
+
+					for _ in range(iterations):
+
+						data = data_func(percent)(i)
 				# 		data = data_func(2**i_pow)(i)
-				# 		uniq = len(set(data))
+					
+						uniq = len(set(data))
 
-				# 		start = time.time()
-				# 		tree = alg.construct_suffix_tree(data)
-				# 		end = time.time()
-				# 		duration = end - start
+
+						start = time.time()
+						tree = alg.construct_suffix_tree(data[:])
+						end = time.time()
+						duration = end - start
 						
-				# 		totalNodes = count_internal_nodes(tree)
+						totalNodes = count_internal_nodes(tree)
 
-				# 		f = open("testData/" + outputfileprefix + '_mbp_' + str(i_pow) + "_" + alg.__name__ + "_" + data_func.__name__, 'a')
-				# 		# f = open("testData/" + outputfileprefix + '_mbp_' + alg.__name__ + "_" + data_func.__name__, 'a')
-				# 		s = '%i, %s, %i, %i\n' % (i, repr(duration), totalNodes, uniq)
-				# 		f.write(s) 
-				# 		f.close()
+						f = open("testData/" + outputfileprefix + '_mbp_' + str(percent) + "_" + alg.__name__ + "_" + data_func.__name__, 'a')
+						# f = open("testData/" + outputfileprefix + '_mbp_' + str(i_pow) + "_" + alg.__name__ + "_" + data_func.__name__, 'a')
+						# f = open("testData/" + outputfileprefix + '_mbp_' + alg.__name__ + "_" + data_func.__name__, 'a')
+						s = '%i, %s, %i, %i\n' % (i, repr(duration), totalNodes, uniq)
+						f.write(s) 
+						f.close()
 		print(i)
+
 
 def test_varying_alphabet_size():
 	iterations = 5
@@ -201,6 +190,8 @@ def different_char(i):
 	l = [n for n in range(i)]
 	return l
 	#return str2int(''.join(random.choice([str(n) for n in range(i)]) for _ in range(i)))
+
+
 def percent_alphabet_size(percent):
 	def helper(i):
 		nonlocal percent
@@ -244,17 +235,13 @@ def dna_prefixes(i):
 	data = read_fasta('human-chromosome2-excerpt.fasta')
 	return str2int(data[11000:11000+i])
 
-	
 
 def same_char(length):
 	return [0]*length
 
 
 def main():
-
 	testProcedure([farach, mccreight], [percent_alphabet_size], 'percent_alph_dependence')
-
-
 	# testProcedure([mccreight, farach], [random_data_varying_alphabet], 'zoom_alph_dependence')
 
 
