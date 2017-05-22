@@ -73,7 +73,7 @@ def testProcedure(algorithms, data_functions, outputfileprefix):
 
 	timeTaken = dict()
 
-	for i in range(10*1000, 34000000000*1000, 50*1000):
+	for i in range(350*1000, 34000000000*1000, 50*1000):
 
 		for data_func in data_functions:
 			# data = data_func(i)
@@ -81,22 +81,28 @@ def testProcedure(algorithms, data_functions, outputfileprefix):
 
 			for alg in algorithms:
 			
-				for i_pow in range(14, 18):
-					for _ in range(iterations):
-						data = data_func(2**i_pow)(i)
-						uniq = len(set(data))
+				# for i_pow in range(14, 18):
+				for i_pow in [10, 15, 20, 25]:
+					if alg.__name__ == "farach" and (i_pow == 10 or i_pow == 25):
+						continue
+					if alg.__name__ == "mccreight" and (i_pow == 20 or i_pow == 25):
+						continue
 
-						start = time.time()
+					data = data_func(i_pow)(i)
+				
+					uniq = len(set(data))
 
-						tree = alg.construct_suffix_tree(data)
-						end = time.time()
-						duration = end - start
-						totalNodes = count_internal_nodes(tree)
+					start = time.time()
 
-						f = open("testData/" + outputfileprefix + '_mbp_' + str(i_pow) + "_" + alg.__name__ + "_" + data_func.__name__, 'a')
-						s = '%i, %s, %i, %i, %i\n' % (i, repr(duration), len(char_freq(data)), totalNodes, uniq)
-						f.write(s) 
-						f.close()
+					tree = alg.construct_suffix_tree(data[:])
+					end = time.time()
+					duration = end - start
+					totalNodes = count_internal_nodes(tree)
+
+					f = open("testData/" + outputfileprefix + '_mbp_' + str(i_pow) + "_" + alg.__name__ + "_" + data_func.__name__, 'a')
+					s = '%i, %s, %i, %i, %i\n' % (i, repr(duration), len(char_freq(data)), totalNodes, uniq)
+					f.write(s) 
+					f.close()
 		print(i)
 
 def test_varying_alphabet_size():
@@ -182,10 +188,24 @@ def periodic_strings(repeated_str):
 def different_char(i):
 	#return [n for n in range(i)]
 	l = [n for n in range(i)]
-	random.shuffle(l)
 	return l
 	#return str2int(''.join(random.choice([str(n) for n in range(i)]) for _ in range(i)))
+def percent_alphabet_size(percent):
+	def helper(i):
+		nonlocal percent
 
+		percent = float(percent/100)
+		length = i * (percent)
+
+		l_temp = different_char(int(length))
+		l = []
+		while len(l) < i:
+			l += l_temp
+		toReturn = l[0:i]
+		random.shuffle(toReturn)
+		return str2int(toReturn[0:i])
+
+	return helper
 
 def random_data(i):
 	return str2int(''.join(random.choice(string.digits) for _ in range(i)))
@@ -217,21 +237,33 @@ def main():
 	# 	for c in S:
 	# 		chars.add(c)
 
-	# 	start = time.time()
-	# 	tree = naive.construct_suffix_tree(S)
-	# 	print("-"*50)
-	# 	print("num of children on averge: " + str(tree.averageLeafs()))
-	# 	print("uniq len: " + str(len(chars)))
-	# 	print("leafs from root: " + str(tree.leafs_from_root()))
-	# 	totalN = tree.totalNodes()
-	# 	print("total nodes: " + str(totalN))
-	# 	print("inner node: " + str(totalN-len(S)))
-	# 	print("time: " + str(time.time()-start))
+	# S = different_char(800 * 1000)
+	# start = time.time()
+	# tree = naive.construct_suffix_tree(S)
+	# print("-"*50)
+	# # 	print("num of children on averge: " + str(tree.averageLeafs()))
+	# # 	print("uniq len: " + str(len(chars)))
+	# # 	print("leafs from root: " + str(tree.leafs_from_root()))
+	# # 	totalN = tree.totalNodes()
+	# # 	print("total nodes: " + str(totalN))
+	# # 	print("inner node: " + str(totalN-len(S)))
+	# print("time: " + str(time.time()-start))
 	# 	print("depth: " + str(tree.depth()))
 		# join(random.choice([str(n) for n in range(i)]) for _ in range(i))
-	testProcedure([farach, mccreight], [random_data_varying_alphabet], 'alph_dependence')
+	# testProcedure([farach, mccreight], [percent_alphabet_size], '12_20_monday')
+	# prc = 10
+	# start = time.time()
+	# farach.construct_suffix_tree(percent_alphabet_size(prc)(653500*1000))
+	# print("farach ved %i i tiden %i" % (prc, (time.time()-start)))
+	# start = time.time()
+	# mccreight.construct_suffix_tree(percent_alphabet_size(prc)(650*1000))
+	# print("mccreight ved %i i tiden %i" % (prc, (time.time()-start)))
 		# test_varying_alphabet_size()
 		# testProcedure([farach], [random_data])
+	length = 2**22
+	print(length)
+	print(len(set(random_data_varying_alphabet(length)(810*1000))))
+	print(len(set(random_data_varying_alphabet(length)(length*4))))
 
 
 if __name__ == '__main__':
