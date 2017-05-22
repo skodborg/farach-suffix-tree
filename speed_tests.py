@@ -68,25 +68,19 @@ def testProcedure(algorithms, data_functions, outputfileprefix):
 			depths_below.append(depth_below(c))
 		return max(depths_below) + 1
 
-	iterations = 3
+	iterations = 5
 	# maxTime = 5*60  #sekunder
 
 	timeTaken = dict()
 
-	for i in range(350*1000, 34000000000*1000, 50*1000):
+	for i in range(10*1000, 34000000000*1000, 50*1000):
 
 		for data_func in data_functions:
 			# data = data_func(i)
 			# rnd_data = data_func(a_size)
 
 			for alg in algorithms:
-			
-				# for i_pow in range(14, 18):
-				for i_pow in [10, 15, 20, 25]:
-					if alg.__name__ == "farach" and (i_pow == 10 or i_pow == 25):
-						continue
-					if alg.__name__ == "mccreight" and (i_pow == 20 or i_pow == 25):
-						continue
+				for i_pow in [10, 15, 20]:
 
 					data = data_func(i_pow)(i)
 				
@@ -103,6 +97,23 @@ def testProcedure(algorithms, data_functions, outputfileprefix):
 					s = '%i, %s, %i, %i, %i\n' % (i, repr(duration), len(char_freq(data)), totalNodes, uniq)
 					f.write(s) 
 					f.close()
+				# for i_pow in range(14, 18):
+				# 	for _ in range(iterations):
+				# 		data = data_func(2**i_pow)(i)
+				# 		uniq = len(set(data))
+
+				# 		start = time.time()
+				# 		tree = alg.construct_suffix_tree(data)
+				# 		end = time.time()
+				# 		duration = end - start
+						
+				# 		totalNodes = count_internal_nodes(tree)
+
+				# 		f = open("testData/" + outputfileprefix + '_mbp_' + str(i_pow) + "_" + alg.__name__ + "_" + data_func.__name__, 'a')
+				# 		# f = open("testData/" + outputfileprefix + '_mbp_' + alg.__name__ + "_" + data_func.__name__, 'a')
+				# 		s = '%i, %s, %i, %i\n' % (i, repr(duration), totalNodes, uniq)
+				# 		f.write(s) 
+				# 		f.close()
 		print(i)
 
 def test_varying_alphabet_size():
@@ -219,6 +230,20 @@ def random_data_varying_alphabet(length):
 
 def random_data_fixed_alphabet(i):
 	return str2int([str(random.randint(0,20*1000)) for _ in range(i)])
+
+
+def dna_prefixes(i):
+	def read_fasta(fname):
+		with open(fname, 'r') as f:
+			# skip first line, a description
+			f.readline()
+			content = f.read().replace('\n', '')
+		return content
+
+	# data = read_fasta('BRCA1_chromosome-17-excerpt.fasta')
+	data = read_fasta('human-chromosome2-excerpt.fasta')
+	return str2int(data[11000:11000+i])
+
 	
 
 def same_char(length):
@@ -226,44 +251,11 @@ def same_char(length):
 
 
 def main():
-	#testMemoryTracking()
-	#testNoise()
-	
-	# for i in range(10,24):
 
-	# 	data_func = random_data_varying_alphabet(2**i)
-	# 	S = data_func(10*1000)
-	# 	chars = set()
-	# 	for c in S:
-	# 		chars.add(c)
+	testProcedure([farach, mccreight], [percent_alphabet_size], 'percent_alph_dependence')
 
-	# S = different_char(800 * 1000)
-	# start = time.time()
-	# tree = naive.construct_suffix_tree(S)
-	# print("-"*50)
-	# # 	print("num of children on averge: " + str(tree.averageLeafs()))
-	# # 	print("uniq len: " + str(len(chars)))
-	# # 	print("leafs from root: " + str(tree.leafs_from_root()))
-	# # 	totalN = tree.totalNodes()
-	# # 	print("total nodes: " + str(totalN))
-	# # 	print("inner node: " + str(totalN-len(S)))
-	# print("time: " + str(time.time()-start))
-	# 	print("depth: " + str(tree.depth()))
-		# join(random.choice([str(n) for n in range(i)]) for _ in range(i))
-	# testProcedure([farach, mccreight], [percent_alphabet_size], '12_20_monday')
-	# prc = 10
-	# start = time.time()
-	# farach.construct_suffix_tree(percent_alphabet_size(prc)(653500*1000))
-	# print("farach ved %i i tiden %i" % (prc, (time.time()-start)))
-	# start = time.time()
-	# mccreight.construct_suffix_tree(percent_alphabet_size(prc)(650*1000))
-	# print("mccreight ved %i i tiden %i" % (prc, (time.time()-start)))
-		# test_varying_alphabet_size()
-		# testProcedure([farach], [random_data])
-	length = 2**22
-	print(length)
-	print(len(set(random_data_varying_alphabet(length)(810*1000))))
-	print(len(set(random_data_varying_alphabet(length)(length*4))))
+
+	# testProcedure([mccreight, farach], [random_data_varying_alphabet], 'zoom_alph_dependence')
 
 
 if __name__ == '__main__':
