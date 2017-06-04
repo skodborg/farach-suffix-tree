@@ -17,7 +17,6 @@ def construct_suffix_tree(inputstr, printstuff=False):
     root.add_child(fst_child)
     root.leaflist = [fst_child]
 
-    start = time.time()
     for i in range(1, n):
         suff = (i, n)  # S[i:n]
         suff_id = i + 1
