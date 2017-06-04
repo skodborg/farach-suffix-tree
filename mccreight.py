@@ -1,14 +1,9 @@
 from utils import Node, append_unique_char, str2int, lcp, string_length
 import check_correctness
 from bisect import bisect_left
-import time
-import memory_tracker
-# inputstr = 'banana'
-inputstr = '1'*10
-# inputstr = 'aabc'
-# inputstr = 'abaab'
 
-# from book, p. 115, fig. 5.2
+import argparse
+import os.path
 
 
 timers = dict()
@@ -35,7 +30,6 @@ def slowscan(u, v, S):
         curr_lcp = lcp(remaining, edge, S)
         if curr_lcp:
             if string_length(curr_lcp) == string_length(edge):
-            #if S[curr_lcp[0] : curr_lcp[1]] == S[edge[0] : edge[1]]:
                 # remaining contains more than curr_lcp; we need to look
                 # further down the tree
                 return slowscan(child, (remaining[0]+string_length(curr_lcp), remaining[1]), S)
@@ -79,7 +73,6 @@ def slowscan(u, v, S):
 
 def fastscan(u, v, S):
     global jump
-    start = time.time()
     # Identify u_i, the child of u matching some prefix of v
     ui = u
     prev_idx = 0
@@ -87,7 +80,6 @@ def fastscan(u, v, S):
 
     searching = True
     while searching:
-        memory_tracker.update_peak()
         jump += 1
         if idx >= string_length(v):
             # we have covered more characters in the tree than is contained
@@ -137,7 +129,6 @@ def fastscan(u, v, S):
         # expected to be root? Not available to grab here, so an ugly
         # test of None returned is performed where fastscan is called;
         # in case the None is returned, the root is used
-        timers["fastscan"] += time.time() - start
         return None, ''
     
 
@@ -152,14 +143,11 @@ def fastscan(u, v, S):
 
     lcp_ui_v = min(string_length(ui_edge), string_length(v_updated))
 
-    timers["fastscan"] += time.time() - start
-    memory_tracker.update_peak()
     return ui, (ui_edge[0] + lcp_ui_v, ui_edge[1])
 
 
 def construct_suffix_tree(inputstr, printstuff=False):
     timers["fastscan"] = 0
-    # TODO: should run in linear time; remove strings from edges n stuff
     S = append_unique_char(inputstr)
     
     alphabet = {}
@@ -182,7 +170,6 @@ def construct_suffix_tree(inputstr, printstuff=False):
     fst_child = Node(aId=1, aStrLength=n)
     fst_child.charDict = dict()
 
-    # fst_child.str = fst_child.edge = S
 
     fst_child.str_length = n
     fst_child.leaflist = [fst_child]
@@ -190,8 +177,6 @@ def construct_suffix_tree(inputstr, printstuff=False):
     root.charDict[S[0]] = fst_child
     root.add_child(fst_child)
 
-    # root.children_char_list[alphabet[fst_child.edge[0]]] = fst_child
-    # print(root.children_char_list)
     root.leaflist = [fst_child]
     id2node[1] = fst_child
 
@@ -199,24 +184,15 @@ def construct_suffix_tree(inputstr, printstuff=False):
     tail_i = (0, n)
 
     for i in range(1, n):
-        # print(root.fancyprint(S))
-        memory_tracker.update_peak()
         if head_i == root:
             tail_i = (tail_i[0]+1, tail_i[1])
 
             head_i, remaining = slowscan(root, tail_i, S)
 
-            # add i+1 and head(i+1) as node if necessary
             leaf_iplus1 = Node(aId=i + 1)
             leaf_iplus1.charDict = dict()
-            # TODO: ADD LIST HERE
-            # leaf_iplus1.str = S[i:]
-            # leaf_iplus1.edge = remaining
 
-            # head_i.add_child(leaf_iplus1)
-            # TODO: UPDATE LIST HERE
-            # tail_i = tail_i[len(head_i.str):]
-            leaf_iplus1.str_length = n - i #TODO: correct index?
+            leaf_iplus1.str_length = n - i
            
 
             leaf_iplus1.leaflist = [leaf_iplus1]
@@ -227,7 +203,7 @@ def construct_suffix_tree(inputstr, printstuff=False):
             leaf_iplusChar = S[i + leaf_iplus1.parent.str_length]
             head_i.charDict[leaf_iplusChar] = leaf_iplus1
 
-            tail_i = (tail_i[0] + head_i.str_length, tail_i[1]) #tail_i[head_i.str_length:]
+            tail_i = (tail_i[0] + head_i.str_length, tail_i[1]) 
             
             continue
 
@@ -235,8 +211,6 @@ def construct_suffix_tree(inputstr, printstuff=False):
         leafID = head_i.leaflist[0].id - 1
 
         v = (leafID + head_i.parent.str_length, leafID + head_i.str_length)
-        # # v = head_i.edge
-        # print(root.fancyprint(inputstr))
         if u != root:
             w, remaining = fastscan(u.suffix_link, v, S)
             if w is None:
@@ -252,10 +226,6 @@ def construct_suffix_tree(inputstr, printstuff=False):
             leaf = w
             w = Node(aId='inner')
             w.charDict = dict()
-            memory_tracker.update_peak()
-            # w.edge = leaf.edge[: len(leaf.edge) - len(remaining)]
-            # w.str = parent.str + w.edge
-            # TODO: ADD LIST HERE
 
             w.str_length = leaf.str_length - string_length(remaining)
           
@@ -272,29 +242,25 @@ def construct_suffix_tree(inputstr, printstuff=False):
             wID = w.leaflist[0].id - 1
             wChar = S[w.parent.str_length + wID]
             parent.charDict[wChar] = w
-            # TODO: UPDATE LIST HERE
+
             w.add_child(leaf)
             leafID = leaf.leaflist[0].id - 1
             leafChar = S[leaf.parent.str_length + leafID]
             w.charDict[leafChar] = leaf
-            # TODO: UPDATE LIST HERE
-
         
             head_i.suffix_link = w
             head_i = w
 
             new_leaf = Node(aId=i + 1)
             new_leaf.charDict = dict()
-            # TODO: ADD LIST HERE
-            # new_leaf.str = S[i:]
-            # new_leaf.edge = new_leaf.str[len(w.str):]
+
+
             new_leaf.leaflist = [new_leaf]
-            new_leaf.str_length = n - i #TODO: correct index?
+            new_leaf.str_length = n - i
             w.add_child(new_leaf)
             new_leafID = new_leaf.leaflist[0].id - 1
             new_leafChar = S[new_leaf.parent.str_length + new_leafID]
             w.charDict[new_leafChar] = new_leaf
-            # TODO: UPDATE LIST HERE
 
         else:
 
@@ -303,13 +269,6 @@ def construct_suffix_tree(inputstr, printstuff=False):
             leaf_iplus1 = Node(aId=i + 1)
             leaf_iplus1.charDict = dict()
 
-            # TODO: ADD LIST HERE
-            # leaf_iplus1.str = S[i:]
-            # leaf_iplus1.edge = remaining
-
-            # head_i.add_child(leaf_iplus1)
-            # TODO: UPDATE LIST HERE
-            # tail_i = S[i + len(head_i.str):]
             leaf_iplus1.str_length = n - i
             leaf_iplus1.leaflist = [leaf_iplus1]
 
@@ -320,21 +279,43 @@ def construct_suffix_tree(inputstr, printstuff=False):
             head_i.charDict[leaf_iplus1Char] = leaf_iplus1
 
             tail_i = (i + head_i.str_length, n)
-    # print("Fastscan: " + str(timers["fastscan"]))
-    memory_tracker.update_peak()
     return root
 
 
 def main():
-    global inputstr
+    parser = argparse.ArgumentParser()
+    input_helptxt = "File or string to construct a suffix tree over."
+    f_helptxt = "If sat, the input argument will be handled as a text file"
+    s_helptxt = "File to save suffix tree to, if not sat the tree will be printed in the console"
+    parser.add_argument("input", help=input_helptxt)
+    parser.add_argument("--f", help=f_helptxt, dest="filename", action="store_const", const=True, default=False)
+
+    parser.add_argument("--s", help=s_helptxt, dest="filename_save")
+
+    args = parser.parse_args()
+    if args.filename_save:
+        if os.path.isfile(args.filename_save):
+            print("Cannot overwrite file %s" % args.filename_save)
+            return
+    inputstr = ""
+    if args.filename:
+        
+        with open(args.input, 'r') as myfile:
+            inputstr=myfile.read()
+    else:
+        inputstr = args.input
+
+
     inputstr = str2int(inputstr)
-    print('\033c')  # clear screen, no scrollback
-    suffix_tree = construct_suffix_tree(inputstr, False)
+    
+    suffixtree = construct_suffix_tree(inputstr)
+    if args.filename_save:
+        if not os.path.isfile(args.filename_save):
+            f = open(args.filename_save, 'w+')
+            f.write(suffixtree.fancyprint(inputstr))
 
-    print('final tree for input %s:' % inputstr)
-    print(suffix_tree.fancyprint(inputstr))
-    check_correctness.check_correctness(suffix_tree, inputstr)
-
+    else:
+        print(suffixtree.fancyprint(inputstr))
 
 if __name__ == '__main__':
     main()

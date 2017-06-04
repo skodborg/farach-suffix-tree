@@ -9,6 +9,8 @@ import memory_tracker
 import os
 import speed_tests
 import sys
+import os.path
+import argparse
 import inspect
 
 
@@ -746,7 +748,39 @@ def cleanup_tree(t_overmerged):
     t_overmerged.traverse(helper)
 
 def main():
-    pass
+    parser = argparse.ArgumentParser()
+    input_helptxt = "File or string to construct a suffix tree over."
+    f_helptxt = "If sat, the input argument will be handled as a text file"
+    s_helptxt = "File to save suffix tree to, if not sat the tree will be printed in the console"
+    parser.add_argument("input", help=input_helptxt)
+    parser.add_argument("--f", help=f_helptxt, dest="filename", action="store_const", const=True, default=False)
+
+    parser.add_argument("--s", help=s_helptxt, dest="filename_save")
+
+    args = parser.parse_args()
+    if args.filename_save:
+        if os.path.isfile(args.filename_save):
+            print("Cannot overwrite file %s" % args.filename_save)
+            return
+    inputstr = ""
+    if args.filename:
+        
+        with open(args.input, 'r') as myfile:
+            inputstr=myfile.read()
+    else:
+        inputstr = args.input
+
+
+    inputstr = str2int(inputstr)
+    
+    suffixtree = construct_suffix_tree(inputstr)
+    if args.filename_save:
+        if not os.path.isfile(args.filename_save):
+            f = open(args.filename_save, 'w+')
+            f.write(suffixtree.fancyprint(inputstr))
+
+    else:
+        print(suffixtree.fancyprint(inputstr))
 
 if __name__ == '__main__':
     main()

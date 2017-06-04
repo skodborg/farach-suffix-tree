@@ -1,8 +1,6 @@
-from utils import Node, append_unique_char, lcp, string_length
-# import memory_tracker
-
-inputstr = 'banana'
-inputstr = 'mississippi'
+from utils import Node, append_unique_char, str2int, lcp, string_length
+import argparse
+import os.path
 
 
 def construct_suffix_tree(inputstr, printstuff=False):
@@ -19,6 +17,7 @@ def construct_suffix_tree(inputstr, printstuff=False):
     root.add_child(fst_child)
     root.leaflist = [fst_child]
 
+    start = time.time()
     for i in range(1, n):
         suff = (i, n)  # S[i:n]
         suff_id = i + 1
@@ -33,7 +32,6 @@ def construct_suffix_tree(inputstr, printstuff=False):
 
         child_to_merge = None
         lcp_with_child = ''
-        # memory_tracker.update_peak()
         while searching:
             continue_loop = False
             if S[remaining[0]] in parent.charDict:
@@ -85,18 +83,44 @@ def construct_suffix_tree(inputstr, printstuff=False):
             parent.add_child(suff_node)
             suff_nodeChar = S[suff_node.getParentEdge()[0]]
             parent.charDict[suff_nodeChar] = suff_node
-    # memory_tracker.update_peak()
     return root
 
 
 def main():
-    global inputstr
-    suffix_tree = construct_suffix_tree([1 for _ in range(6000)])
-    # suffix_tree = construct_suffix_tree(str2int("a"*10))
-    # print('final tree for input %s:' % inputstr)
-    # print(suffix_tree.fancyprint(inputstr))
-    print(suffix_tree.getSize() >> 20)
+    parser = argparse.ArgumentParser()
+    input_helptxt = "File or string to construct a suffix tree over."
+    f_helptxt = "If sat, the input argument will be handled as a text file"
+    s_helptxt = "File to save suffix tree to, if not sat the tree will be printed in the console"
+    parser.add_argument("input", help=input_helptxt)
+    parser.add_argument("--f", help=f_helptxt, dest="filename", action="store_const", const=True, default=False)
 
+    parser.add_argument("--s", help=s_helptxt, dest="filename_save")
+
+    args = parser.parse_args()
+    if args.filename_save:
+        if os.path.isfile(args.filename_save):
+            print("Cannot overwrite file %s" % args.filename_save)
+            return
+    inputstr = ""
+    if args.filename:
+        
+        with open(args.input, 'r') as myfile:
+            inputstr=myfile.read()
+    else:
+        inputstr = args.input
+
+
+    inputstr = str2int(inputstr)
+    
+    suffixtree = construct_suffix_tree(inputstr)
+    if args.filename_save:
+        if not os.path.isfile(args.filename_save):
+            f = open(args.filename_save, 'w+')
+            f.write(suffixtree.fancyprint(inputstr))
+
+    else:
+        print(suffixtree.fancyprint(inputstr))
+    
 
 if __name__ == '__main__':
     main()
