@@ -11,30 +11,9 @@ import speed_tests
 import sys
 import inspect
 
-input = '121112212221'
-# input = '111222122121'
-# input = '12121212121'
-# input = 'mississippi'
-input = 'banana'
-# input = 'ababcacac'
-# input = '1'
-input = '1212'
-input = '12313'
-
-input = '12334415267355128923774847392925544838571011310528298910109758458910367896442410106853911093294435210483101091098'
-
-maxLength = 0
-timers = dict()
-total_recursive = 1
-# input = '1222112221212'
 
 _printstuff = False
 
-_odd_calls = 0
-_even_calls = 0
-_overmerge = 0
-_lcp_depth = 0
-_currentMaxLength = 0
 
 def construct_suffix_tree(inputstr, printstuff=False):
     global _printstuff, maxLength, timers, total_recursive
@@ -42,10 +21,6 @@ def construct_suffix_tree(inputstr, printstuff=False):
 
     # assumes inputstr converted to integer alphabet, takes O(n) to do anyway
     inputstr = append_unique_char(inputstr)
-    if maxLength <= len(inputstr):
-        maxLength = len(inputstr)
-        totalTimerStart = time.time()
-        total_recursive = 1
 
     if len(inputstr) - 1 == 0:
         root = Node(aId='root')
@@ -60,91 +35,27 @@ def construct_suffix_tree(inputstr, printstuff=False):
         root.add_child(Node(aId=2, aStrLength=1))
         root.update_leaf_list()
         return root
-    memory_tracker.update_peak()
+    
     t_odd = T_odd(inputstr)
-    # printif('odd tree for %s' % inputstr)
-    # printif(t_odd.fancyprint(inputstr))
 
     t_even = T_even(t_odd, inputstr)
-    # printif('even tree for %s' % inputstr)
-    # printif(t_even.fancyprint(inputstr))
 
     t_overmerged = overmerge(t_even, t_odd, inputstr)
-    # printif('overmerge tree for %s' % inputstr)
-    # printif(t_overmerged.fancyprint(inputstr))
-
-    # if maxLength == len(inputstr):
-    #     start = time.time()
 
     compute_lcp_tree(t_overmerged)
 
-    # if maxLength == len(inputstr):
-    #     end = time.time()
-    #     total = (end - start)
-    #     if "compute_lcp_tree" in timers:
-    #         timers["compute_lcp_tree"].append((maxLength, total))
-    #     else:
-    #         timers["compute_lcp_tree"] = [(maxLength, total)]
-
-    # if maxLength == len(inputstr):
-    #     start = time.time()
-
     adjust_overmerge(t_overmerged, t_even, t_odd, inputstr)
-
-    # if maxLength == len(inputstr):
-    #     end = time.time()
-    #     total = (end - start)
-    #     if "adjust_overmerge" in timers:
-    #         timers["adjust_overmerge"].append((maxLength, total))
-    #     else:
-    #         timers["adjust_overmerge"] = [(maxLength, total)]
-
-    # if maxLength == len(inputstr):
-    #     startClean = time.time()
+    
     cleanup_tree(t_overmerged)
-    memory_tracker.update_peak()
-    # printif('adjusted tree for %s' % inputstr)
-    # printif(t_overmerged.fancyprint(inputstr))
-    # if maxLength == len(inputstr):
-    #     total = time.time() - startClean
-    #     if "clean" in timers:
-    #         timers["clean"].append((maxLength, total))
-    #     else:
-    #         timers["clean"] = [(maxLength, total)]
-    #     print("DONE")
-
-    # if maxLength == len(inputstr):
-    #     totalTimerEnd = time.time()
-    #     total = totalTimerEnd - totalTimerStart
-    #     if "total" in timers:
-    #         timers["total"].append((maxLength, total))
-    #     else:
-    #         timers["total"] = [(maxLength, total)]
-
-    #     if "recursive" in timers:
-    #         timers["recursive"].append((maxLength, total_recursive))
-    #     else:
-    #         timers["recursive"] = [(maxLength, total_recursive)]
-
-    # if maxLength == len(inputstr):
-    #     # print("\033c")  # clear screen, no scrollback
-
-        # print(", " + ", ".join([key for key in timers]))
-        # for i in range(len(timers["T_even"])):
-        #     print(str(timers["T_even"][i][0]) + ", " + ", ".join([str(value[i][1]) for value in timers.values()]))
 
     return t_overmerged
 
 
 def T_odd(inputstr):
-    global _printstuff, timers, total_recursive, _odd_calls
-    if(len(inputstr) == maxLength):
-        start = time.time()
-
+    global _printstuff
+    
     S = inputstr
     n = len(S)
-    _odd_calls += 1
-    
     def extend_length(node):
 
         def helper(node):
@@ -257,14 +168,8 @@ def T_odd(inputstr):
         pair = (int(S[2 * i - 2]), int(S[2 * i - 1]))
         Sm.append(pair2single[pair])
 
-    if(len(inputstr) == maxLength):
-        end = time.time()
-        curr_time = end - start
-
-    total_recursive += 1
     tree_Sm = construct_suffix_tree(Sm, _printstuff)
-    if(len(inputstr) == maxLength):
-        start = time.time()
+
     tree_Sm.update_leaf_list()
 
     extend_length(tree_Sm)
@@ -277,26 +182,14 @@ def T_odd(inputstr):
     resolve_suffix_tree(tree_Sm)
 
     tree_Sm.update_leaf_list()
-    if(len(inputstr) == maxLength):
-        end = time.time()
-        total = (end - start) + curr_time
-        if "T_odd" in timers:
-            timers["T_odd"].append((maxLength, total))
-        else:
-            timers["T_odd"] = [(maxLength, total)]
-    memory_tracker.update_peak()
     del S, n, chr_pairs, unique_chr_pairs, Sm, count, pair2single
     return tree_Sm
 
 
 def T_even(t_odd, inputstr):
     global _even_calls
-    if(len(inputstr) == maxLength):
-        start = time.time()
     S = inputstr
     n = len(S)
-    _even_calls += 1
-
     # (i)
     # find the lexicographical ordering of the even suffixes
     leaflist = []
@@ -353,7 +246,6 @@ def T_even(t_odd, inputstr):
                 curr_lcp = 1
 
         lcp[(even_suffixes[idx], even_suffixes[idx + 1])] = curr_lcp
-    memory_tracker.update_peak()
     # (iii)
     # construct T_even using information from (i) and (ii)
     root = Node(aId='root')
@@ -395,7 +287,6 @@ def T_even(t_odd, inputstr):
 
                 possible_insertion_node = prev_node.parent
 
-                startLoop = time.time()
                 while remaining_until_insertion > 0:
                     # run up through parentEdges until
                     # remaining_until_insertion is 0
@@ -403,8 +294,6 @@ def T_even(t_odd, inputstr):
 
                     remaining_until_insertion -= len_of_edge
                     possible_insertion_node = possible_insertion_node.parent
-
-                currLoopTime = currLoopTime + (time.time() - startLoop)
 
                 # possible_insertion_node is now the spot at which we
                 # should place curr_suf
@@ -460,14 +349,6 @@ def T_even(t_odd, inputstr):
                 innernode.add_child(new_node)
     t_even = root
     t_even.update_leaf_list()
-    if(len(inputstr) == maxLength):
-        end = time.time()
-        total = end - start
-        if "T_even" in timers:
-            timers["T_even"].append((maxLength, total))
-        else:
-            timers["T_even"] = [(maxLength, total)]
-    memory_tracker.update_peak()
 
     del S, n, leaflist, odd_suffix_ordering, even_suffixes, lca_f, id2node
     return t_even
@@ -475,14 +356,10 @@ def T_even(t_odd, inputstr):
 
 def overmerge(t_even, t_odd, S):
 
-    if(len(S) == maxLength):
-        start = time.time()
     t_overmerged = Node(aId="root", aStrLength=0)
 
-    def merger_helper(current, even, odd, depth=0):
+    def merger_helper(current, even, odd):
         global _overmerge
-        memory_tracker.update_calls(max(depth, memory_tracker.get_calls()))
-
         even_children = even.children
         odd_children = odd.children
         e = 0
@@ -524,7 +401,6 @@ def overmerge(t_even, t_odd, S):
                         current.lca_odd = o_child
                     else:
                         current.lca_odd = o_child.leaflist[0]
-                    printif('case 1 added %s' % current.lca_odd)
                 if not hasattr(current, 'lca_even') or hasattr(current, 'overwrite_lca') and hasattr(current, 'lca_odd'):
                     if hasattr(e_child, 'lca_even'):
                         current.lca_even = e_child.lca_even
@@ -540,7 +416,6 @@ def overmerge(t_even, t_odd, S):
                         current.lca_even = e_child
                     else:
                         current.lca_even = e_child.leaflist[0]
-                    printif('case 2 added %s' % current.lca_even)
                     # continue
                 if not hasattr(current, 'lca_odd') or hasattr(current, 'overwrite_lca') and hasattr(current, 'lca_even'):
                     if hasattr(e_child, 'lca_odd'):
@@ -564,7 +439,6 @@ def overmerge(t_even, t_odd, S):
                             current.lca_odd = o_child
                         else:
                             current.lca_odd = o_child.leaflist[0]
-                        printif('case 3 added %s' % current.lca_odd)
                     if not hasattr(current, 'lca_even') or hasattr(current, 'overwrite_lca') and hasattr(current, 'lca_odd'):
                         if hasattr(o_child, 'lca_even'):
                             current.lca_even = o_child.lca_even
@@ -578,7 +452,7 @@ def overmerge(t_even, t_odd, S):
                             current.lca_even = e_child
                         else:
                             current.lca_even = e_child.leaflist[0]
-                        printif('case 4 added %s' % current.lca_even)
+
                     if not hasattr(current, 'lca_odd') or hasattr(current, 'overwrite_lca'):
                         if hasattr(e_child, 'lca_odd'):
                             current.lca_odd = e_child.lca_odd
@@ -632,10 +506,10 @@ def overmerge(t_even, t_odd, S):
 
                     if swapped:
                         # short_child originates in even_tree
-                        merger_helper(inner_node, short_child, short_child_sub, depth + 1)
+                        merger_helper(inner_node, short_child, short_child_sub)
                     else:
                         # short_child originates in odd_tree
-                        merger_helper(inner_node, short_child_sub, short_child, depth + 1)
+                        merger_helper(inner_node, short_child_sub, short_child)
 
                     had_lca_even_too = False
                     overwrote = False
@@ -645,19 +519,17 @@ def overmerge(t_even, t_odd, S):
                             had_lca_even_too = True
                             if hasattr(current, 'overwrite_lca'):
                                 overwrote = True
-                            printif('case 5 added %s to %s' % (inner_node.lca_even, current))
+                            
                     if not hasattr(current, 'lca_odd') or hasattr(current, 'overwrite_lca') and not overwrote:
                         if hasattr(inner_node, 'lca_odd'):
                             current.lca_odd = inner_node.lca_odd
-                            printif('case 6 added %s to %s' % (inner_node.lca_odd, current))
                             if had_lca_even_too:
                                 # we cached both lca_even and lca_odd from same
                                 # child, mark this so one can be overwritten by
                                 # whatever leafnode we may see next in another
                                 # subtree
                                 current.overwrite_lca = True
-                                printif('overwrite added to %s with both %s and %s' % (current, inner_node.lca_odd, inner_node.lca_even))
-
+                               
                 else:
                     # Case 2
                     # If two parent edge's start with the same char, and are of
@@ -689,16 +561,14 @@ def overmerge(t_even, t_odd, S):
                     if not e_child.children:
                         inner.id = e_child.id
                         inner.lca_even = e_child
-                        printif('case 7 added %s to %s' % (e_child, inner))
                     if not o_child.children:
                         inner.id = o_child.id
                         inner.lca_odd = o_child
-                        printif('case 8 added %s to %s' % (o_child, inner))
 
                     current.add_child(inner)
                     inner.even_subtree = e_child
                     inner.odd_subtree = o_child
-                    merger_helper(inner, e_child, o_child, depth + 1)
+                    merger_helper(inner, e_child, o_child)
 
                     # t_overmerged.update_leaf_list()
 
@@ -710,28 +580,16 @@ def overmerge(t_even, t_odd, S):
                             had_lca_even_too = True
                             if hasattr(current, 'overwrite_lca'):
                                 overwrote = True
-                            printif('case 9 added %s to %s' % (current.lca_even, current))
                     if not hasattr(current, 'lca_odd') or hasattr(current, 'overwrite_lca') and not overwrote:
                         if hasattr(inner, 'lca_odd'):
                             current.lca_odd = inner.lca_odd
-                            printif('case 10 added %s to %s' % (current.lca_odd, current))
                             if had_lca_even_too:
                                 current.overwrite_lca = True
                 o += 1
                 e += 1
-    memory_tracker.update_peak()
     merger_helper(t_overmerged, t_even, t_odd)
-    memory_tracker.update_peak()
-    t_overmerged.update_leaf_list()
-    memory_tracker.update_peak()
 
-    if(len(S) == maxLength):
-        end = time.time()
-        total = end - start
-        if "t_overmerged" in timers:
-            timers["t_overmerged"].append((maxLength, total))
-        else:
-            timers["t_overmerged"] = [(maxLength, total)]
+    t_overmerged.update_leaf_list()
     return t_overmerged
 
 
@@ -784,19 +642,14 @@ def compute_lcp_tree(t_overmerged):
 
         # assert(lca_parent == lca_parent_naive)
         lca.suffix_link = lca_parent
-    memory_tracker.update_peak()
     # ---------------------------------------
     # ADD LCP DEPTH TO ALL NODES USING A SINGLE DFS
     # ---------------------------------------
-    _lcp_depth = 0
-    def lcp_depth(node, depth=0):
-        global _lcp_depth
-        depth += 1
+    def lcp_depth(node):
         if hasattr(node, 'lcp_depth'):
             # we already computed this node as a result of computing an
             # earlier node with a suffix link to this node, no need to
             # repeat the computation
-            _lcp_depth = max(_lcp_depth, depth)
             return node.lcp_depth
 
         if hasattr(node, 'suffix_link'):
@@ -806,15 +659,12 @@ def compute_lcp_tree(t_overmerged):
                 # continue the bfs. This is still within O(n) as we simply
                 # skip the node when we encounter it the second time in
                 # the initial bfs
-                node.lcp_depth = lcp_depth(node.suffix_link, depth=depth) + 1
+                node.lcp_depth = lcp_depth(node.suffix_link) + 1
             node.lcp_depth = node.suffix_link.lcp_depth + 1
-            _lcp_depth = max(_lcp_depth, depth)
             return node.lcp_depth
 
     t_overmerged.lcp_depth = 0
     t_overmerged.bfs(lcp_depth)
-
-    memory_tracker.update_peak()
     
     del lca_nodepairs, id2node, lca_f,
 
@@ -865,10 +715,9 @@ def adjust_overmerge(t_overmerged, t_even, t_odd, S):
                     curr_node.add_child(odd_tree)
                     curr_node.add_child(even_tree)
                 return 'continue'
-    memory_tracker.update_peak()
+
     bfs(t_overmerged, adjust_overmerge_helper)
     t_overmerged.update_leaf_list()
-    memory_tracker.update_peak()
 
 
 def cleanup_tree(t_overmerged):
@@ -896,39 +745,8 @@ def cleanup_tree(t_overmerged):
 
     t_overmerged.traverse(helper)
 
-
-def printif(s):
-    global _printstuff
-    if _printstuff:
-        print(s)
-
-
 def main():
-    global _currentMaxLength, _odd_calls, _even_calls, _overmerge, _lcp_depth
-    dna = open('BRCA1_chromosome-17-excerpt.fasta', 'r').read()
-    dna = ''.join(dna.split('\n')[1:-1])
-    dna = str2int(dna)
-    construct_suffix_tree(dna)
-    print(memory_tracker.get_calls())
-  
-    # for i in range(1, 21*1000, 1000):
-    #     _currentMaxLength = i
-    #     _odd_calls = 0
-    #     _even_calls = 0
-    #     _overmerge = 0
-    #     _lcp_depth = 0
-    #     S = speed_tests.random_data(_currentMaxLength-1)
-    #     suffix_tree = construct_suffix_tree(S)
-    #     print(i-1, ",", _even_calls, ",", _odd_calls, ",", _overmerge, ",", _lcp_depth)
-        #print(suffix_tree.fancyprint(S))
-
-
-    # print('final tree for input %s:' % inputstr)
-    # #print(suffix_tree.fancyprint(inputstr))
-    # suffix_tree.update_leaf_list()
-    # print(suffix_tree.getSize() >> 10)
-    #check_correctness.check_correctness(suffix_tree, inputstr)
-
+    pass
 
 if __name__ == '__main__':
     main()
