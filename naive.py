@@ -109,16 +109,17 @@ def main():
         inputstr = args.input
 
 
+    inputOriginal = inputstr + "$"
     inputstr = str2int(inputstr)
     
     suffixtree = construct_suffix_tree(inputstr)
     if args.filename_save:
         if not os.path.isfile(args.filename_save):
             f = open(args.filename_save, 'w+')
-            f.write(suffixtree.fancyprint(inputstr))
+            f.write(suffixtree.fancyprint(inputOriginal))
 
     else:
-        print(suffixtree.fancyprint(inputstr))
+        print(suffixtree.fancyprint(inputOriginal))
     
 
 if __name__ == '__main__':
